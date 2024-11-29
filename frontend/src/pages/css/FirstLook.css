@@ -1,0 +1,93 @@
+
+.welcome-look-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+  margin-top: 50px;
+  font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
+
+.ayurprakuthi-highlight {
+  color: #48D1CC;
+  font-style: italic;
+}
+
+.first-look-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+  background-image: url('../images/FirstLook.jpeg') !important;
+ /* Background image */
+  background-size: cover; /* Cover the entire viewport */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+}
+
+
+.first-look-image {
+  width: 100%; /* Full width */
+  height: auto; /* Maintain aspect ratio */
+  max-height: 50vh; /* Limits height to half the viewport */
+  object-fit: contain; /* Show the entire image */
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.first-look-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px; /* Reduced space below text */
+  line-height: 1.5;
+  font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 70px; /* Reduced gap between buttons */
+  margin-bottom: 0; /* No extra space below the buttons */
+  padding-bottom: 0; /* No extra padding below the button container */
+  font-family: "Open Sans", sans-serif;
+
+}
+
+.take-picture-button {
+  background-color: #48D1CC; /* Button color */
+  color: #fff; /* Text color */
+  padding: 12px 40px; /* Adjust padding for better width */
+  font-size: 1.2rem; /* Font size */
+  border-radius: 5px; /* Border radius */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow */
+  border: none; /* Remove default border */
+  cursor: pointer; /* Pointer cursor on hover */
+  width: auto; /* Adjust width */
+  min-width: 150px; /* Minimum width */
+  text-align: center; /* Center text */
+  margin-bottom: 0; /* Remove margin below button */
+  font-family: "Open Sans", sans-serif;
+}
+
+.take-picture-button:hover {
+  background-color: #48D1CC; /* Background color on hover */
+}
+
+.first-look-container {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8); /* Background of the container */
+  padding: 20px; /* Padding of the container */
+  border-radius: 10px; /* Rounded corners */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex-grow: 1; /* Takes all available space */
+}
