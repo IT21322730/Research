@@ -16,7 +16,7 @@ import {
   IonBackButton,
   IonButtons
 } from '@ionic/react';
-import { auth, db } from '../firebase/firebase'; // Import your Firebase auth and Firestore
+import { auth, db } from '../firebase/firebase'; // Relative path to firebase.js
 import { doc, onSnapshot, setDoc } from 'firebase/firestore'; // Import Firestore functions
 import '../css/Profile.css'; // Import your CSS styles
 import { useHistory } from 'react-router-dom'; // Changed to useHistory

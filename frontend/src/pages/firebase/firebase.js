@@ -4,7 +4,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import {Timestamp, FieldValue } from "firebase/firestore"; // <-- Added FieldValue
+import { Timestamp, FieldValue } from "firebase/firestore"; // For Firestore operations
 import { getStorage } from 'firebase/storage';
 
 // TODO: Add SDKs for Firebase products that you want to use
