@@ -1,0 +1,73 @@
+/* Import Open Sans font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+/* Apply Open Sans font to all content in Step */
+body, html {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Apply Open Sans font to specific elements in Step */
+.headline-name {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600; /* Optional: Adjust the weight if needed */
+  font-size: 24px;  /* Optional: Adjust the size of the title */
+  color:  #20B2AA;      /* Optional: Set color for the title */
+}
+
+.instructions-heading {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600; /* Optional: Set a bold weight */
+  font-size: 20px;  /* Optional: Adjust the size of the heading */
+  color: #333;      /* Optional: Set color for the heading */
+}
+
+.justified-text {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;  /* Optional: Adjust the size for the text */
+  line-height: 1.6; /* Optional: Set line height for better readability */
+  color: #444;      /* Optional: Set color for the text */
+  text-align: justify; /* Ensures the text is justified */
+}
+
+.instructions-list {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;  /* Optional: Adjust the size for the list */
+  color: #444;      /* Optional: Set color for the list */
+}
+
+.instructions-list li {
+  margin-bottom: 10px; /* Optional: Space between list items */
+}
+
+/* Apply Open Sans font to buttons */
+.take-picture-button {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600; /* Optional: Set a bold weight for button text */
+  color: white;     /* Set text color for the button */
+  padding: 10px 20px; /* Optional: Button padding */
+  border: none;     /* Remove button border */
+  border-radius: 5px; /* Optional: Rounded button edges */
+  cursor: pointer;  /* Optional: Change cursor to pointer on hover */
+}
+
+.take-picture-button:hover {
+  background-color: #20B2AA; /* Optional: Change button color on hover */
+}
+
+/* Ensure the font is applied to all headings and paragraphs */
+h2, h3, p, li {
+  font-family: 'Open Sans', sans-serif;
+  color: #333; /* Optional: Set default text color */
+}
+
+/* Optional: Styling for accordion items to ensure font applies */
+ion-accordion {
+  font-family: 'Open Sans', sans-serif;
+}
+
+ion-label {
+  font-family: 'Open Sans', sans-serif;
+}
+
+
+
