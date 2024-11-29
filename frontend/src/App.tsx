@@ -19,6 +19,11 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
+import FirstLook from './pages/all/FirstLook';
+import Login from './pages/all/Login';
+import ForgotPassword from './pages/all/ForgotPassword';
+
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
@@ -39,12 +44,11 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
+        <Route exact path="/" component={FirstLook} />
+        <Route path="/login" component={Login} />
+        <Route path="/forgot-password" component={ForgotPassword} exact={true} />
+
+        
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
