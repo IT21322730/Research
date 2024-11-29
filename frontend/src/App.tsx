@@ -22,7 +22,10 @@ import '@ionic/react/css/display.css';
 import FirstLook from './pages/all/FirstLook';
 import Login from './pages/all/Login';
 import ForgotPassword from './pages/all/ForgotPassword';
-
+import Question from './pages/all/Question';
+import Tabs from './pages/all/Tabs';
+import Signup from './pages/all/Signup';
+import VerificationCode from './pages/all/VerificationCode'
 
 /**
  * Ionic Dark Mode
@@ -45,8 +48,12 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/" component={FirstLook} />
+        <Route path="/app" component={Tabs} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Signup} />
         <Route path="/forgot-password" component={ForgotPassword} exact={true} />
+        <Route path="/verify-code" component={VerificationCode} exact={true} />
+        <Route path="/app/question" component={Question} exact={true} />
 
         
       </IonRouterOutlet>

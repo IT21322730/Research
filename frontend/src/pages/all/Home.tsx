@@ -19,30 +19,51 @@ const Home: React.FC = () => {
   const posts: Post[] = [
     {
       id: '1',
-      image: "https://coastaldermaesthetics.com/wp-content/uploads/2021/03/Coastal-Derm-March-2021-Web-Go-Glow-scaled.jpg",
-      name: "Face Analysis",
-      route: "/app/facehome"
+      image: "https://aayushbharat.com/blogs/wp-content/uploads/2021/11/prakruti_blogbanner.jpg",
+      name: "Prakurthi Analysis",
+      route: "/app/step"
 
     },
     {
       id: '2',
-      image: "https://www.centreforsight.net/wp-content/uploads/2023/03/complete-eye-care.webp",
-      name: "Eye Analysis",
-      route: "/app/eyehome"
+      image: "https://edited.beautybay.com/wp-content/uploads/2021/04/04_05_EDITED_DERMALOGICA_FACEMAPPING_EDITED-ARTICLE.jpg",
+      name: "Face Mapping Analysis",
+      route: "/app/facemapping"
 
     },
     {
       id: '3',
-      image: "https://img.freepik.com/free-photo/happy-smiling-woman-playing-with-her-long-curly-hair_171337-12165.jpg",
-      name: "Hair Analysis",
-      route: "/app/hairhome"
+      image: "https://www.candacesmithetiquette.com/images/xMontage_of_facial_expressions.jpg.pagespeed.ic.vB1xtSDp_0.jpg",
+      name: "Facial Micro Expression Analysis",
+      route: "/app/facemicro"
 
     },
     {
       id: '4',
-      image: "https://www.gotirth.org/wp-content/uploads/2020/01/healthy-nails.jpg",
-      name: "Nail Analysis",
-      route: "/app/nailhome"
+      image: "https://www.sistemaimpulsa.com/blog/wp-content/uploads/2024/05/Beneficios-del-Eye-Tracking-para-tu-estrategia-de-marketing.jpg",
+      name: "Blinking rate and eye movement Analysis",
+      route: "/app/blink"
+
+    },
+    {
+      id: '5',
+      image: "https://www.drmalaymehta.com/wp-content/uploads/2023/12/androgenic-alopecia-diagnosed-994x1024.jpg",
+      name: "Patterned Alopecia Analysis",
+      route: "/app/alophecia"
+
+    },
+    {
+      id: '6',
+      image: "https://haireveryday.com/wp-content/uploads/2022/10/Hormones.jpg",
+      name: "Hair Texture Based Diagnosis",
+      route: "/app/texture"
+
+    },
+    {
+      id: '7',
+      image: "https://bjgp.org/content/bjgp/66/652/587/F1.large.jpg",
+      name: "Capillary Refill Time Analysis",
+      route: "/app/cap"
 
     }
   ]
