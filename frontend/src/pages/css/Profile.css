@@ -1,0 +1,178 @@
+/* Profile Container */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #ffffff; /* Ensure a white background */
+}
+
+/* Profile Picture Container */
+.profile-pic-container {
+  position: relative;
+  width: 350px;
+  height: 200px;
+  margin-bottom: 20px;
+  background-color: #ffffff; /* White lightbox effect */
+  padding: 10px;
+  border-radius: 10%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Profile Picture */
+.profile-pic {
+  width: 200px !important; /* Increased width */
+  height: 200px !important; /* Increased height */
+  border-radius: 50%;
+  object-fit: contain; /* Change to contain to fit the entire image */
+}
+
+/* Edit and Logout Buttons */
+.edit-button,
+.logout-button {
+  width: 100%;
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #48D1CC;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+}
+
+.logout-button {
+  background-color: #d9534f; /* Red color for logout button */
+}
+
+.edit-button:hover,
+.logout-button:hover {
+  opacity: 0.9;
+}
+
+/* Profile Info Box */
+.profile-info-box {
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 5px; /* Reduced margin-top for less space */
+  text-align: left;
+}
+
+.profile-info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 16px;
+}
+
+.profile-info-item strong {
+  color: #333;
+  flex: 1;
+}
+
+.profile-info-item span {
+  text-align: right;
+  flex: 1;
+  color: #666;
+}
+
+/* Modal Styling */
+.modal-content {
+  padding: 40px; /* Decreased padding */
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 800px; /* Keep increased max-width */
+  margin: 20px auto; /* Decreased margin */
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #48D1CC;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Input and Radio Styles */
+ion-input {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-family: 'Comic Sans MS', cursive, sans-serif; /* Apply Comic Sans MS font */
+  color: gray; /* Set text color to gray */
+}
+
+/* Rest of your styles remain unchanged */
+
+
+ion-radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+ion-item {
+  --background: transparent;
+  --inner-padding-end: 0;
+}
+
+ion-label {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Button in Modal */
+.modal-actions ion-button {
+  flex: 1;
+  margin: 0 5px;
+}
+
+.modal-actions ion-button:first-child {
+  background-color: #48D1CC;
+  color: white;
+}
+
+.modal-actions ion-button:last-child {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modal-actions ion-button:hover {
+  opacity: 0.8;
+}
+
+/* Profile Info Text Styling */
+.profile-info-item strong,
+.profile-info-item span {
+  font-family: 'Comic Sans MS', cursive, sans-serif; /* Apply Comic Sans MS font */
+}
+
+/* Hide dividers in Modal */
+.modal-input .ion-item-divider {
+  display: none; /* Hides the divider */
+}
+
+.modal-content {
+  font-family: 'Comic Sans MS', cursive, sans-serif; /* Change the font to Comic Sans MS */
+}
+
+.modal-input .radio-label {
+  font-family: 'Comic Sans MS', cursive, sans-serif; /* Set Comic Sans MS for the radio labels */
+}
