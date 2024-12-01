@@ -2,6 +2,7 @@ import React from 'react';
 import { IonButton, IonContent, IonHeader } from '@ionic/react';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import '../css/FirstLook.css'; // Import the CSS file for styling
+import localImage from '../images/img_03.png'; // Import the local image
 
 const FirstLook: React.FC = () => {
   const history = useHistory(); // Initialize useHistory
@@ -18,23 +19,19 @@ const FirstLook: React.FC = () => {
 
       <IonContent 
       className="first-look-content"
-      
       >
-        <p className="welcome-look-text">
-          <i>Welcome to </i><span className="ayurprakuthi-highlight">Ayur Prakruthi...!</span>
-        </p>
         <div className="first-look-container">
           <img
-            src="https://aadar.co/cdn/shop/articles/NEW-BLOG---2.png?v=1586645948"
+            src={localImage} // Use the imported local image here
             alt="Ayurvedic Image"
             className="first-look-image"
           />
           <p className="first-look-text">
-            <i>An Ayurvedic approach to understand human for a healthy and better life</i>
+            {/* Add text here if needed */}
           </p>
           <div className="button-container">
             <button className="take-picture-button" onClick={handleStartClick}>
-            Let&apos;s Start
+              Let&apos;s Start
             </button>
           </div>
         </div>
