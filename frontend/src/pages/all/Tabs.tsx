@@ -12,7 +12,11 @@ import { home, person, search, logOut} from 'ionicons/icons';  // Import icons c
 import FinalPrakurthi from '../all/FinalPrakurthi';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
-import Step from './Step';
+import Eyeprakurthi from '../eye/Eyeprakurthi';
+import Blinkeye from '../eye/Blinkeye';
+import BlinkFinal from '../eye/BlinkFinal';
+import EyeHome from '../eye/EyeHome';
+import StepHome from './StepHome';
 
 
 const Tabs: React.FC = () => {
@@ -43,7 +47,12 @@ const Tabs: React.FC = () => {
             <Route path="/app/profile" component={Profile} />
             <Route path="/app/search" component={Search} />
             <Route path="/app/final-prakurthi" component={Prakurthi} />
-            <Route path="/app/step" component={Step} />
+            <Route path="/app/step" component={StepHome} />
+
+            <Route path="/app/eyehome" component={EyeHome} />
+            <Route path="/app/eyeprakurthi" component={Eyeprakurthi} />
+            <Route path="/app/blink" component={Blinkeye} />
+            <Route path="/app/blinkfinal" component={BlinkFinal} />
 
             
             <Route path="/app/final" component={FinalPrakurthi} />
