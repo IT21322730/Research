@@ -14,6 +14,7 @@ import Pitta from './Pitta';
 import Kapha from './Kapha'
 
 import BlinkFinal from '../eye/BlinkFinal';
+import BlinkEye from '../eye/BlinkEye'
 
 import EyeHome from '../eye/EyeHome';
 import StepHome from './StepHome';
@@ -50,6 +51,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/step" component={StepHome} />
 
             <Route path="/app/eyehome" component={EyeHome} />
+            <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
 
             
