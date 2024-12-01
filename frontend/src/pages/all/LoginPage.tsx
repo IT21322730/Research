@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonToolbar, IonIcon, IonButtons, IonTitle, IonBackButton, IonToast } from '@ionic/react';
 import { eye, eyeOff } from 'ionicons/icons';
 import { handleLogin } from '../firebase/auth'; // Import the login function
-import '../css/Login.css';
+import '../css/LoginPage.css';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import img_01 from '../images/img_01.jpeg';
 
