@@ -1,7 +1,7 @@
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -20,12 +20,15 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
 import FirstLook from './pages/all/FirstLook';
-import Login from './pages/all/Login';
+import LoginHome from './pages/all/LoginPage'
 import ForgotPassword from './pages/all/ForgotPassword';
 import Question from './pages/all/Question';
 import Tabs from './pages/all/Tabs';
 import Signup from './pages/all/Signup';
 import VerificationCode from './pages/all/VerificationCode'
+
+import EyePic from './pages/eye/EyePic'
+import Eyevideo from './pages/eye/Eyevideo'
 
 /**
  * Ionic Dark Mode
@@ -49,11 +52,14 @@ const App: React.FC = () => (
       <IonRouterOutlet>
         <Route exact path="/" component={FirstLook} />
         <Route path="/app" component={Tabs} />
-        <Route path="/login" component={Login} />
+        <Route path="/login" component={LoginHome} />
         <Route path="/register" component={Signup} />
         <Route path="/forgot-password" component={ForgotPassword} exact={true} />
         <Route path="/verify-code" component={VerificationCode} exact={true} />
         <Route path="/app/question" component={Question} exact={true} />
+
+        <Route path="/app/eye-pic" component={EyePic} exact={true} />
+        <Route path="/app/eye-video" component={Eyevideo} exact={true} />
 
         
       </IonRouterOutlet>
