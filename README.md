@@ -16,14 +16,16 @@ Assist students and novice doctors by automating Prakruti diagnosis.
 Provide an interactive platform for data collection, analysis, and reporting.
 Enhance learning through visualization of diagnosis.
 
+
 Architectural Diagram
+
+![1 drawio](https://github.com/user-attachments/assets/77025c2a-75a7-4fac-ab28-7187371c2678)
+
 
 
 Required Dependencies
-The following dependencies and tools are required to run this project:
 
-Programming Languages and Frameworks
-
+Programming Languages and Frameworks:
 Python 3.8+ (backend development)
 React Ionic (frontend framework)
 
