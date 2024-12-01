@@ -50,7 +50,7 @@
     background-color: #48D1CC; /* Customize button color */
     color: black; /* Text color */
     width: 100%; /* Make the button full width */
-    max-width: 500px; /* Set a max width if you want to limit size */
+    max-width: 350px; /* Set a max width if you want to limit size */
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
 }
 
