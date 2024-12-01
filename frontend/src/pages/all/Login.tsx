@@ -1,7 +1,5 @@
-// src/pages/firebase/Login.jsx
-
-import React, { useState } from 'react';
-import { IonContent, IonHeader, IonToolbar, IonIcon, IonButtons, IonTitle, IonBackButton } from '@ionic/react';
+import React, { useState, useEffect } from 'react';
+import { IonContent, IonHeader, IonToolbar, IonIcon, IonButtons, IonTitle, IonBackButton, IonToast } from '@ionic/react';
 import { eye, eyeOff } from 'ionicons/icons';
 import { handleLogin } from '../firebase/auth'; // Import the login function
 import '../css/Login.css';
@@ -13,20 +11,33 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState(''); // Changed from username to password
+  const [toastMessage, setToastMessage] = useState(''); // State for toast message
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  useEffect(() => {
+    // Check if the page has already been refreshed in this session
+    const isRefreshed = sessionStorage.getItem('isLoginPageRefreshed');
+
+    if (!isRefreshed) {
+      // Set the flag in sessionStorage to indicate the page has been refreshed
+      sessionStorage.setItem('isLoginPageRefreshed', 'true');
+      // Refresh the page only once when navigating back to the Login page
+      window.location.reload();
+    }
+  }, []); // The empty dependency array ensures this effect runs only once on mount
 
   const onLogin = async (e) => {
     e.preventDefault(); // Prevent form submission
     const success = await handleLogin(email, password); // Call the login function
 
     if (success) {
-      alert("User logged in successfully!"); // Alert on successful login
+      setToastMessage("User logged in successfully!"); // Set the success message for the toast
       history.push('/app/home'); // Navigate to home page if login is successful
     } else {
-      alert("Login failed. Please check your credentials and try again."); // Alert on failed login
+      setToastMessage("Login failed. Please check your credentials and try again."); // Set the failure message for the toast
     }
   };
 
@@ -43,7 +54,7 @@ const Login = () => {
 
       <IonContent className="login-content">
         <div className="login-container">
-        <img
+          <img
             src={img_01}
             alt="Profile"
             className="profile-pic"
@@ -89,6 +100,15 @@ const Login = () => {
           </p>
         </div>
       </IonContent>
+
+      {/* IonToast component to show the toast message */}
+      <IonToast
+        isOpen={!!toastMessage} // Show toast if there's a message
+        message={toastMessage} // Display the toast message
+        duration={2000} // Duration of toast message
+        onDidDismiss={() => setToastMessage('')} // Hide the toast after it disappears
+        className="toast-rounded" // Apply the rounded toast style
+      />
     </>
   );
 };

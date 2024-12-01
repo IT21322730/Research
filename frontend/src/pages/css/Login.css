@@ -100,4 +100,15 @@
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
 
 }
+/* src/css/Login.css */
+
+/* Custom toast style */
+.toast-rounded {
+    --border-radius: 20px; /* Set the radius for rounded corners */
+    --background: #333; /* Optional: Set background color */
+    --color: white; /* Set text color */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+
+  }
+  
 
