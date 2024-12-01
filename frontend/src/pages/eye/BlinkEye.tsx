@@ -8,7 +8,7 @@ const BlinkEye: React.FC = () => {
 
   const handleTakePicture = () => {
     console.log('Navigate to video recording page');
-    history.push('/app/eye-video'); // Navigate to /app/eye-video
+    history.push('/app/home'); // Navigate to /app/eye-video
     window.location.reload()
   };
 
