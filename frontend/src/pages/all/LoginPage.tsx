@@ -4,7 +4,7 @@ import { eye, eyeOff } from 'ionicons/icons';
 import { handleLogin } from '../firebase/auth'; // Import the login function
 import '../css/LoginPage.css';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
-import img_01 from '../images/img_01.jpeg';
+import img_03 from '../images/img_03.png';
 
 const Login = () => {
   const history = useHistory(); // Initialize history for navigation
@@ -55,7 +55,7 @@ const Login = () => {
       <IonContent className="login-content">
         <div className="login-container">
           <img
-            src={img_01}
+            src={img_03}
             alt="Profile"
             className="profile-pic"
           />

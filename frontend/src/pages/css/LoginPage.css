@@ -14,7 +14,6 @@
     align-items: center;
     height: 100%;
     padding-left: 20px; /* Add left padding to the content */
-    
 }
 
 .login-container {
@@ -29,6 +28,9 @@
     margin-top: 20px; /* Space between header and form */
     margin-bottom: 10px; /* Reduce space below the container */
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+    background-image: url('../images//img_04.png'); /* Add your image path here */
+    background-size: cover; /* Ensure the background covers the container */
+    background-position: center; /* Center the background image */
 }
 
 .profile-pic {
@@ -37,7 +39,6 @@
     border-radius: 0; /* Remove rounding to show full image */
     margin-bottom: 0!important;
 }
-
 
 .form-input {
     width: 100%;
@@ -98,8 +99,8 @@
     font-size: 30px; /* Increased font size */
     font-weight: bold; /* Optional: make it bold */
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
-
 }
+
 /* src/css/Login.css */
 
 /* Custom toast style */
@@ -108,7 +109,4 @@
     --background: #333; /* Optional: Set background color */
     --color: white; /* Set text color */
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
-
-  }
-  
-
+}

@@ -7,8 +7,11 @@ import { camera, save, swapHorizontal } from 'ionicons/icons';
 import { db } from '../firebase/firebase';
 import { addDoc, collection } from "firebase/firestore";
 import '../css/EyePic.css';
+import { useHistory } from "react-router-dom"; // Add this import
+
 
 const EyePic: React.FC = () => {
+  const history = useHistory();
   const [photo, setPhoto] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
@@ -83,6 +86,7 @@ const EyePic: React.FC = () => {
     setShowAlert(false);
     if (confirmSave) {
       handleSaveToFirebase();
+      history.push("/app/step");
     }
     setPhoto(null);
   };
