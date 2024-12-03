@@ -8,7 +8,7 @@
     color: black; /* Set title color to black */
 }
 
-.signup-content {
+.login-content {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,7 +16,7 @@
     padding-left: 20px; /* Add left padding to the content */
 }
 
-.signup-container {
+.login-container {
     width: 90%;
     max-width: 400px;
     text-align: center;
@@ -28,16 +28,16 @@
     margin-top: 20px; /* Space between header and form */
     margin-bottom: 10px; /* Reduce space below the container */
     font-family: "Open Sans", sans-serif; /* Explicit font declaration */
-    background-image: url('../images//img_04.png');
+    background-image: url('../images//img_04.png'); /* Add your image path here */
     background-size: cover; /* Ensure the background covers the container */
     background-position: center; /* Center the background image */
 }
 
 .profile-pic {
-    width: 120px; /* Adjust as needed */
-    height: 120px; /* Adjust as needed */
-    border-radius: 50%; /* Make it round */
-    margin-bottom: 5px;
+    width: 100%!important; /* Full width of its container */
+    height: auto; /* Auto height to maintain aspect ratio */
+    border-radius: 0; /* Remove rounding to show full image */
+    margin-bottom: 0!important;
 }
 
 .form-input {
@@ -52,7 +52,6 @@
 
 .form-input::placeholder {
     color: #aaa; /* Grey color for placeholder text */
-    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
 }
 
 .password-container {
@@ -66,7 +65,7 @@
     transform: translate(-50%, -50%); /* Center the icon both vertically and horizontally */
 }
 
-.signup-button {
+.login-button {
     margin-top: 15px; /* Space above the button */
     width: 100%; /* Full width for the button */
     background-color: #48D1CC; /* Set button color */
@@ -76,21 +75,38 @@
     border-radius: 4px; /* Optional: rounded corners for the button */
     font-size: 16px; /* Font size for button text */
     cursor: pointer; /* Pointer cursor on hover */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
 }
 
-.signup-button:hover {
+.login-button:hover {
     background-color: #48D1CC; /* Slightly lighter color on hover */
 }
 
-.signup-text {
+.register-text {
     margin-top: 40px; /* Remove space above the register text */
     margin-bottom: 10px; /* Remove space below the register text */
 }
 
-.signup-link {
-    color: #4a5a02; /* Register link color */
+.forgot-password {
+    text-align: right; /* Align text to the right */
+    margin-top: 0px; /* Space above the forgot password text */
+    color: #aaa; /* Grey color for the text */
+    font-size: 14px; /* Decrease the font size for the forgot password text */
 }
 
+.sign-in-prompt{
+    color: #48D1CC;
+    font-size: 30px; /* Increased font size */
+    font-weight: bold; /* Optional: make it bold */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
 
+/* src/css/Login.css */
 
-
+/* Custom toast style */
+.toast-rounded {
+    --border-radius: 20px; /* Set the radius for rounded corners */
+    --background: #333; /* Optional: Set background color */
+    --color: white; /* Set text color */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
