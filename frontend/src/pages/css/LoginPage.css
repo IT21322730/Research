@@ -1,0 +1,112 @@
+.header-toolbar {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Align items vertically centered */
+}
+
+.header-title {
+    margin-left: 0; /* Remove space between the icon and the title */
+    color: black; /* Set title color to black */
+}
+
+.login-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-left: 20px; /* Add left padding to the content */
+}
+
+.login-container {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ddd; /* Optional: border for the container */
+    border-radius: 8px; /* Optional: rounded corners for the container */
+    background-color: white; /* Optional: background color for the container */
+    margin-left: 20px; /* Add left margin to the container for additional space */
+    margin-top: 20px; /* Space between header and form */
+    margin-bottom: 10px; /* Reduce space below the container */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+    background-image: url('../images//img_04.png'); /* Add your image path here */
+    background-size: cover; /* Ensure the background covers the container */
+    background-position: center; /* Center the background image */
+}
+
+.profile-pic {
+    width: 100%!important; /* Full width of its container */
+    height: auto; /* Auto height to maintain aspect ratio */
+    border-radius: 0; /* Remove rounding to show full image */
+    margin-bottom: 0!important;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px; /* Increase padding for larger input height */
+    margin-bottom: 15px; /* Space between inputs */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 18px; /* Increase font size for better readability */
+    height: 50px; /* Set a fixed height for the input boxes */
+}
+
+.form-input::placeholder {
+    color: #aaa; /* Grey color for placeholder text */
+}
+
+.password-container {
+    position: relative; /* Position relative for the eye icon */
+}
+
+.eye-icon {
+    position: absolute; /* Position absolute to place it inside the text box */
+    right: 10px; /* Adjust as needed */
+    top: 50%;
+    transform: translate(-50%, -50%); /* Center the icon both vertically and horizontally */
+}
+
+.login-button {
+    margin-top: 15px; /* Space above the button */
+    width: 100%; /* Full width for the button */
+    background-color: #48D1CC; /* Set button color */
+    color: white; /* Set text color for better contrast */
+    padding: 12px; /* Increase button height */
+    border: none; /* Remove border for a cleaner look */
+    border-radius: 4px; /* Optional: rounded corners for the button */
+    font-size: 16px; /* Font size for button text */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
+
+.login-button:hover {
+    background-color: #48D1CC; /* Slightly lighter color on hover */
+}
+
+.register-text {
+    margin-top: 40px; /* Remove space above the register text */
+    margin-bottom: 10px; /* Remove space below the register text */
+}
+
+.forgot-password {
+    text-align: right; /* Align text to the right */
+    margin-top: 0px; /* Space above the forgot password text */
+    color: #aaa; /* Grey color for the text */
+    font-size: 14px; /* Decrease the font size for the forgot password text */
+}
+
+.sign-in-prompt{
+    color: #48D1CC;
+    font-size: 30px; /* Increased font size */
+    font-weight: bold; /* Optional: make it bold */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}
+
+/* src/css/Login.css */
+
+/* Custom toast style */
+.toast-rounded {
+    --border-radius: 20px; /* Set the radius for rounded corners */
+    --background: #333; /* Optional: Set background color */
+    --color: white; /* Set text color */
+    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
+}

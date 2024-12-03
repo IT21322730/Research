@@ -1,0 +1,53 @@
+.prakurthi-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align towards the top */
+    padding: 16px;
+  }
+  
+  .prakurthi-box {
+    width: 90%; /* Increased the width */
+    max-width: 500px; /* Adjusted maximum width for responsiveness */
+    padding: 16px;
+    border: 2px solid #48D1CC; /* Updated to requested color */
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    text-align: center;
+    font-family: "Open Sans", sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 16px; /* Reduced spacing from the header */
+  }
+  
+  h2 {
+    margin: 0;
+    padding: 8px 0;
+    color: #333;
+    font-size: 20px;
+  }
+  
+  .body-type {
+    margin-top: 8px;
+    font-size: 18px;
+    color: #48D1CC; /* Matching the border color for consistency */
+  }
+  
+  .advice-button {
+    margin-top: 12px;
+    padding: 12px 24px;
+    width: 340px; /* Increased button width */
+    background-color: #48D1CC; /* Updated button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "Open Sans", sans-serif;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .advice-button:hover {
+    background-color: #40BFB3; /* Slightly darker shade for hover */
+  }
+  
