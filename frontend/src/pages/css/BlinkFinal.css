@@ -1,0 +1,41 @@
+.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .stress-level-text {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .stress-level-graph {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #ccc; /* Optional: add a border around the graph */
+    border-radius: 8px; /* Optional: round the corners */
+    overflow: hidden; /* Prevent overflow of sections */
+  }
+  
+  .graph-section {
+    flex: 1; /* Make each section take equal space */
+    padding: 10px; /* Add padding for space inside */
+    color: white; /* Text color */
+    font-weight: bold; /* Make text bold */
+  }
+  
+  .low {
+    background-color: #28a745; /* Green for low stress */
+  }
+  
+  .medium {
+    background-color: #ffc107; /* Yellow for medium stress */
+  }
+  
+  .high {
+    background-color: #dc3545; /* Red for high stress */
+  }
+  

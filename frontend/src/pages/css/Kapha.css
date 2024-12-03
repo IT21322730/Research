@@ -1,0 +1,102 @@
+
+/* If you want to set a max-height to control scrolling */
+.Kapha-container {
+    font-family: "Open Sans", sans-serif;
+    color: #48D1CC;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #48D1CC;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    
+}
+
+/* Other existing styles */
+.Kapha-container img {
+    border-radius: 2%; /* Makes the image round */
+    max-width: 100%; /* Ensures the image doesn't exceed the container width */
+    height: auto; /* Maintains the aspect ratio */
+    border: 1px solid gray; /* Optional: Add a border around the image */
+}
+
+p, ul {
+    color: #333;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+h1, h2 {
+    color: #48D1CC;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+/* Updated .pitta-frame to fix the bottom border */
+.Kapha-frame {
+    border: 1px solid #48D1CC;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px; /* Space below the frame */
+    position: relative; /* Ensures it is positioned correctly */
+}
+
+/* Explicit bottom border declaration */
+.Kapha-frame::after {
+    content: ''; /* Creates an empty element */
+    display: block;
+    height: 2px; /* Height of the bottom border */
+    background-color: #48D1CC; /* Color of the bottom border */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Table Styles for Pitta Dosha Diet Guidelines */
+.diet-table {
+    width: 100%;
+    border-collapse: collapse; /* Ensures table borders are collapsed into single lines */
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.diet-table th, .diet-table td {
+    border: 1px solid #0b0c0c; /* Light blue border color */
+    padding: 10px;
+    text-align: left; /* Aligns text to the left */
+}
+
+.diet-table th {
+    background-color: #48D1CC; /* Header background color */
+    color: rgb(17, 16, 16); /* Text color for header */
+    font-weight: bold; /* Makes header text bold */
+}
+
+.diet-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light gray background for even rows */
+}
+
+.diet-table tr:hover {
+    background-color: #ddd; /* Darkens row background when hovered */
+}
+
+.diet-table td {
+    font-size: 14px; /* Adjusts font size */
+    color: #333; /* Text color for the data cells */
+}
+
+.pose-list img {
+    border-radius: 2%; /* Makes the image round */
+    max-width: 100%; /* Ensures the image doesn't exceed the container width */
+    height: auto; /* Maintains the aspect ratio */
+    border: 1px solid gray; /* Optional: Add a border around the image */
+}
