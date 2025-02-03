@@ -1,0 +1,66 @@
+/* Global Item Styling */
+ion-item {
+  --background: #fff;
+  width: 100%;
+}
+
+/* List Styling */
+ion-list {
+  --ion-item-background: #fff;
+  overflow-y: auto; /* Enable scrolling */
+}
+
+/* Card Styling */
+ion-card {
+  margin: 10px 5px;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Post Name Text Styling */
+.card-content ion-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Card Image Styling */
+.card-image {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Content Container */
+.content-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column by default */
+  gap: 10px;
+  width: 100%;
+  height: auto; /* Ensure height grows with content */
+  overflow-y: auto; /* Enable scrolling */
+  font-family: "Open Sans", sans-serif; /* Apply font family to content */
+  background-image: url('../images/img_04.png');
+  background-size: cover; /* Ensure the background covers the container */
+  background-position: center; /* Center the background image */
+}
+
+/* Media Queries for Responsiveness */
+@media (min-width: 600px) {
+  .content-container {
+      grid-template-columns: repeat(2, 1fr); /* Two columns for tablets */
+      gap: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-container {
+      grid-template-columns: repeat(3, 1fr); /* Three columns for desktops */
+      gap: 20px;
+  }
+}

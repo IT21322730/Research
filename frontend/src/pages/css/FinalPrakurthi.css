@@ -1,0 +1,38 @@
+.final-prakurthi-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    padding: 16px; /* Add padding */
+  }
+  
+  .final-prakurthi-container h2 {
+    margin-bottom: 8px; /* Space below the heading */
+    text-align: center; /* Center align the heading */
+  }
+  
+  .final-prakurthi-container p {
+    text-align: center; /* Center align the paragraph */
+    margin: 0; /* Remove default margin */
+  }
+  
+  .body-type-cards {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping of cards */
+    justify-content: center; /* Center the cards */
+    margin-top: 16px; /* Space above the cards */
+  }
+  
+  .body-type-card {
+    width: 150px; /* Increase width for more space */
+    height: 100px; /* Increase height for more space */
+    margin: 8px; /* Space between cards */
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    font-weight: bold; /* Bold text */
+    font-size: 14px; /* Increase font size for better readability */
+    text-align: center; /* Center text */
+  }
+  
