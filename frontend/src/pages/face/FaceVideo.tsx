@@ -11,17 +11,23 @@ import {
   IonTitle,
   IonAlert,
 } from '@ionic/react';
-import '../css/FaceVideo.css'; // You can rename the CSS to FaceVideo.css
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import '../css/FaceVideo.css';
 import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const FaceVideo: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
+  const [recordedVideoBlob, setRecordedVideoBlob] = useState<Blob | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [emotionResult, setEmotionResult] = useState<string | null>(null);
+  const [emotionCount, setEmotionCount] = useState<number | null>(null);
+
+  const history = useHistory(); // Initialize history for navigation
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -57,20 +63,26 @@ const FaceVideo: React.FC = () => {
       mediaRecorderRef.current.onstop = () => {
         if (chunksRef.current.length > 0) {
           const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-          const videoURL = URL.createObjectURL(videoBlob);
-          setRecordedVideoURL(videoURL);
+          setRecordedVideoBlob(videoBlob);
+          setRecordedVideoURL(URL.createObjectURL(videoBlob));
         }
       };
 
       mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setRecordedVideoURL(null);
+      setRecordedVideoBlob(null);
+      setEmotionResult(null);
+      setEmotionCount(null);
+
       let seconds = 0;
       timerRef.current = setInterval(() => {
         seconds += 1;
         setRecordingTime(seconds);
+        if (seconds >= 30) {
+          handleStopRecording();
+        }
       }, 1000);
-
-      setIsRecording(true);
-      setRecordedVideoURL(null);
     } catch (error) {
       console.error('Error accessing media devices or starting recording.', error);
       alert('Unable to access your camera or start recording.');
@@ -98,48 +110,53 @@ const FaceVideo: React.FC = () => {
 
     setRecordingTime(0);
     setIsRecording(false);
-
-    if (chunksRef.current.length > 0) {
-      const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-      const videoFile = new File([videoBlob], 'video.webm', { type: 'video/webm' });
-
-      try {
-        setIsUploading(true);
-        const storage = getStorage();
-        const storageRef = ref(storage, `facevideos/${Date.now()}_video.webm`);
-        await uploadBytes(storageRef, videoFile);
-
-        const videoURL = await getDownloadURL(storageRef);
-        setRecordedVideoURL(videoURL);
-        setIsUploading(false);
-      } catch (error) {
-        console.error('Error uploading video:', error);
-        setIsUploading(false);
-      }
-    } else {
-      console.warn('No recorded chunks available!');
-    }
   };
 
   const handleSaveVideo = async () => {
-    if (recordedVideoURL) {
-      setShowAlert(true);
-    } else {
-      console.log('No video recorded!');
+    if (!recordedVideoBlob) {
+      console.log('No recorded video available!');
+      return;
     }
-  };
 
-  const confirmSave = async () => {
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('video', recordedVideoBlob, 'video.webm');
+
     try {
-      await addDoc(collection(db, 'facevideo'), {  // Change collection name here
-        videoUrl: recordedVideoURL,
-        timestamp: serverTimestamp(),
+      const response = await fetch('http://127.0.0.1:5000/analyze-micro-expressions', {
+        method: 'POST',
+        body: formData,
       });
-      console.log('Video saved successfully!');
-      setShowAlert(false);  // Close the alert after saving the video
+
+      const data = await response.json();
+      console.log('Backend response:', data);
+
+      if (data.dominant_emotion) {
+        setEmotionResult(data.dominant_emotion);
+        setEmotionCount(data.count);
+
+        // Save the detected emotion and count to Firestore
+        await addDoc(collection(db, 'facevideo'), {
+          emotion: data.dominant_emotion,
+          count: data.count,
+          timestamp: serverTimestamp(),
+        });
+
+        console.log('Emotion analysis saved successfully!');
+
+        // Now navigate to prediction page with the emotion result
+        history.push({
+          pathname: '/app/face-video-prediction',
+          state: { emotion: data.dominant_emotion, count: data.count },
+        });
+
+      } else {
+        console.log('No emotion detected!');
+      }
     } catch (error) {
-      console.error('Error saving video:', error);
-      setShowAlert(false);  // Close the alert if there's an error
+      console.error('Error sending video to backend:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -164,7 +181,7 @@ const FaceVideo: React.FC = () => {
         />
 
         {isRecording && (
-          <div className={`recording-time ${!isRecording && recordingTime > 0 ? 'stopped' : ''}`}>
+          <div className="recording-time">
             Recording Time: {recordingTime}s
           </div>
         )}
@@ -188,26 +205,28 @@ const FaceVideo: React.FC = () => {
           </IonButton>
         </div>
         <div className="tab-button">
-          <IonButton onClick={handleSaveVideo} fill="clear">
+          <IonButton onClick={() => setShowSaveAlert(true)} fill="clear">
             <IonIcon icon={save} />
           </IonButton>
         </div>
       </div>
 
+      {/* Save Confirmation Alert */}
       <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
+        isOpen={showSaveAlert}
+        onDidDismiss={() => setShowSaveAlert(false)}
         header="Save Video"
-        message="Do you want to save this video?"
+        message="Are you sure you want to save and analyze the video?"
         buttons={[
           {
-            text: 'No',
+            text: 'Cancel',
             role: 'cancel',
-            handler: () => console.log('Video not saved'),
           },
           {
-            text: 'Yes',
-            handler: confirmSave,
+            text: 'Save',
+            handler: () => {
+              handleSaveVideo(); // Call function to save and analyze
+            },
           },
         ]}
       />
