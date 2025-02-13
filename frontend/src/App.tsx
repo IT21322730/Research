@@ -29,6 +29,8 @@ import VerificationCode from './pages/all/VerificationCode'
 
 import EyePic from './pages/eye/EyePic'
 import Eyevideo from './pages/eye/Eyevideo'
+import HairPrakruthiResults from './pages/hair/HairPrakurthiResults';
+import HairPic from './pages/hair/HairPic';
 
 /**
  * Ionic Dark Mode
@@ -60,6 +62,8 @@ const App: React.FC = () => (
 
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
+        <Route path="/app/hair-results" component={HairPrakruthiResults} exact={true}/>
+        <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
         
       </IonRouterOutlet>
