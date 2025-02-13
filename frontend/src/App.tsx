@@ -1,7 +1,17 @@
+import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
+import FirstLook from './pages/all/FirstLook';
+import LoginHome from './pages/all/LoginPage'
+import ForgotPassword from './pages/all/ForgotPassword';
+import Question from './pages/all/Question';
+import Tabs from './pages/all/Tabs';
+import Signup from './pages/all/Signup';
+import VerificationCode from './pages/all/VerificationCode'
+import EyePic from './pages/eye/EyePic'
+import Eyevideo from './pages/eye/Eyevideo'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -19,30 +29,13 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-import FirstLook from './pages/all/FirstLook';
-import LoginHome from './pages/all/LoginPage'
-import ForgotPassword from './pages/all/ForgotPassword';
-import Question from './pages/all/Question';
-import Tabs from './pages/all/Tabs';
-import Signup from './pages/all/Signup';
-import VerificationCode from './pages/all/VerificationCode'
-
-import EyePic from './pages/eye/EyePic'
-import Eyevideo from './pages/eye/Eyevideo'
-
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import FacePic from './pages/face/FacePic';
+import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
+
 
 setupIonicReact();
 
@@ -61,6 +54,8 @@ const App: React.FC = () => (
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
 
+        <Route path="/app/face-pic" component={FacePic} exact={true} />
+        <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
         
       </IonRouterOutlet>
     </IonReactRouter>
