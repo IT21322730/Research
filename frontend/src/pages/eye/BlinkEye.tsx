@@ -8,7 +8,7 @@ const BlinkEye: React.FC = () => {
 
   const handleTakePicture = () => {
     console.log('Navigate to video recording page');
-    history.push('/app/home'); // Navigate to /app/eye-video
+    history.push('/app/eye-video'); // Navigate to /app/eye-video
     window.location.reload()
   };
 
@@ -17,7 +17,7 @@ const BlinkEye: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/eyehome" /> {/* Replace with your previous page path */}
+            <IonBackButton defaultHref="/app/home" /> {/* Replace with your previous page path */}
           </IonButtons>
           <IonTitle>BLINKING RATE AND EYE MOVEMENT ANALYSIS</IonTitle>
         </IonToolbar>
