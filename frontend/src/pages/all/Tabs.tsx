@@ -17,7 +17,7 @@ import Patient from '../all/Patient'
 
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye'
-
+import BlinkPrediction from '../eye/BlinkPrediction'
 import EyeHome from '../eye/EyeHome';
 import Step from './Step'
 
@@ -57,6 +57,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
+            <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
 
             
             <Route path="/app/final" component={FinalPrakurthi} />
