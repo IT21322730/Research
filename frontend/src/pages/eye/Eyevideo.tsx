@@ -77,7 +77,7 @@ const Eyevideo: React.FC = () => {
       setTimeout(() => {
         clearInterval(interval);
         handleStopRecording();
-      }, 30000);
+      }, 15000);
     }
   };
 
