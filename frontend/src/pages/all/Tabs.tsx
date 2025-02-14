@@ -17,11 +17,13 @@ import Patient from '../all/Patient'
 
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye';
+import EyePrakurthi from '../eye/Eyeprakurthi';
+import BlinkPrediction from '../eye/BlinkPrediction';
 
 
 import EyeHome from '../eye/EyeHome';
 import HairHome from '../hair/HairHome';
-// import StepHome from './StepHome';
+import Step from './Step';
 
 import HairPrakurthi from '../hair/HairPrakurthi';
 
@@ -65,7 +67,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
             <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
-            <Route path="/app/eyeprakurthi" component={Eyeprakurthi} />
+            <Route path="/app/eyeprakurthi" component={EyePrakurthi} />
             
             <Route path="/app/final" component={FinalPrakurthi} />
 
