@@ -1,0 +1,68 @@
+/* Home.css */
+
+/* Style the IonSearchbar */
+.ion-searchbar {
+    --background: #f0f0f0; /* Light background for the search bar */
+    --border-radius: 8px; /* Rounded corners */
+    --padding-start: 16px; /* Padding inside the search bar */
+    --color: #333; /* Text color */
+    --placeholder-color: #aaa; /* Placeholder text color */
+    margin: 16px; /* Add some margin around the search bar */
+  }
+  
+  /* Style the IonToolbar that contains the search bar */
+  .ion-toolbar {
+    --background: #ffffff; /* White background for the toolbar */
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for toolbar */
+    padding: 8px 16px; /* Padding for the toolbar */
+  }
+  
+  /* Customize the 'No patients found' message */
+  .no-patients-found {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    margin-top: 20px;
+  }
+  
+  /* Style for patient details card */
+  .patient-details-card {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+  }
+  
+  /* Container for the patient's profile picture */
+  .patient-profile-picture-container {
+    margin-right: 16px;
+  }
+  
+  .patient-profile-picture {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Patient info details container */
+  .patient-info-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Styling text inside the patient info details */
+  .patient-details-text {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .patient-details-text strong {
+    font-weight: bold;
+  }
+  
