@@ -12,12 +12,15 @@ import { home, person, search, logOut} from 'ionicons/icons';  // Import icons c
 import FinalPrakurthi from '../all/FinalPrakurthi';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
+import EditPatient from '../all/EditPatient';
+import Patient from '../all/Patient'
 
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye'
-
+import BlinkPrediction from '../eye/BlinkPrediction'
 import EyeHome from '../eye/EyeHome';
-import StepHome from './StepHome';
+import Eyeprakurthi from '../eye/Eyeprakurthi';
+import Step from './Step'
 
 
 const Tabs: React.FC = () => {
@@ -48,12 +51,15 @@ const Tabs: React.FC = () => {
             <Route path="/app/profile" component={Profile} />
             <Route path="/app/search" component={Search} />
             <Route path="/app/final-prakurthi" component={Prakurthi} />
-            <Route path="/app/step" component={StepHome} />
+            <Route path="/app/step" component={Step} />
+            <Route path="/app/patient-info" component={Patient} />
+            <Route path="/app/edit-patient/:patientId" component={EditPatient} />
 
             <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
-
+            <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
+            <Route path="/app/eyeprakurthi" component={Eyeprakurthi} />
             
             <Route path="/app/final" component={FinalPrakurthi} />
 

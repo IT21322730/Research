@@ -1,0 +1,66 @@
+/* BlinkPrediction.css */
+
+/* Container for the color coding section */
+.color-coding {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Fatigue Level Section */
+.fatigue-level {
+    flex: 1;
+    margin-right: 20px;
+    font-family: "Open Sans", sans-serif;
+}
+
+/* Stress Level Section */
+.stress-level {
+    flex: 1;
+    font-family: "Open Sans", sans-serif;
+}
+
+/* Color codes for each level */
+.low-fatigue {
+    color: #4CAF50;
+}
+
+.medium-fatigue {
+    color: #FF5733;
+}
+
+.high-fatigue {
+    color: #F44336;
+}
+
+.low-stress {
+    color: #4CAF50;
+}
+
+.medium-stress {
+    color: #FF5733;
+}
+
+.high-stress {
+    color: #F44336;
+}
+
+.color-coding table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.color-coding td {
+    padding: 8px;
+    text-align: left;
+}
+
+.color-coding tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.color-coding td:first-child {
+    font-size: 20px;
+}

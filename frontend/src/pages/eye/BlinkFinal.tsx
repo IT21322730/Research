@@ -1,23 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonButtons, IonBackButton, IonText } from '@ionic/react';
 import '../css/BlinkFinal.css'; // Create this CSS file for styling
 
 const BlinkFinal: React.FC = () => {
-  const stressLevel = 'Medium'; // Example stress level
-  const data = {
-    high: 30,
-    low: 20,
-    medium: 50,
-  };
-
-  const total = data.high + data.low + data.medium;
-
-  const calculateStrokeDasharray = (value: number) => {
-    return `${(value / total) * 100} ${100 - (value / total) * 100}`;
-  };
-
-  const lowOffset = calculateStrokeDasharray(data.low).split(' ')[0];
-  const mediumOffset = parseFloat(lowOffset) + parseFloat(calculateStrokeDasharray(data.medium).split(' ')[0]);
+  // Example state for fatigue level
+  const [fatigueLevel, setFatigueLevel] = useState<'low' | 'normal' | 'high'>('normal');
 
   return (
     <IonPage>
@@ -33,15 +20,15 @@ const BlinkFinal: React.FC = () => {
       <IonContent fullscreen>
         <div className="content-container">
           <IonText>
-            <h2>Your stress level is: {stressLevel}</h2>
+            <h2>Your Blinking Rate is (blinks/min): </h2>
+            <h2>Your Fatigue level is:</h2>
           </IonText>
-
-          <svg width="200" height="200">
-            <circle cx="100" cy="100" r="70" stroke="lightgray" strokeWidth="30" fill="none" />
-            <circle cx="100" cy="100" r="70" stroke="green" strokeWidth="30" fill="none" strokeDasharray={calculateStrokeDasharray(data.low)} strokeDashoffset={0} />
-            <circle cx="100" cy="100" r="70" stroke="orange" strokeWidth="30" fill="none" strokeDasharray={calculateStrokeDasharray(data.medium)} strokeDashoffset={lowOffset} />
-            <circle cx="100" cy="100" r="70" stroke="red" strokeWidth="30" fill="none" strokeDasharray={calculateStrokeDasharray(data.high)} strokeDashoffset={mediumOffset} />
-          </svg>
+          <div className={`fatigue-charger ${fatigueLevel}`}>
+            {fatigueLevel.toUpperCase()}
+          </div>
+          <IonText>
+            <h2>Your Stress level is: </h2>
+          </IonText>
         </div>
       </IonContent>
     </IonPage>

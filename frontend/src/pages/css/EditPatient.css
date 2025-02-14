@@ -1,0 +1,31 @@
+.edit-patient-form {
+    margin: 20px;
+    font-family: "Open Sans", sans-serif; 
+  }
+  
+  .edit-patient-form .ion-item {
+    margin-bottom: 20px;
+    font-family: "Open Sans", sans-serif; 
+  }
+  
+  .edit-patient-form .ion-button {
+    margin-top: 20px;
+    font-family: "Open Sans", sans-serif; 
+  }
+  
+  .delete-patient-button {
+    background-color: red;
+    color: white;
+    margin-top: 10px;
+    font-family: "Open Sans", sans-serif; 
+    
+  }
+
+  .delete-patient{
+    font-family: "Open Sans", sans-serif; 
+  }
+
+  .save-patient{
+    font-family: "Open Sans", sans-serif; 
+  }
+  

@@ -1,5 +1,5 @@
-import React from 'react';
-import { IonButton, IonContent, IonHeader } from '@ionic/react';
+import React, { useEffect } from 'react';
+import { IonContent, IonHeader } from '@ionic/react';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import '../css/FirstLook.css'; // Import the CSS file for styling
 import localImage from '../images/img_03.png'; // Import the local image
@@ -7,9 +7,14 @@ import localImage from '../images/img_03.png'; // Import the local image
 const FirstLook: React.FC = () => {
   const history = useHistory(); // Initialize useHistory
 
-  const handleStartClick = () => {
-    history.push('/login'); // Navigate to the /login page
-  };
+  useEffect(() => {
+    // Automatically navigate to /login after the component mounts
+    const timer = setTimeout(() => {
+      history.push('/login');
+    }, 3000); // Redirect after 3 seconds (adjust as needed)
+
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, [history]); // Dependencies for useEffect
 
   return (
     <>
@@ -29,11 +34,7 @@ const FirstLook: React.FC = () => {
           <p className="first-look-text">
             {/* Add text here if needed */}
           </p>
-          <div className="button-container">
-            <button className="take-picture-button" onClick={handleStartClick}>
-              Let&apos;s Start
-            </button>
-          </div>
+          {/* No button needed */}
         </div>
       </IonContent>
     </>
