@@ -1,21 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonImg,
-  IonButtons, IonBackButton, IonButton, IonAlert
+  IonButtons, IonBackButton, IonAlert, IonLoading
 } from '@ionic/react';
-import { camera, save, swapHorizontal } from 'ionicons/icons';
-import { db } from '../firebase/firebase';
-import { addDoc, collection } from "firebase/firestore";
+import { camera, swapHorizontal, save } from 'ionicons/icons';
+import { useHistory } from "react-router-dom";
+import { auth } from "../firebase/firebase";  // Use auth instead of getAuth
+import { db, doc, getDoc } from "../firebase/firebase"; // Use db instead of getFirestore, getDocs instead of getDoc
+import Reloader from '../all/Reloader'; // Import Reloader component
 import '../css/EyePic.css';
-import { useHistory } from "react-router-dom"; // Add this import
-
 
 const EyePic: React.FC = () => {
   const history = useHistory();
   const [photo, setPhoto] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false); // Loader state
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const user = auth.currentUser; // Get current user from Firebase Auth
+  const user_uid = user ? user.uid : ''; // Firebase Authentication UID
+
+  // Function to get user document ID from Firestore
+   // Function to get user document ID from Firestore
+   const getUserDocId = async (uid: string) => {
+    try {
+      const userRef = doc(db, "users", uid); // Reference to user document
+      const userDoc = await getDoc(userRef);  // Use getDoc to fetch a single document
+  
+      if (userDoc.exists()) {
+        return userDoc.id;  // Accessing the document's ID
+      } else {
+        console.error('User not found in Firestore');
+        return '';
+      }
+    } catch (error) {
+      console.error('Error fetching user document:', error);
+      return '';
+    }
+  };
 
   useEffect(() => {
     const startCamera = async () => {
@@ -49,35 +72,75 @@ const EyePic: React.FC = () => {
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-  
+
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/png');
-        setPhoto(dataUrl); // Set the captured image to display
+        setPhoto(dataUrl);
       }
     }
   };
-  
-
 
   const toggleCamera = () => {
     setUseFrontCamera(!useFrontCamera);
   };
 
-  const handleSaveToFirebase = async () => {
-    if (photo) {
-      try {
-        await addDoc(collection(db, "eye"), { imageUrl: photo, timestamp: new Date() });
-        console.log("Image saved to Firebase");
-        window.location.reload();
-        
-      } catch (error) {
-        console.error("Error saving image to Firebase: ", error);
+  const handleSaveToBackend = async () => {
+    try {
+      if (!photo) {
+        console.error('No photo available to upload');
+        return;
       }
+  
+      setLoading(true); // Show loader before saving
+
+      // Get user document ID from Firestore
+      const user_doc_id = await getUserDocId(user_uid);
+      if (!user_doc_id) {
+        console.error('User document ID not found');
+        setLoading(false);
+        return;
+      }
+  
+      const response = await fetch('http://127.0.0.1:5000/process-firebase-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          image_data: photo,
+          user_uid: user_uid,
+          user_doc_id: user_doc_id // Send both UID and document ID
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.error('Error uploading image:', errorMessage);
+        setLoading(false); // Hide loader on error
+        return;
+      }
+  
+      const result = await response.json();
+      
+      // Check if document_id exists in the response
+      if (result.document_id) {
+        console.log('Image processed successfully:', result.message);
+        console.log('Prediction:', result.prediction);
+  
+        // Redirect to the prediction page with the docId
+        history.push(`/app/prediction/${result.document_id}`);
+      } else {
+        console.error('No docId returned from the backend');
+        setLoading(false); // Hide loader on error
+      }
+    } catch (error) {
+      console.error('Request failed:', error);
+      setLoading(false); // Hide loader on error
     }
   };
-
+  
   const confirmSaveOrDelete = () => {
     setShowAlert(true);
   };
@@ -85,8 +148,7 @@ const EyePic: React.FC = () => {
   const handleAlertResponse = (confirmSave: boolean) => {
     setShowAlert(false);
     if (confirmSave) {
-      handleSaveToFirebase();
-      history.push("/app/step");
+      handleSaveToBackend(); // Call the backend processing on save
     }
     setPhoto(null);
   };
@@ -98,18 +160,15 @@ const EyePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take Your Eye Picture</IonTitle>
+          <IonTitle>Take Picture</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         {!photo ? (
-          <video ref={videoRef} id="video" autoPlay playsInline></video>
+          <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh'}} />
         )}
-        <div className="focus-text-container">
-          <h2>Focus your eyes on the camera to capture a clear image.</h2>
-        </div>
 
         <div className="tab-bar">
           <div className="tab-button" onClick={toggleCamera}>
@@ -122,6 +181,8 @@ const EyePic: React.FC = () => {
             <IonIcon icon={save} />
           </div>
         </div>
+
+        {loading && <Reloader />} {/* Display Reloader when loading */}
 
         <IonAlert
           isOpen={showAlert}
