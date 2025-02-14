@@ -13,6 +13,7 @@ import FinalPrakurthi from '../all/FinalPrakurthi';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
 import EditPatient from '../all/EditPatient';
+import Patient from '../all/Patient'
 
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye'
@@ -50,6 +51,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/search" component={Search} />
             <Route path="/app/final-prakurthi" component={Prakurthi} />
             <Route path="/app/step" component={StepHome} />
+            <Route path="/app/patient-info" component={Patient} />
             <Route path="/app/edit-patient/:patientId" component={EditPatient} />
 
             <Route path="/app/eyehome" component={EyeHome} />
