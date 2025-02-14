@@ -29,6 +29,19 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
+
+import HairPrakruthiResults from './pages/hair/HairPrakurthiResults';
+import HairPic from './pages/hair/HairPic';
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* import '@ionic/react/css/palettes/dark.always.css'; */
+/* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
@@ -56,6 +69,8 @@ const App: React.FC = () => (
 
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
+        <Route path="/app/hair-results" component={HairPrakruthiResults} exact={true}/>
+        <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
         <Route path="/app/face-pic" component={FacePic} exact={true} />
         <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
