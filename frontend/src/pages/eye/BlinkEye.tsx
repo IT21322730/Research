@@ -1,9 +1,9 @@
 import React from 'react';
 import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonText, IonImg, IonBackButton, IonButton, IonButtons } from '@ionic/react';
 import { useHistory } from 'react-router-dom'; // Import useHistory
-import '../css/Eye.css'; // Import your styles here
+import '../css/Blinkeye.css'; // Import your styles here
 
-const BlinkEye: React.FC = () => {
+const Blinkeye: React.FC = () => {
   const history = useHistory(); // Initialize useHistory
 
   const handleTakePicture = () => {
@@ -49,7 +49,24 @@ const BlinkEye: React.FC = () => {
             <li>After recording, review the footage to ensure the images are clear for analysis.</li>
           </ol>
 
-          <button className="take-picture-button" onClick={handleTakePicture}>
+          <button className="take-picture-button" 
+          style={{
+            fontWeight: '600',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '5px',
+            fontSize: '18px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+            fontFamily: '"Open Sans", sans-serif',
+            width: '350px',
+            height: '45px',
+            textAlign: 'center',
+            backgroundColor: 'rgb(72, 209, 204)',
+            color: 'black',
+            marginTop: '20px', // Added space above the button
+            marginBottom: '5px', // Space below the button
+          }}onClick={handleTakePicture}>
             Start Video Recording
           </button>
         </div><br/>
@@ -58,4 +75,4 @@ const BlinkEye: React.FC = () => {
   );
 };
 
-export default BlinkEye;
+export default Blinkeye;
