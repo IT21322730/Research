@@ -19,7 +19,7 @@ import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye'
 
 import EyeHome from '../eye/EyeHome';
-import StepHome from './StepHome';
+import Step from './Step'
 
 
 const Tabs: React.FC = () => {
@@ -50,7 +50,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/profile" component={Profile} />
             <Route path="/app/search" component={Search} />
             <Route path="/app/final-prakurthi" component={Prakurthi} />
-            <Route path="/app/step" component={StepHome} />
+            <Route path="/app/step" component={Step} />
             <Route path="/app/patient-info" component={Patient} />
             <Route path="/app/edit-patient/:patientId" component={EditPatient} />
 

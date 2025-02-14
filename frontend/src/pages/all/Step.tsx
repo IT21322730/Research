@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom'; 
-import { IonPage, IonContent, IonAccordionGroup, IonAccordion, IonItem, IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, IonButton } from "@ionic/react";
-import '../css/StepHome.css';  // Importing the CSS file
+import { IonPage,IonSelect,IonSelectOption,IonBadge, IonIcon,IonContent, IonAccordionGroup, IonAccordion, IonItem, IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, IonButton } from "@ionic/react";
+import '../css/Step.css';  // Importing the CSS file
+import { notificationsOutline } from 'ionicons/icons';
 
-const StepHome: React.FC = () => {
+const Step: React.FC = () => {
     const history = useHistory();
     const [accordionValue, setAccordionValue] = useState<string[]>(['first']);  // Default open 'first' accordion
+
 
     const handleTakeFacePicture = () => {
         console.log('Open camera to take a picture');
@@ -36,12 +38,16 @@ const StepHome: React.FC = () => {
     return (
         <IonPage>
             <IonHeader>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                        <IonBackButton defaultHref="/login" /> 
-                    </IonButtons>
-                    <IonTitle>Prakurthi Analysis</IonTitle>
-                </IonToolbar>
+            <IonToolbar>
+                <IonButtons slot="start">
+                    <IonBackButton defaultHref="/login" />
+                </IonButtons>
+                <IonTitle>PRAKURTHI ANALYSIS</IonTitle>
+                <IonButtons slot="end">
+                
+          </IonButtons>
+    
+            </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding">
                 <IonAccordionGroup value={accordionValue} onIonChange={(e) => setAccordionValue(e.detail.value)}>
@@ -159,24 +165,48 @@ const StepHome: React.FC = () => {
                     </IonAccordion>
 
                     <IonAccordion value="fifth">
-                        <IonItem slot="header" color="light">
-                            Step 05
-                        </IonItem>
-                        <div className="ion-padding" slot="content">
-                            <p className="justified-text">You need to complete the above steps as mentioned.</p>
-                            <button
-                                className="take-picture-button"
-                                style={{ backgroundColor: '#48D1CC', color: 'black' }}
-                                onClick={handleTakePicture}
-                            >
-                                Final
-                            </button>
-                        </div>
-                    </IonAccordion>
+  <IonItem slot="header" color="light">
+    Step 05
+  </IonItem>
+  <div className="ion-padding" slot="content">
+    <p className="justified-text">You need to complete the above steps as mentioned.</p>
+    
+    <div>
+    <p className="justified-text">Your Face prakurthi</p>
+    <input type="text" readOnly className="ion-input" />
+    </div>
+    
+    <div>
+      <p className="justified-text">Your Eye prakurthi</p>
+      <input type="text" readOnly className="ion-input" />
+    </div>
+    
+    <div>
+      <p className="justified-text">Your Hair prakurthi</p>
+      <input type="text" readOnly className="ion-input" />
+    </div>
+    
+    <div>
+      <p className="justified-text">Your Nail prakurthi</p>
+      <input type="text" readOnly className="ion-input" />
+    </div>
+
+    <button
+      className="take-picture-button"
+      style={{ backgroundColor: '#48D1CC', color: 'black' }}
+      onClick={handleTakePicture}
+    >
+      Final
+    </button>
+  </div>
+</IonAccordion>
+
+
+
                 </IonAccordionGroup>
             </IonContent>
         </IonPage>
     );
 };
 
-export default StepHome;
+export default Step;

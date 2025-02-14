@@ -1,9 +1,8 @@
-/* Import Open Sans font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-
 /* Apply Open Sans font to all content in Step */
-body, html {
+html, body {
   font-family: 'Open Sans', sans-serif;
+  height: 100%;
+  margin: 0;
 }
 
 /* Apply Open Sans font to specific elements in Step */
@@ -11,7 +10,7 @@ body, html {
   font-family: 'Open Sans', sans-serif;
   font-weight: 600; /* Optional: Adjust the weight if needed */
   font-size: 24px;  /* Optional: Adjust the size of the title */
-  color:  #20B2AA;      /* Optional: Set color for the title */
+  color: #20B2AA;      /* Optional: Set color for the title */
 }
 
 .instructions-heading {
@@ -48,6 +47,7 @@ body, html {
   border: none;     /* Remove button border */
   border-radius: 5px; /* Optional: Rounded button edges */
   cursor: pointer;  /* Optional: Change cursor to pointer on hover */
+  width: auto;
 }
 
 .take-picture-button:hover {
@@ -75,4 +75,22 @@ ion-item[slot="header"] {
   font-weight: 600; /* Optional: Set bold weight for the header */
   font-size: 18px;  /* Optional: Adjust the size of the header */
   color: #333;      /* Optional: Set color for the header text */
+}
+
+.ion-input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  text-align: center;
+  color: #333;
+}
+
+.ion-input:focus {
+  outline: none;
+  border-color: #48D1CC;
+  box-shadow: 0 0 5px rgba(72, 209, 204, 0.5);
 }
