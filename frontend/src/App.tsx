@@ -35,6 +35,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 import FacePic from './pages/face/FacePic';
 import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
+import FaceMicro from './pages/face/FaceMicro';
 import FaceVideo from './pages/face/FaceVideo';
 import FaceVideoPrediction from './pages/face/FaceVideoPrediction';
 
@@ -58,6 +59,7 @@ const App: React.FC = () => (
 
         <Route path="/app/face-pic" component={FacePic} exact={true} />
         <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
+        <Route path="/app/facemicro" component={FaceMicro} />
         <Route path="/app/face-video" component={FaceVideo} exact={true} />
         <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
         
