@@ -3,14 +3,10 @@
 // Import the functions you need from the Firebase SDKs
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { Timestamp, FieldValue } from "firebase/firestore"; // For Firestore operations
-import { getStorage } from 'firebase/storage';
+import { getFirestore, collection, addDoc, onSnapshot,deleteDoc,doc,  getDoc, query,updateDoc, getDocs } from "firebase/firestore";
+import {Timestamp, FieldValue } from "firebase/firestore"; // <-- Added FieldValue
+import { getStorage,ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDcRlNcadKaM2o45tj5Tc0bGFXSDU_BoPc",
   authDomain: "ayurprakrutiapp.firebaseapp.com",
@@ -24,9 +20,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-const storage = getStorage(app);
+export const auth = getAuth(app);// Firebase Authentication
+export const db = getFirestore(app);// Firestore Database
+export const storage = getStorage(app);// Firebase Storage
+
+// Export Firestore utilities
+export { ref, uploadBytes, getDownloadURL,collection, addDoc,onSnapshot, deleteDoc,doc,getDoc, query,updateDoc,getDocs};
 
 // Export FieldValue for usage in Firestore operations - eye video
 export { FieldValue, Timestamp };
