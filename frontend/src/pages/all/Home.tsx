@@ -44,7 +44,7 @@ const Home: React.FC = () => {
       id: '3',
       image: 'https://www.candacesmithetiquette.com/images/xMontage_of_facial_expressions.jpg.pagespeed.ic.vB1xtSDp_0.jpg',
       name: 'Facial Micro Expression Analysis',
-      route: '/app/facemicro',
+      route: '/app/face-video',
     },
     {
       id: '4',

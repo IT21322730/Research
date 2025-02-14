@@ -79,7 +79,7 @@ const FaceVideo: React.FC = () => {
       timerRef.current = setInterval(() => {
         seconds += 1;
         setRecordingTime(seconds);
-        if (seconds >= 30) {
+        if (seconds >= 10) {
           handleStopRecording();
         }
       }, 1000);
