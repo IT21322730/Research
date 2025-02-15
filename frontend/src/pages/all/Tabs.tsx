@@ -14,7 +14,7 @@ import Pitta from './Pitta';
 import Kapha from './Kapha'
 import EditPatient from '../all/EditPatient';
 import Patient from '../all/Patient'
-
+import EyePredictionPage from '../eye/Eyeprediction'
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye';
 import EyePrakurthi from '../eye/Eyeprakurthi';
@@ -68,6 +68,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/blinkfinal" component={BlinkFinal} />
             <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
             <Route path="/app/eyeprakurthi" component={EyePrakurthi} />
+            <Route path="/app/prediction/:docId" component={EyePredictionPage} />
             
             <Route path="/app/final" component={FinalPrakurthi} />
 
