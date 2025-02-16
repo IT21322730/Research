@@ -17,7 +17,7 @@ import pytz
 
 #IT21319488
 import sys
-import dlib
+import mediapipe as mp
 import time
 
 # Initialize Flask app
@@ -25,7 +25,11 @@ app = Flask(__name__)
 
 #IT21319488
 UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+#os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 CORS(app)
 
@@ -402,195 +406,132 @@ def get_prediction_by_id(doc_id):
         return jsonify({"error": str(e)}), 500
         
 
-# Eye Aspect Ratio (EAR) Calculation
-def calculate_ear(eye):
-    A = np.linalg.norm(eye[1] - eye[5])  # Vertical distance
-    B = np.linalg.norm(eye[2] - eye[4])  # Vertical distance
-    C = np.linalg.norm(eye[0] - eye[3])  # Horizontal distance
+# Initialize Mediapipe Face Mesh
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+# Eye landmarks for Mediapipe Face Mesh
+LEFT_EYE = [33, 160, 158, 133, 153, 144]
+RIGHT_EYE = [362, 385, 387, 263, 373, 380]
+LEFT_IRIS = [474, 475, 476, 477]
+RIGHT_IRIS = [469, 470, 471, 472]
+
+BLINK_THRESHOLD = 0.2  
+BLINK_CONSEC_FRAMES = 3  
+
+def eye_aspect_ratio(landmarks, eye_points):
+    """Calculate Eye Aspect Ratio (EAR) to detect blinks."""
+    A = np.linalg.norm(landmarks[eye_points[1]] - landmarks[eye_points[5]])
+    B = np.linalg.norm(landmarks[eye_points[2]] - landmarks[eye_points[4]])
+    C = np.linalg.norm(landmarks[eye_points[0]] - landmarks[eye_points[3]])
     return (A + B) / (2.0 * C)
 
-# Pupil Size Calculation
-def calculate_pupil_size(eye_region, gray_frame):
-    x_min, y_min, x_max, y_max = eye_region
-    eye_frame = gray_frame[y_min:y_max, x_min:x_max]
-
-    if eye_frame.size == 0:
-        return 0  # Prevent errors if eye region is empty
-
-    _, threshold_eye = cv2.threshold(eye_frame, 50, 255, cv2.THRESH_BINARY_INV)
-    contours, _ = cv2.findContours(threshold_eye, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    if contours:
-        max_contour = max(contours, key=cv2.contourArea)
-        return cv2.contourArea(max_contour)
-    return 0
-
-# Track Pupil Movement
-def track_pupil_movement(previous_center, current_center):
-    if previous_center is None:
-        return 0
-    return np.linalg.norm(np.array(previous_center) - np.array(current_center))
-
-# Analyze Stress and Fatigue Levels
 def analyze_stress_fatigue_pupil(video_source):
     try:
-        print(f"Starting analysis for video: {video_source}")
-        face_detector = dlib.get_frontal_face_detector()
-        landmark_predictor = dlib.shape_predictor("D:\\Backend\\model\\shape_predictor_68_face_landmarks.dat")
-
         cap = cv2.VideoCapture(video_source)
-
         if not cap.isOpened():
-            print("Error: Cannot open video file")
             return {"error": "Cannot open video"}
 
-        print("Video loaded successfully")
-
-        fps = cap.get(cv2.CAP_PROP_FPS) or 30  
-        frame_time = 1 / fps  
-
         blink_count = 0
-        blink_active = False
-        total_frames = 0
-        last_blink_time = 0  # Helps in preventing false blinks
+        blink_start_time = time.time()
+        closed_eye_frames = 0
+        total_movement = 0
+        movement_count = 0
+        previous_left_iris = None
+        previous_right_iris = None
 
-        pupil_sizes = []
-        previous_left_pupil_center = None
-        previous_right_pupil_center = None
-        pupil_movement_distances = []
-
-        while True:
+        while cap.isOpened():
             ret, frame = cap.read()
-            if not ret or frame is None:
+            if not ret:
                 break
 
-            # Resize frame to ensure consistent detection
-            frame = cv2.resize(frame, (640, 480))
+            frame = cv2.flip(frame, 1)
+            h, w, _ = frame.shape
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = face_mesh.process(rgb_frame)
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray = cv2.equalizeHist(gray)  # Improve contrast for better eye detection
+            if results.multi_face_landmarks:
+                for face_landmarks in results.multi_face_landmarks:
+                    landmark_points = np.array([
+                        (int(face_landmarks.landmark[i].x * w), int(face_landmarks.landmark[i].y * h)) 
+                        for i in range(468)
+                    ])
 
-            faces = face_detector(gray)
+                    left_ear = eye_aspect_ratio(landmark_points, LEFT_EYE)
+                    right_ear = eye_aspect_ratio(landmark_points, RIGHT_EYE)
+                    avg_ear = (left_ear + right_ear) / 2.0
 
-            for face in faces:
-                landmarks = landmark_predictor(gray, face)
+                    if avg_ear < BLINK_THRESHOLD:
+                        closed_eye_frames += 1
+                    else:
+                        if closed_eye_frames >= BLINK_CONSEC_FRAMES:
+                            blink_count += 1
+                            closed_eye_frames = 0
 
-                left_eye = np.array([[landmarks.part(i).x, landmarks.part(i).y] for i in range(36, 42)])
-                right_eye = np.array([[landmarks.part(i).x, landmarks.part(i).y] for i in range(42, 48)])
+                    left_iris = np.mean([(face_landmarks.landmark[i].x * w, face_landmarks.landmark[i].y * h) for i in LEFT_IRIS], axis=0)
+                    right_iris = np.mean([(face_landmarks.landmark[i].x * w, face_landmarks.landmark[i].y * h) for i in RIGHT_IRIS], axis=0)
 
-                ear_left = calculate_ear(left_eye)
-                ear_right = calculate_ear(right_eye)
-                ear_avg = (ear_left + ear_right) / 2.0
+                    if previous_left_iris is not None and previous_right_iris is not None:
+                        left_movement = np.linalg.norm(np.array(left_iris) - np.array(previous_left_iris))
+                        right_movement = np.linalg.norm(np.array(right_iris) - np.array(previous_right_iris))
 
-                # Debugging EAR values
-                print(f"EAR Left: {ear_left}, EAR Right: {ear_right}, EAR Avg: {ear_avg}")
+                        eye_movement = (left_movement + right_movement) / 2.0
+                        total_movement += eye_movement
+                        movement_count += 1
 
-                current_time = time.time()
-
-                # Improved Blink Detection with adjusted threshold
-                if ear_avg < 0.20:  # Adjust EAR threshold if needed
-                    if not blink_active and (current_time - last_blink_time > 0.15):  # Avoid multiple blinks for one closure
-                        blink_active = True
-                        last_blink_time = current_time
-                else:
-                    if blink_active:
-                        blink_count += 1
-                        blink_active = False
-
-                left_eye_region = (left_eye[:, 0].min(), left_eye[:, 1].min(), left_eye[:, 0].max(), left_eye[:, 1].max())
-                right_eye_region = (right_eye[:, 0].min(), right_eye[:, 1].min(), right_eye[:, 0].max(), right_eye[:, 1].max())
-
-                left_pupil_size = calculate_pupil_size(left_eye_region, gray)
-                right_pupil_size = calculate_pupil_size(right_eye_region, gray)
-
-                avg_pupil_size = (left_pupil_size + right_pupil_size) / 2.0
-                pupil_sizes.append(avg_pupil_size)
-
-                left_center = (np.mean(left_eye[:, 0]), np.mean(left_eye[:, 1]))
-                right_center = (np.mean(right_eye[:, 0]), np.mean(right_eye[:, 1]))
-
-                if previous_left_pupil_center is not None:
-                    pupil_movement_distances.append(track_pupil_movement(previous_left_pupil_center, left_center))
-
-                if previous_right_pupil_center is not None:
-                    pupil_movement_distances.append(track_pupil_movement(previous_right_pupil_center, right_center))
-
-                previous_left_pupil_center = left_center
-                previous_right_pupil_center = right_center
-
-            total_frames += 1
+                    previous_left_iris = left_iris
+                    previous_right_iris = right_iris
 
         cap.release()
 
-        if total_frames > 0:
-            blinking_rate = (blink_count / (total_frames / fps)) * 60
-        else:
-            blinking_rate = 0
+        elapsed_time = time.time() - blink_start_time
+        blink_rate = (blink_count / elapsed_time) * 60 if elapsed_time > 0 else 0
+        avg_movement = total_movement / movement_count if movement_count > 0 else 0
 
-        avg_pupil_movement = np.mean(pupil_movement_distances) if pupil_movement_distances else 0
-        fatigue_level = "Low Fatigue" if avg_pupil_movement < 2 else "Medium Fatigue" if 2 <= avg_pupil_movement <= 10 else "High Fatigue"
-
-        stress_level = "Low Stress" if blinking_rate < 15 else "Medium Stress" if 15 <= blinking_rate <= 25 else "High Stress"
-
-        avg_pupil_size = np.mean(pupil_sizes) if pupil_sizes else 0
-        pupil_behavior = "High Pupil Dilation (Stress/Fatigue)" if avg_pupil_size > 1000 else "Normal Pupil Response" if 500 <= avg_pupil_size <= 1000 else "Low Pupil Response (Possible Fatigue)"
+        fatigue_level = "Low Fatigue" if avg_movement < 2 else "Medium Fatigue" if 2 <= avg_movement <= 10 else "High Fatigue"
+        stress_level = "Low Stress" if blink_rate < 15 else "Medium Stress" if 15 <= blink_rate <= 25 else "High Stress"
 
         return {
             'blink_count': blink_count,
-            'blinking_rate': blinking_rate,
+            'blinking_rate': blink_rate,
             'fatigue_level': fatigue_level,
-            'stress_level': stress_level,
-            'pupil_behavior': pupil_behavior
+            'stress_level': stress_level
         }
 
     except Exception as e:
-        print(f"Error during analysis: {e}")
         return {"error": str(e)}
 
-# Flask route for video analysis
 @app.route('/analyze', methods=['POST'])
 def analyze_video():
-    print("Request received at /analyze")  # Debug log
-    print("Request content-type:", request.content_type)  # Debug log
-
     if 'video' not in request.files:
         return jsonify({'error': 'No video file provided'}), 400
 
     video = request.files['video']
-    print("Video file received:", video.filename)  # Debug log
-
-    video_path = os.path.join(UPLOAD_FOLDER, video.filename)
+    video_path = os.path.join(app.config['UPLOAD_FOLDER'], video.filename)
     video.save(video_path)
-    print(f"Video file saved to: {video_path}")  # Debug log
 
     try:
         result = analyze_stress_fatigue_pupil(video_path)
-
         if 'error' in result:
             return jsonify({'error': result['error']}), 500
 
-        # Prepare the data to save in Firestore
         data = {
-            'result': result,  # Contains the analysis result
-            'video_url': video_path,  # Save the local path or a URL if hosted
+            'result': result,
+            'video_url': video_path,
             'timestamp': firestore.SERVER_TIMESTAMP
         }
 
-        # Save the data to Firestore under the 'eyevideo' collection
         doc_ref = db.collection('eyevideo').add(data)
-        doc_id = doc_ref[1].id  # Extract the document ID
+        doc_id = doc_ref[1].id
 
-        # Return the result along with the video path and document ID
         return jsonify({'result': result, 'video_url': video_path, 'document_id': doc_id})
 
     except Exception as e:
-        print(f"Error during processing: {e}")
         return jsonify({'error': str(e)}), 500
+
     finally:
         if os.path.exists(video_path):
             os.remove(video_path)
-            print("Video file deleted after processing")  # Debug log
-
 
 
 @app.route('/analyze/<document_id>', methods=['GET'])
