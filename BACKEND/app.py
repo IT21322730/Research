@@ -48,10 +48,13 @@ cred = credentials.Certificate('D:\\Backend\\serviceAccountKey.json')
 initialize_app(cred)
 db = firestore.client()
 
-# Load the ML model for images - IT21322730
+# Load the ML model for face images - IT21322730
 facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
-# Load the ML model for images - IT21319488
-image_model = tf.keras.models.load_model('D:\\Backend\\model\\Hybrid_CNN_Transformer_Model.h5')
+# Load the ML model for eye images - IT21319488
+image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
+# Load the ML model for hair images
+hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
+
 
 
 # Mapping of model output to Ayurvedic Prakriti classifications for images
