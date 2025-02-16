@@ -610,5 +610,102 @@ def get_results(document_id):
         print(f"Error: {str(e)}")  # Log the error
         return jsonify({"error": str(e)}), 500
         
+
+    #IT21319938
+@app.route('/process-hair-images', methods=['POST'])
+def process_hair_images():
+    try:
+        # Get request data
+        data = request.json
+        image_list = data.get("image_data")  # Expecting a list of 3 Base64 strings
+        user_uid = data.get("user_uid")  # Firebase Auth UID (same for patient/doctor)
+        
+        if not image_list or len(image_list) != 3 or not user_uid:
+            return jsonify({"error": "Missing required data (images or user UID)"}), 400
+
+        print(f"Received {len(image_list)} images for user UID: {user_uid}")  # Log receipt
+
+        predictions = []
+
+        for image_base64 in image_list:
+            # Ensure proper padding for Base64 decoding
+            padding_needed = len(image_base64) % 4
+            if padding_needed != 0:
+                image_base64 += "=" * (4 - padding_needed)
+
+            # Decode Base64 to bytes
+            image_data = base64.b64decode(image_base64.split(",")[1] if "," in image_base64 else image_base64)
+            
+            # Convert bytes to PIL Image
+            image = Image.open(io.BytesIO(image_data))
+
+            # Convert to RGB if needed
+            if image.mode != "RGB":
+                image = image.convert("RGB")
+
+            # Resize image to the size expected by the model
+            image = image.resize((128, 128))
+
+            # Normalize image data
+            image_array = np.array(image) / 255.0
+            image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+
+            # Predict using the model
+            prediction = hair_model.predict(image_array)
+            predicted_class = np.argmax(prediction, axis=1)[0]
+            predictions.append(prediction_mapping[predicted_class])
+
+        # Determine the final prakruti using majority vote
+        overall_result = Counter(predictions).most_common(1)[0][0]
+
+        # Query Firestore for the user document
+        user_ref = db.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        # Get user document ID
+        user_doc_id = user_doc.id
+
+        # Store prediction result in Firestore
+        
+        # Define your local timezone (e.g., 'Asia/Colombo' for Sri Lanka)
+        local_tz = pytz.timezone('Asia/Colombo')
+
+        # Get the current UTC time and convert it to local time
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+
+        # Format the timestamp
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
+        
+        doc_ref = db.collection("hair_predictions").document()  # Auto-generate document ID
+
+        doc_ref.set({
+            "uuid": user_uid,  # Firebase UID
+            "user_id": user_doc_id,  # Firestore user document ID
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
+            "timestamp": timestamp
+        })
+
+        print(f"Prediction saved successfully for user {user_uid} at {timestamp}")
+
+        # Return response
+        return jsonify({
+            "message": "Hair images processed and stored successfully!",
+            "document_id": doc_ref.id,
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
+            "timestamp": timestamp
+        })
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")  
+        print(traceback.format_exc())  # Log detailed traceback
+        return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
