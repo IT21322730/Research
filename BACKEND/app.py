@@ -232,13 +232,12 @@ def analyze_micro_expressions():
     video_file.save(video_path)
 
     try:
-        final_emotion = analyze_video(video_path)
+        final_emotion = analyze_video(video_path)  # Ensure the video_path is passed correctly here
         return jsonify({"dominant_emotion": final_emotion[0], "count": final_emotion[1]})
     
     finally:
         if os.path.exists(video_path):
             os.remove(video_path)
-
 
 
 
