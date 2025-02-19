@@ -152,6 +152,183 @@ def process_face_images():
 
 
 
+### Face mapping analysis
+# Initialize MediaPipe FaceMesh
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
+
+# 🔹 **Define TCM Facial Regions (Landmark Indexes)**
+TCM_ZONES = {
+    "Kidney Health (Under-Eyes)": [33, 133, 168, 158],  
+    "Liver Health (Between Eyebrows, Temples)": [10, 109, 67, 103],  
+    "Heart Health (Nose, Around Mouth)": [1, 2, 97, 164],  
+    "Lung Health (Cheeks)": [50, 280, 206, 425],  
+    "Digestive Issues (Nose, Chin)": [2, 97, 164, 18, 17],  
+    "Hormonal Imbalance (Chin, Jawline)": [17, 57, 185, 201],  
+    "Spleen Health (Upper Cheeks)": [120, 121, 234, 454],  
+    "Bladder Health (Forehead Center)": [9, 107, 66, 105],  
+    "Gallbladder Health (Temples)": [127, 234, 454, 356]  
+}
+
+# 🔹 **Function to Analyze the Face for TCM Mapping**
+def analyze_face(image_path, user_uid):
+    image = cv2.imread(image_path)
+    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    results = face_mesh.process(rgb_image)
+
+    if not results.multi_face_landmarks:
+        return {"error": "No face detected."}
+
+    detected_issues = {}
+
+    for face_landmarks in results.multi_face_landmarks:
+        for region, landmarks in TCM_ZONES.items():
+            # Get landmark positions for this region
+            region_pixels = [(int(face_landmarks.landmark[idx].x * image.shape[1]), 
+                              int(face_landmarks.landmark[idx].y * image.shape[0])) for idx in landmarks]
+
+            # Extract ROI (Region of Interest)
+            mask = np.zeros(image.shape[:2], dtype=np.uint8)
+            cv2.fillPoly(mask, [np.array(region_pixels)], 255)
+            roi = cv2.bitwise_and(image, image, mask=mask)
+
+            # Analyze for redness (Inflammation, Circulation Issues)
+            hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+            lower_red = np.array([0, 120, 70])
+            upper_red = np.array([10, 255, 255])
+            redness_mask = cv2.inRange(hsv, lower_red, upper_red)
+            redness_score = np.count_nonzero(redness_mask)
+
+            # Analyze for dryness (Brightness Detection)
+            grayscale = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            brightness_score = np.mean(grayscale)
+
+            # Analyze for acne/spots (Texture Analysis)
+            blurred = cv2.GaussianBlur(grayscale, (5, 5), 0)
+            edges = cv2.Canny(blurred, 50, 150)
+            acne_score = np.count_nonzero(edges)
+
+            # Determine health issue based on scores
+            symptoms = []
+            if redness_score > 7000:
+                symptoms.append("Redness detected (Possible inflammation or circulation issue).")
+            if brightness_score > 190:
+                symptoms.append("High brightness detected (Possible dryness or dull skin).")
+            if acne_score > 1000:
+                symptoms.append("Acne/blemishes detected (Possible hormonal or digestive issue).")
+
+            if symptoms:
+                detected_issues[region] = symptoms
+
+    if not detected_issues:
+        detected_issues["Healthy"] = ["No significant facial abnormalities detected."]
+
+    # **Generate recommendations based on detected issues**
+    face_mapping_recommendations = generate_face_mapping_recommendations(detected_issues)
+
+    # ✅ Debugging print statements to check values
+    print("DEBUG: User UID:", user_uid)
+    print("DEBUG: Detected Issues:", detected_issues)
+    print("DEBUG: Recommendations:", face_mapping_recommendations)
+
+    # ✅ Ensure `recommendations` is always a valid list
+    if not isinstance(face_mapping_recommendations, list):
+        face_mapping_recommendations = ["No specific face_mapping_recommendations available."]
+
+    # ✅ Now Call `save_to_firestore()` With All Three Arguments
+    doc_id, timestamp = save_to_face_mapping_firestore(user_uid, detected_issues, face_mapping_recommendations)
+
+    return {
+        "message": "Face mapping analysis completed!",
+        "detected_issues": detected_issues,
+        "face_mapping_recommendations": face_mapping_recommendations,
+        "timestamp": timestamp,
+        "doc_id": doc_id
+    }
+
+# 🔹 **Generate Recommendations Based on Issues**
+def generate_face_mapping_recommendations(detected_issues):
+    recs = []
+    for issue in detected_issues:
+        if "Kidney" in issue:
+            recs.append("Stay hydrated and avoid excessive caffeine or alcohol.")
+        if "Liver" in issue:
+            recs.append("Reduce stress, avoid alcohol, and eat more greens.")
+        if "Heart" in issue:
+            recs.append("Exercise regularly and avoid excessive processed food.")
+        if "Lung" in issue:
+            recs.append("Improve air quality and consider breathing exercises.")
+        if "Digestive" in issue:
+            recs.append("Eat fiber-rich foods and avoid processed sugars.")
+        if "Hormonal" in issue:
+            recs.append("Maintain hormonal balance through diet and stress management.")
+        if "Spleen" in issue:
+            recs.append("Improve nutrient intake and avoid cold/raw foods.")
+        if "Bladder" in issue:
+            recs.append("Drink plenty of water and avoid dehydration.")
+        if "Gallbladder" in issue:
+            recs.append("Reduce oily foods and improve fat digestion.")
+
+    if not recs:
+        recs.append("Maintain a balanced lifestyle with a proper diet and exercise.")
+
+    return recs
+
+# 🔹 **Save Data to Firestore**
+def save_to_face_mapping_firestore(user_uid, detected_issues, face_mapping_recommendations):
+    try:
+        local_tz = pytz.timezone('Asia/Colombo')
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        user_ref = db.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            print(f"User {user_uid} not found in Firestore")
+            return None, None
+
+        doc_ref = db.collection("face_analysis").document()
+        doc_ref.set({
+            "uuid": user_uid,
+            "user_id": user_doc.id,
+            "detected_issues": detected_issues,
+            "face_mapping_recommendations": face_mapping_recommendations,
+            "timestamp": timestamp
+        })
+
+        print(f"Face analysis saved successfully for user {user_uid} at {timestamp}")
+
+        return doc_ref.id, timestamp
+
+    except Exception as e:
+        print(f"Error saving to Firestore: {str(e)}")
+        print(traceback.format_exc())
+        return None, None
+
+# 🔹 **Flask API Endpoint**
+@app.route('/analyze-face-mapping', methods=['POST'])
+def analyze_face_endpoint():
+    if 'image' not in request.files or 'user_uid' not in request.form:
+        return jsonify({"error": "Missing image file or user UID"}), 400
+
+    image = request.files['image']
+    user_uid = request.form['user_uid']
+
+    image_path = os.path.join("uploads", image.filename)
+    image.save(image_path)
+
+    # Process the face mapping
+    result = analyze_face(image_path, user_uid)
+
+    # Clean up the uploaded image
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    return jsonify(result)
+
+
 
 ### Micro expression analysis
 # **Function to analyze the video and return psychological insights**
@@ -223,7 +400,7 @@ def analyze_video(video_path, user_uid):
         psychological_insights.append("No concerning emotional patterns detected. You seem mentally stable and balanced.")
 
     # **Save to Firestore & get doc ID + timestamp**
-    doc_id, timestamp = save_to_firestore(user_uid, emotion_percentages, psychological_insights, recommendations)
+    doc_id, timestamp = save_to_micro_expressions_firestore(user_uid, emotion_percentages, psychological_insights, recommendations)
 
     response_data = {
         "message": "Your micro-expression analysis is done!!!",
@@ -288,7 +465,7 @@ def get_recommendations(psychological_insights):
 
 
 # **Function to Save Data to Firestore & Return Doc ID + Timestamp**
-def save_to_firestore(user_uid, emotion_percentages, psychological_insights, recommendations):
+def save_to_micro_expressions_firestore(user_uid, emotion_percentages, psychological_insights, recommendations):
     try:
         # Define timezone
         local_tz = pytz.timezone('Asia/Colombo')
