@@ -11,24 +11,20 @@ import {
   IonBackButton,
   IonButton,
   IonAlert,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
 } from "@ionic/react";
 import { camera, save, swapHorizontal } from "ionicons/icons";
-import { db } from "../firebase/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { useHistory } from "react-router-dom";
 import "../css/FaceMappingPic.css";
 
-const FacePic: React.FC = () => {
+const FaceMappingPic: React.FC = () => {
   const [photo, setPhoto] = useState<string | null>(null);
-  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true); // Front camera initially
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
-  const [currentView, setCurrentView] = useState<string>("Front View");
-  const [capturedViews, setCapturedViews] = useState<{
-    [view: string]: string;
-  }>({}); // Stores the image for all views
   const videoRef = useRef<HTMLVideoElement>(null);
+  const history = useHistory();
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   useEffect(() => {
     const startCamera = async () => {
@@ -56,7 +52,7 @@ const FacePic: React.FC = () => {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [useFrontCamera, currentView]); // Watch both useFrontCamera and currentView for changes
+  }, [useFrontCamera]);
 
   const takePicture = () => {
     const video = videoRef.current;
@@ -70,12 +66,6 @@ const FacePic: React.FC = () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL("image/png");
         setPhoto(dataUrl);
-
-        // Save the captured image for the current view
-        setCapturedViews((prev) => ({
-          ...prev,
-          [currentView]: dataUrl,
-        }));
       }
     }
   };
@@ -84,54 +74,45 @@ const FacePic: React.FC = () => {
     setUseFrontCamera(!useFrontCamera);
   };
 
-  const handleSaveToFirebase = async () => {
+  const handleSaveToBackend = async () => {
+    if (!photo || !user) {
+      console.error("No photo taken or user not authenticated.");
+      return;
+    }
+  
     try {
-      const batch = collection(db, "facemicro");
-      // Save all views (Front, Left, Right) that have been captured to Firebase
-      for (const [view, imageUrl] of Object.entries(capturedViews)) {
-        await addDoc(batch, { view, imageUrl, timestamp: new Date() });
+      const blob = await fetch(photo).then((res) => res.blob());
+      const formData = new FormData();
+      formData.append("image", blob, "face_image.png");
+      formData.append("user_uid", user.uid);
+  
+      const response = await fetch("http://127.0.0.1:5000/analyze-face-mapping", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
       }
-      console.log("Images saved to Firebase");
+  
+      const result = await response.json();
+      console.log("Backend response:", result);
+  
+      // ✅ Pass the result as state when navigating
+      history.push({
+        pathname: "/app/face-mapping-prediction",
+        state: {
+          diagnosis_percentages: result.diagnosis_percentages,
+          recommendations: result.recommendations,
+          message: result.message,
+        },
+      });
+  
     } catch (error) {
-      console.error("Error saving images to Firebase: ", error);
+      console.error("Error sending image to backend:", error);
     }
   };
-
-  const confirmSave = () => {
-    setShowAlert(true);
-  };
-
-  const resetPhotos = () => {
-    setPhoto(null);
-    setCapturedViews({});
-  };
-
-  const handleSaveAlertResponse = (isSave: boolean) => {
-    if (isSave) {
-      // Save the captured images to Firebase
-      handleSaveToFirebase();
-
-      // After saving, reset the photo and switch views
-      setPhoto(null);
-      setCapturedViews({}); // Clear captured views
-
-      if (currentView === "Front View") {
-        setCurrentView("Left View");
-        setUseFrontCamera(false); // Switch to rear camera for Left View
-      } else if (currentView === "Left View") {
-        setCurrentView("Right View");
-        setUseFrontCamera(false); // Switch to rear camera for Right View
-      } else if (currentView === "Right View") {
-        setPhoto(null); // End the process after right view
-        setCapturedViews({}); // Clear captured views
-        setCurrentView("Front View"); // Reset back to front view after right view
-        setUseFrontCamera(true); // Set the front camera on
-      }
-    } else {
-      // If user clicked "No", just hide the alert and keep the current camera view
-      setShowAlert(false);
-    }
-  };
+  
 
   return (
     <IonPage>
@@ -140,42 +121,15 @@ const FacePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/facemapping" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>Take a Picture</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
         {!photo ? (
-          <video
-            key={currentView} // Add this line to force a re-render when switching views
-            ref={videoRef}
-            id="video"
-            autoPlay
-            playsInline
-          ></video>
+          <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
           <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
         )}
-
-        <IonSegment
-          value={currentView}
-          onIonChange={(e) => setCurrentView(e.detail.value as string)}
-        >
-          <IonSegmentButton value="Front View">
-            <IonLabel style={{ fontFamily: '"Open Sans", sans-serif' }}>
-              Front View
-            </IonLabel>
-          </IonSegmentButton>
-          <IonSegmentButton value="Left View">
-            <IonLabel style={{ fontFamily: '"Open Sans", sans-serif' }}>
-              Left View
-            </IonLabel>
-          </IonSegmentButton>
-          <IonSegmentButton value="Right View">
-            <IonLabel style={{ fontFamily: '"Open Sans", sans-serif' }}>
-              Right View
-            </IonLabel>
-          </IonSegmentButton>
-        </IonSegment>
 
         <div className="tab-bar">
           <div className="tab-button" onClick={toggleCamera}>
@@ -184,7 +138,7 @@ const FacePic: React.FC = () => {
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
-          <div className="tab-button" onClick={confirmSave}>
+          <div className="tab-button" onClick={() => setShowAlert(true)}>
             <IonIcon icon={save} />
           </div>
         </div>
@@ -193,16 +147,16 @@ const FacePic: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
           header={"Save Image"}
-          message={`Do you want to save the ${currentView.toLowerCase()} of your face?`}
+          message={"Do you want to save this image for face mapping analysis?"}
           buttons={[
             {
               text: "No",
               role: "cancel",
-              handler: () => handleSaveAlertResponse(false),
+              handler: () => setShowAlert(false),
             },
             {
               text: "Yes",
-              handler: () => handleSaveAlertResponse(true),
+              handler: handleSaveToBackend,
             },
           ]}
         />
@@ -211,4 +165,4 @@ const FacePic: React.FC = () => {
   );
 };
 
-export default FacePic;
+export default FaceMappingPic;
