@@ -15,6 +15,7 @@ import { useHistory } from 'react-router-dom'; // Import useHistory for navigati
 import '../css/FaceVideo.css';
 import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
 const FaceVideo: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -112,53 +113,66 @@ const FaceVideo: React.FC = () => {
     setIsRecording(false);
   };
 
-  const handleSaveVideo = async () => {
-    if (!recordedVideoBlob) {
-      console.log('No recorded video available!');
-      return;
+ const handleSaveVideo = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser; // Get the currently logged-in user
+
+  if (!user) {
+    console.error("No authenticated user found. Please log in.");
+    return;
+  }
+
+  if (!recordedVideoBlob) {
+    console.log("No recorded video available!");
+    return;
+  }
+
+  setIsUploading(true);
+  const formData = new FormData();
+  formData.append("video", recordedVideoBlob, "video.webm");
+  formData.append("user_uid", user.uid); // Send user UID to backend
+
+  try {
+    const response = await fetch("http://127.0.0.1:5000/analyze-micro-expressions", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
     }
 
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('video', recordedVideoBlob, 'video.webm');
+    const data = await response.json();
+    console.log("Backend response:", data);
 
-    try {
-      const response = await fetch('http://127.0.0.1:5000/analyze-micro-expressions', {
-        method: 'POST',
-        body: formData,
+    if (data.emotion_percentages) {
+      // Get the dominant emotion (the one with the highest percentage)
+      const dominantEmotion = Object.keys(data.emotion_percentages).reduce((a, b) =>
+        data.emotion_percentages[a] > data.emotion_percentages[b] ? a : b
+      );
+
+      setEmotionResult(dominantEmotion);
+      setEmotionCount(data.emotion_percentages[dominantEmotion]);
+
+      history.push({
+        pathname: "/app/face-video-prediction",
+        state: {
+          emotion_percentages: data.emotion_percentages, // ✅ Pass all emotions!
+          psychological_insights: data.psychological_insights,
+          recommendations: data.recommendations,
+          message: data.message,
+        },
       });
-
-      const data = await response.json();
-      console.log('Backend response:', data);
-
-      if (data.dominant_emotion) {
-        setEmotionResult(data.dominant_emotion);
-        setEmotionCount(data.count);
-
-        // Save the detected emotion and count to Firestore
-        await addDoc(collection(db, 'facevideo'), {
-          emotion: data.dominant_emotion,
-          count: data.count,
-          timestamp: serverTimestamp(),
-        });
-
-        console.log('Emotion analysis saved successfully!');
-
-        // Now navigate to prediction page with the emotion result
-        history.push({
-          pathname: '/app/face-video-prediction',
-          state: { emotion: data.dominant_emotion, count: data.count },
-        });
-
-      } else {
-        console.log('No emotion detected!');
-      }
-    } catch (error) {
-      console.error('Error sending video to backend:', error);
-    } finally {
-      setIsUploading(false);
+    } else {
+      console.log("No emotions detected!");
     }
-  };
+  } catch (error) {
+    console.error("Error sending video to backend:", error);
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   return (
     <IonPage>
