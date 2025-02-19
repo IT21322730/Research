@@ -276,7 +276,7 @@ def analyze_face(image_path, user_uid):
     doc_id, timestamp = save_to_face_mapping_firestore(user_uid, diagnosis_percentages, recommendations)
 
     return {
-        "message": "Face mapping analysis completed!",
+        "message": "Face mapping analysis is completed!!!",
         "doc_id": doc_id,
         "diagnosis_percentages": diagnosis_percentages,
         "recommendations": recommendations,
