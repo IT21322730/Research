@@ -38,7 +38,9 @@ import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
 import FaceMicro from './pages/face/FaceMicro';
 import FaceVideo from './pages/face/FaceVideo';
 import FaceVideoPrediction from './pages/face/FaceVideoPrediction';
-
+import FaceMapping from './pages/face/FaceMapping';
+import FaceMappingPic from './pages/face/FaceMappingPic';
+import FaceMappingPrediction from './pages/face/FaceMappingPrediction';
 
 setupIonicReact();
 
@@ -62,6 +64,10 @@ const App: React.FC = () => (
         <Route path="/app/facemicro" component={FaceMicro} />
         <Route path="/app/face-video" component={FaceVideo} exact={true} />
         <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
+        <Route path="/app/facemapping" component={FaceMapping} exact={true} />
+        <Route path="/app/face-mapping-pic" component={FaceMappingPic} exact={true} />
+        <Route path="/app/face-mapping-prediction" component={FaceMappingPrediction} exact={true} />
+
         
       </IonRouterOutlet>
     </IonReactRouter>
