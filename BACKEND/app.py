@@ -159,15 +159,27 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
 
 # 🔹 **Define TCM Facial Regions (Landmark Indexes)**
 TCM_ZONES = {
-    "Kidney Health (Under-Eyes)": [33, 133, 168, 158],  
-    "Liver Health (Between Eyebrows, Temples)": [10, 109, 67, 103],  
-    "Heart Health (Nose, Around Mouth)": [1, 2, 97, 164],  
-    "Lung Health (Cheeks)": [50, 280, 206, 425],  
-    "Digestive Issues (Nose, Chin)": [2, 97, 164, 18, 17],  
-    "Hormonal Imbalance (Chin, Jawline)": [17, 57, 185, 201],  
-    "Spleen Health (Upper Cheeks)": [120, 121, 234, 454],  
-    "Bladder Health (Forehead Center)": [9, 107, 66, 105],  
-    "Gallbladder Health (Temples)": [127, 234, 454, 356]  
+    "Kidney Health": [33, 133, 168, 158],  
+    "Liver Health": [10, 109, 67, 103],  
+    "Heart Health": [1, 2, 97, 164],  
+    "Lung Health": [50, 280, 206, 425],  
+    "Digestive Health": [2, 97, 164, 18, 17],  
+    "Hormonal Health": [17, 57, 185, 201],  
+    "Spleen Health": [120, 121, 234, 454],  
+    "Bladder Health": [9, 107, 66, 105],  
+    "Gallbladder Health": [127, 234, 454, 356]  
+}
+
+# 🔹 **Symptom Weights**
+SYMPTOM_WEIGHTS = {
+    "redness": 20,
+    "brightness": 15,
+    "acne": 25,
+    "oiliness": 15,
+    "dark_circles": 15,
+    "wrinkles": 10,
+    "pores": 10,
+    "lip_color": 10
 }
 
 # 🔹 **Function to Analyze the Face for TCM Mapping**
@@ -180,6 +192,7 @@ def analyze_face(image_path, user_uid):
         return {"error": "No face detected."}
 
     detected_issues = {}
+    diagnosis_percentages = {region: 0 for region in TCM_ZONES}
 
     for face_landmarks in results.multi_face_landmarks:
         for region, landmarks in TCM_ZONES.items():
@@ -192,30 +205,63 @@ def analyze_face(image_path, user_uid):
             cv2.fillPoly(mask, [np.array(region_pixels)], 255)
             roi = cv2.bitwise_and(image, image, mask=mask)
 
-            # Analyze for redness (Inflammation, Circulation Issues)
+            # Convert to HSV and Grayscale
             hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-            lower_red = np.array([0, 120, 70])
-            upper_red = np.array([10, 255, 255])
-            redness_mask = cv2.inRange(hsv, lower_red, upper_red)
-            redness_score = np.count_nonzero(redness_mask)
-
-            # Analyze for dryness (Brightness Detection)
             grayscale = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+
+            # 🔹 **Feature Analysis**
+            redness_score = np.count_nonzero(cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])))
             brightness_score = np.mean(grayscale)
+            acne_score = np.count_nonzero(cv2.Canny(cv2.GaussianBlur(grayscale, (5, 5), 0), 50, 150))
+            oiliness_score = np.count_nonzero(cv2.inRange(hsv, np.array([0, 50, 200]), np.array([180, 255, 255])))
+            dark_circle_score = np.mean(grayscale[:10])
+            wrinkle_score = np.count_nonzero(cv2.Canny(grayscale, 30, 100))
+            pores_score = np.var(grayscale)
+            lip_color_score = np.count_nonzero(cv2.inRange(hsv, np.array([160, 100, 50]), np.array([180, 255, 255])))
 
-            # Analyze for acne/spots (Texture Analysis)
-            blurred = cv2.GaussianBlur(grayscale, (5, 5), 0)
-            edges = cv2.Canny(blurred, 50, 150)
-            acne_score = np.count_nonzero(edges)
+            # Normalize scores (convert to 0-100%)
+            max_score = 10000
+            redness_percentage = (redness_score / max_score) * 100
+            brightness_percentage = (brightness_score / 255) * 100
+            acne_percentage = (acne_score / max_score) * 100
+            oiliness_percentage = (oiliness_score / max_score) * 100
+            dark_circles_percentage = (dark_circle_score / 255) * 100
+            wrinkles_percentage = (wrinkle_score / max_score) * 100
+            pores_percentage = (pores_score / 500) * 100  # Adjusted for variance
+            lip_color_percentage = (lip_color_score / max_score) * 100
 
-            # Determine health issue based on scores
+            # 🔹 **Determine Health Issues**
             symptoms = []
-            if redness_score > 7000:
+            if redness_percentage > 70:
                 symptoms.append("Redness detected (Possible inflammation or circulation issue).")
-            if brightness_score > 190:
+            if brightness_percentage > 75:
                 symptoms.append("High brightness detected (Possible dryness or dull skin).")
-            if acne_score > 1000:
+            if acne_percentage > 80:
                 symptoms.append("Acne/blemishes detected (Possible hormonal or digestive issue).")
+            if oiliness_percentage > 70:
+                symptoms.append("Oily skin detected (Possible liver or hormonal imbalance).")
+            if dark_circles_percentage < 20:
+                symptoms.append("Dark circles detected (Possible kidney issues or stress).")
+            if wrinkles_percentage > 50:
+                symptoms.append("Wrinkles detected (Possible aging, stress, or dehydration).")
+            if pores_percentage > 60:
+                symptoms.append("Large pores detected (Possible toxin buildup or poor skin health).")
+            if lip_color_percentage < 30:
+                symptoms.append("Pale lips detected (Possible digestive or spleen-related issues).")
+
+            # Calculate overall issue percentage
+            issue_percentage = (
+                redness_percentage * SYMPTOM_WEIGHTS["redness"] +
+                brightness_percentage * SYMPTOM_WEIGHTS["brightness"] +
+                acne_percentage * SYMPTOM_WEIGHTS["acne"] +
+                oiliness_percentage * SYMPTOM_WEIGHTS["oiliness"] +
+                dark_circles_percentage * SYMPTOM_WEIGHTS["dark_circles"] +
+                wrinkles_percentage * SYMPTOM_WEIGHTS["wrinkles"] +
+                pores_percentage * SYMPTOM_WEIGHTS["pores"] +
+                lip_color_percentage * SYMPTOM_WEIGHTS["lip_color"]
+            ) / sum(SYMPTOM_WEIGHTS.values())
+
+            diagnosis_percentages[region] = round(issue_percentage, 2)
 
             if symptoms:
                 detected_issues[region] = symptoms
@@ -223,89 +269,204 @@ def analyze_face(image_path, user_uid):
     if not detected_issues:
         detected_issues["Healthy"] = ["No significant facial abnormalities detected."]
 
-    # **Generate recommendations based on detected issues**
-    face_mapping_recommendations = generate_face_mapping_recommendations(detected_issues)
+    # ✅ Generate Recommendations
+    recommendations = generate_face_mapping_recommendations(diagnosis_percentages)
 
-    # ✅ Debugging print statements to check values
-    print("DEBUG: User UID:", user_uid)
-    print("DEBUG: Detected Issues:", detected_issues)
-    print("DEBUG: Recommendations:", face_mapping_recommendations)
-
-    # ✅ Ensure `recommendations` is always a valid list
-    if not isinstance(face_mapping_recommendations, list):
-        face_mapping_recommendations = ["No specific face_mapping_recommendations available."]
-
-    # ✅ Now Call `save_to_firestore()` With All Three Arguments
-    doc_id, timestamp = save_to_face_mapping_firestore(user_uid, detected_issues, face_mapping_recommendations)
+    # ✅ Save to Firestore
+    doc_id, timestamp = save_to_face_mapping_firestore(user_uid, diagnosis_percentages, recommendations)
 
     return {
         "message": "Face mapping analysis completed!",
-        "detected_issues": detected_issues,
-        "face_mapping_recommendations": face_mapping_recommendations,
-        "timestamp": timestamp,
-        "doc_id": doc_id
+        "doc_id": doc_id,
+        "diagnosis_percentages": diagnosis_percentages,
+        "recommendations": recommendations,
+        "timestamp": timestamp
     }
 
-# 🔹 **Generate Recommendations Based on Issues**
-def generate_face_mapping_recommendations(detected_issues):
-    recs = []
-    for issue in detected_issues:
-        if "Kidney" in issue:
-            recs.append("Stay hydrated and avoid excessive caffeine or alcohol.")
-        if "Liver" in issue:
-            recs.append("Reduce stress, avoid alcohol, and eat more greens.")
-        if "Heart" in issue:
-            recs.append("Exercise regularly and avoid excessive processed food.")
-        if "Lung" in issue:
-            recs.append("Improve air quality and consider breathing exercises.")
-        if "Digestive" in issue:
-            recs.append("Eat fiber-rich foods and avoid processed sugars.")
-        if "Hormonal" in issue:
-            recs.append("Maintain hormonal balance through diet and stress management.")
-        if "Spleen" in issue:
-            recs.append("Improve nutrient intake and avoid cold/raw foods.")
-        if "Bladder" in issue:
-            recs.append("Drink plenty of water and avoid dehydration.")
-        if "Gallbladder" in issue:
-            recs.append("Reduce oily foods and improve fat digestion.")
 
+
+ # 🔹 **Generate Recommendations Based on Diagnosis**
+def generate_face_mapping_recommendations(diagnosis_percentages):
+    recs = {}
+
+    for region, percentage in diagnosis_percentages.items():
+        if percentage > 70:
+            recs[region] = {
+                "general": f"Consider medical consultation for {region}."
+            }
+            continue  
+        elif percentage > 50:
+            recs[region] = {
+                "general": f"Monitor your {region} health and maintain a balanced diet.",
+                "methods": []
+            }
+        elif percentage > 30:
+            recs[region] = {
+                "general": f"Maintain a healthy lifestyle to prevent {region} issues.",
+                "methods": []
+            }
+        else:
+            continue  
+
+        # **Add specific methods separately for each range**
+        if "Kidney" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Increase water intake to flush out toxins.",
+                    "Consume potassium-rich foods like bananas and sweet potatoes.",
+                    "Avoid high sodium and processed foods."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Stay hydrated and drink enough water.",
+                    "Limit caffeine and alcohol intake.",
+                    "Include antioxidant-rich foods like berries."
+                ])
+
+        if "Liver" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Reduce alcohol and fatty food consumption.",
+                    "Increase intake of detoxifying foods like garlic and turmeric.",
+                    "Exercise regularly to support liver function."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Eat leafy greens and fiber-rich foods.",
+                    "Avoid excessive sugar and processed food.",
+                    "Drink lemon water to aid digestion."
+                ])
+
+        if "Heart" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Engage in cardiovascular exercises like walking or jogging.",
+                    "Reduce saturated fat intake and consume heart-friendly foods.",
+                    "Monitor blood pressure and cholesterol levels."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Maintain a balanced diet with omega-3-rich foods.",
+                    "Stay active and manage stress through meditation.",
+                    "Limit processed and salty foods."
+                ])
+
+        if "Lung" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Avoid polluted environments and smoke exposure.",
+                    "Practice deep breathing exercises for lung capacity.",
+                    "Consume vitamin C and antioxidant-rich foods."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Engage in breathing exercises daily.",
+                    "Keep indoor air quality clean with ventilation.",
+                    "Drink herbal teas to soothe the lungs."
+                ])
+
+        if "Digestive" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Eat probiotic-rich foods like yogurt and kimchi.",
+                    "Reduce processed foods and increase fiber intake.",
+                    "Avoid eating late at night for better digestion."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Drink plenty of water to aid digestion.",
+                    "Consume fiber-rich foods such as oats and beans.",
+                    "Include ginger or peppermint tea for digestion support."
+                ])
+
+        if "Hormonal" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Avoid endocrine-disrupting chemicals found in plastics.",
+                    "Include omega-3 fatty acids for hormonal balance.",
+                    "Reduce stress through yoga or meditation."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Maintain a well-balanced diet with healthy fats.",
+                    "Get sufficient sleep to regulate hormone levels.",
+                    "Avoid excessive caffeine and sugar."
+                ])
+
+        if "Spleen" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Consume spleen-friendly foods like pumpkin and squash.",
+                    "Avoid excessive sugar and alcohol.",
+                    "Engage in mild physical activity like walking."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Eat warm, easily digestible foods.",
+                    "Avoid raw and cold foods to support spleen function.",
+                    "Reduce dairy and processed foods."
+                ])
+
+        if "Bladder" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Drink more water to prevent infections.",
+                    "Avoid carbonated and caffeinated drinks.",
+                    "Maintain proper hygiene to avoid irritation."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Stay hydrated and drink cranberry juice.",
+                    "Limit spicy foods that can irritate the bladder.",
+                    "Practice bladder-friendly habits like regular urination."
+                ])
+
+        if "Gallbladder" in region:
+            if percentage > 50:
+                recs[region]["methods"].extend([
+                    "Increase intake of bile-supportive foods like beets and apples.",
+                    "Reduce cholesterol-heavy foods to prevent gallstones.",
+                    "Consult a doctor if experiencing persistent digestive issues."
+                ])
+            elif percentage > 30:
+                recs[region]["methods"].extend([
+                    "Eat fiber-rich foods to support gallbladder function.",
+                    "Avoid processed and high-fat foods.",
+                    "Maintain a healthy weight through diet and exercise."
+                ])
+
+    # ✅ If no recommendations were generated, add a default healthy message
     if not recs:
-        recs.append("Maintain a balanced lifestyle with a proper diet and exercise.")
+        recs["general"] = {
+            "general": "Your facial mapping analysis looks good! Keep up a healthy routine."
+        }
 
-    return recs
+    return recs  
+
+
 
 # 🔹 **Save Data to Firestore**
-def save_to_face_mapping_firestore(user_uid, detected_issues, face_mapping_recommendations):
+def save_to_face_mapping_firestore(user_uid, diagnosis_percentages, recommendations):
     try:
         local_tz = pytz.timezone('Asia/Colombo')
         utc_now = datetime.utcnow()
         local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
         timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
 
-        user_ref = db.collection("users").document(user_uid)
-        user_doc = user_ref.get()
-
-        if not user_doc.exists:
-            print(f"User {user_uid} not found in Firestore")
-            return None, None
-
         doc_ref = db.collection("face_analysis").document()
         doc_ref.set({
             "uuid": user_uid,
-            "user_id": user_doc.id,
-            "detected_issues": detected_issues,
-            "face_mapping_recommendations": face_mapping_recommendations,
+            "diagnosis_percentages": diagnosis_percentages,
+            "recommendations": recommendations,
             "timestamp": timestamp
         })
-
-        print(f"Face analysis saved successfully for user {user_uid} at {timestamp}")
 
         return doc_ref.id, timestamp
 
     except Exception as e:
         print(f"Error saving to Firestore: {str(e)}")
-        print(traceback.format_exc())
         return None, None
+
 
 # 🔹 **Flask API Endpoint**
 @app.route('/analyze-face-mapping', methods=['POST'])
