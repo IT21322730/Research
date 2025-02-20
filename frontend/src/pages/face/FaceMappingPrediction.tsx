@@ -98,7 +98,7 @@ const FaceMappingPrediction: React.FC = () => {
                     style={{
                         width: "95%",
                         maxWidth: "850px",
-                        margin: "20px auto",
+                        margin: "15px auto",
                         backgroundColor: "white",
                         borderRadius: "12px",
                         boxShadow: "0 6px 15px rgba(0, 0, 0, 0.1)",
@@ -129,7 +129,7 @@ const FaceMappingPrediction: React.FC = () => {
                                 marginBottom: "15px",
                             }}
                         >
-                            Get a glance to your internal helath issues...
+                            Get a glance of your internal health issues...
                         </p>
                     )}
 
@@ -137,7 +137,7 @@ const FaceMappingPrediction: React.FC = () => {
                     {hasDiagnosisData ? (
                         <div
                             style={{
-                                width: "275px",
+                                width: "100%",
                                 height: "500px",
                                 margin: "auto",
                                 backgroundColor: "white",

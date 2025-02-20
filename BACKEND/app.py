@@ -438,7 +438,7 @@ def generate_face_mapping_recommendations(diagnosis_percentages):
     # ✅ If no recommendations were generated, add a default healthy message
     if not recs:
         recs["general"] = {
-            "general": "Your facial mapping analysis looks good! Keep up a healthy routine."
+            "general": "Your facial mapping analysis looks good. Keep up a healthy routine."
         }
 
     return recs  
