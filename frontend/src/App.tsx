@@ -33,6 +33,11 @@ import '@ionic/react/css/display.css';
 import HairPrakruthiResults from './pages/hair/HairPrakurthiResults';
 import HairPic from './pages/hair/HairPic';
 
+import NailVideo from './pages/nail/NailVedio'
+import NailPic from './pages/nail/NailPic';
+import NailPredictionPage from './pages/nail/NailPredictionpage';
+
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
@@ -72,11 +77,12 @@ const App: React.FC = () => (
         <Route path="/app/hair-results" component={HairPrakruthiResults} exact={true}/>
         <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
-        <Route path="/app/face-pic" component={FacePic} exact={true} />
-        <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
-        <Route path="/app/facemicro" component={FaceMicro} />
-        <Route path="/app/face-video" component={FaceVideo} exact={true} />
-        <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
+
+        <Route path="/app/nail-pic" component={NailPic} exact={true} />
+        <Route path="/app/nail-video" component={NailVideo} exact={true} />
+        <Route path="/app/nailprediction" component={NailPredictionPage} exact={true} />
+       
+
         
       </IonRouterOutlet>
     </IonReactRouter>
