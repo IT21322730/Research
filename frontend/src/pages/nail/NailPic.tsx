@@ -17,20 +17,18 @@ import {
   IonLabel,
 } from "@ionic/react";
 import { camera, save, swapHorizontal } from "ionicons/icons";
-import { db } from "../firebase/firebase";
-import { addDoc, collection } from "firebase/firestore";
-import "../css/FacePic.css";
+import "../css/NailPic.css";
 import { useHistory } from "react-router-dom";
 
 const NailPic: React.FC = () => {
   const history = useHistory();
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photo1, setPhoto1] = useState<string | null>(null);
+  const [photo2, setPhoto2] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [currentTab, setCurrentTab] = useState<number>(1);
-  const [capturedPhotos, setCapturedPhotos] = useState<{ [tab: number]: string }>({});
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentTab, setCurrentTab] = useState<number>(1);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -41,24 +39,22 @@ const NailPic: React.FC = () => {
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.play().catch((error) =>
-            console.error("Video play was interrupted:", error)
-          );
+          await videoRef.current.play();
         }
       } catch (error) {
-        console.error("Error accessing the camera: ", error);
+        console.error("Error accessing the camera:", error);
       }
     };
 
     startCamera();
 
     return () => {
-      if (videoRef.current?.srcObject) {
+      if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [useFrontCamera, currentTab]);
+  }, [useFrontCamera]);
 
   const takePicture = () => {
     const video = videoRef.current;
@@ -71,12 +67,7 @@ const NailPic: React.FC = () => {
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL("image/png");
-        setPhoto(dataUrl);
-
-        setCapturedPhotos((prev) => ({
-          ...prev,
-          [currentTab]: dataUrl,
-        }));
+        currentTab === 1 ? setPhoto1(dataUrl) : setPhoto2(dataUrl);
       }
     }
   };
@@ -85,21 +76,36 @@ const NailPic: React.FC = () => {
     setUseFrontCamera((prev) => !prev);
   };
 
-  const handleSaveToFirebase = async () => {
-    if (Object.keys(capturedPhotos).length === 0) {
-      console.error("No images to save.");
+  const sendImagesToBackend = async () => {
+    if (!photo1 || !photo2) {
+      console.error("Both images are required.");
       return;
     }
 
     try {
-      const batch = collection(db, "nails");
-      for (const [tab, imageUrl] of Object.entries(capturedPhotos)) {
-        await addDoc(batch, { tab, imageUrl, timestamp: new Date() });
+      const response = await fetch("http://localhost:5000/nailpredict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image_data1: photo1,
+          image_data2: photo2,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("📢 Backend response:", result);
+
+      if (response.ok) {
+        setShowToast(true);
+        console.log("✅ Prediction result:", result);
+
+        // 🛠 FIX: Pass prediction data to NailPredictionPage
+        history.push("/app/nailprediction", { predictionResult: result });
+      } else {
+        console.error("❌ Error from backend:", result.error);
       }
-      console.log("Images saved to Firebase");
-      setShowToast(true);
     } catch (error) {
-      console.error("Error saving images to Firebase: ", error);
+      console.error("⚠️ Error sending images to backend:", error);
     }
   };
 
@@ -109,20 +115,13 @@ const NailPic: React.FC = () => {
 
   const handleSaveAlertResponse = (isSave: boolean) => {
     if (isSave) {
-      handleSaveToFirebase();
-      setPhoto(null);
-      setCapturedPhotos({});
-
       if (currentTab === 2) {
-        setCurrentTab(1);
-        setUseFrontCamera(true);
-        history.push("/app/step");
+        sendImagesToBackend();
       } else {
-        setCurrentTab((prev) => prev + 1);
+        setCurrentTab(2);
       }
-    } else {
-      setShowAlert(false);
     }
+    setShowAlert(false);
   };
 
   return (
@@ -136,25 +135,15 @@ const NailPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {!photo ? (
-          <video ref={videoRef} id="video" autoPlay playsInline></video>
-        ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
-        )}
+        <video ref={videoRef} id="video" autoPlay playsInline></video>
 
-        <IonSegment
-          value={String(currentTab)}
-          onIonChange={(e) => setCurrentTab(Number(e.detail.value))}
-        >
-          {[{ label: "One Pic", value: 1 }, { label: "Two Pic", value: 2 }].map(
-            ({ label, value }) => (
-              <IonSegmentButton key={value} value={String(value)}>
-                <IonLabel style={{ fontFamily: '"Open Sans", sans-serif' }}>
-                  {label}
-                </IonLabel>
-              </IonSegmentButton>
-            )
-          )}
+        <IonSegment value={String(currentTab)} onIonChange={(e) => setCurrentTab(Number(e.detail.value))}>
+          <IonSegmentButton value="1">
+            <IonLabel>Image 1</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="2">
+            <IonLabel>Image 2</IonLabel>
+          </IonSegmentButton>
         </IonSegment>
 
         <div className="tab-bar">
@@ -173,26 +162,14 @@ const NailPic: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
           header={"Save Image"}
-          message={`Do you want to save the picture for "${currentTab === 1 ? "One Pic" : "Two Pic"}"?`}
+          message={`Do you want to save the picture for "Image ${currentTab}"?`}
           buttons={[
-            {
-              text: "No",
-              role: "cancel",
-              handler: () => handleSaveAlertResponse(false),
-            },
-            {
-              text: "Yes",
-              handler: () => handleSaveAlertResponse(true),
-            },
+            { text: "No", role: "cancel", handler: () => handleSaveAlertResponse(false) },
+            { text: "Yes", handler: () => handleSaveAlertResponse(true) },
           ]}
         />
 
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message="Image saved successfully!"
-          duration={2000}
-        />
+        <IonToast isOpen={showToast} onDidDismiss={() => setShowToast(false)} message="Prediction completed!" duration={2000} />
       </IonContent>
     </IonPage>
   );
