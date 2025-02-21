@@ -6,6 +6,8 @@ import Home from '../all/Home';
 import Profile from '../all/Profile';
 import Search from '../all/Search';
 import Prakurthi from '../all/Prakurthi';
+import Patient from '../all/Patient';
+import EditPatient from '../all/EditPatient';
 
 
 import { home, person, search, logOut} from 'ionicons/icons';  // Import icons correctly
@@ -18,6 +20,13 @@ import BlinkEye from '../eye/BlinkEye'
 
 import EyeHome from '../eye/EyeHome';
 import StepHome from './StepHome';
+
+import NailHome from '../nail/NailHome';
+import NailPrakurthi from '../nail/NailPrakurthi';
+import NailCap from '../nail/NailCap';
+import NailPredictionPage from '../nail/NailPredictionpage';
+
+
 
 
 const Tabs: React.FC = () => {
@@ -54,12 +63,22 @@ const Tabs: React.FC = () => {
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
 
+            <Route path="/app/nailhome" component={NailHome} />
+            <Route path="/app/nailprakurthi" component={NailPrakurthi} />
+            <Route path="/app/cap" component={NailCap} />
+            
+
+            <Route path="/app/patient-info" component={Patient} />
+            <Route path="/app/edit-patient/:patientId" component={EditPatient} />
+
             
             <Route path="/app/final" component={FinalPrakurthi} />
 
             
             <Route path="/app/pitta-body" component={Pitta} />
             <Route path="/app/kapha-body" component={Kapha} />
+
+            
             <Route exact path="/app">
                 <Redirect to="/app/home" />
             </Route>
