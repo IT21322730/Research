@@ -15,10 +15,14 @@ from collections import Counter
 from datetime import datetime
 import pytz
 
+
 #IT21319488
 import sys
 import mediapipe as mp
 import time
+
+#IT21324024
+import uuid
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -54,6 +58,11 @@ facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePraku
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
 # Load the ML model for hair images
 hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
+# Load the ML model for hair images - IT21324024
+try:
+    model = tf.keras.models.load_model(MODEL_PATH)
+except Exception as e:
+    raise RuntimeError(f"Error loading model: {str(e)}")
 
 
 
@@ -650,5 +659,80 @@ def process_hair_images():
         return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
 
 
+    #IT21324024
+    
+    def preprocess_image(image_data, target_size=(150, 150)):
+     """Decodes base64 image and preprocesses it for model prediction."""
+    try:
+        if ',' in image_data:
+            image_data = image_data.split(',')[1]
+        image_bytes = base64.b64decode(image_data)
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        image = image.resize(target_size)
+        image_array = np.array(image) / 255.0
+        return np.expand_dims(image_array, axis=0)
+    except Exception as e:
+        print(f"Error processing image: {str(e)}")
+        return None
+
+def get_overall_prediction(prediction1, prediction2):
+    """Logic to determine the overall prediction."""
+    return prediction1  # Example logic
+
+@app.route('/nailpredict', methods=['POST'])
+def predict():
+    try:
+        data = request.json
+        image_data1 = data.get('image_data1')
+        image_data2 = data.get('image_data2')
+
+        if not image_data1 or not image_data2:
+            return jsonify({"error": "Both images are required"}), 400
+
+        prediction_uuid = str(uuid.uuid4())
+        user_uid = prediction_uuid
+
+        image_array1 = preprocess_image(image_data1)
+        image_array2 = preprocess_image(image_data2)
+
+        if image_array1 is None or image_array2 is None:
+            return jsonify({"error": "Invalid image data"}), 400
+
+        predictions1 = model.predict(image_array1)
+        predictions2 = model.predict(image_array2)
+        
+        predicted_class1 = np.argmax(predictions1, axis=1)[0]
+        predicted_class2 = np.argmax(predictions2, axis=1)[0]
+        prakriti_prediction1 = class_labels.get(predicted_class1, "Unknown")
+        prakriti_prediction2 = class_labels.get(predicted_class2, "Unknown")
+
+        overall_prediction = get_overall_prediction(prakriti_prediction1, prakriti_prediction2)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        doc_ref = db.collection('nails').document()
+        doc_ref.set({
+            "user_uid": user_uid,
+            "uuid": prediction_uuid,
+            "prediction1": prakriti_prediction1,
+            "prediction2": prakriti_prediction2,
+            "overall_prediction": overall_prediction,
+            "timestamp": timestamp
+        })
+
+        return jsonify({
+            "message": "Prediction successful",
+            "document_id": doc_ref.id,
+            "uuid": prediction_uuid,
+            "user_uid": user_uid,
+            "prediction1": prakriti_prediction1,
+            "prediction2": prakriti_prediction2,
+            "overall_prediction": overall_prediction,
+            "timestamp": timestamp
+        })
+    except Exception as e:
+        print(f"Server Error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": "Internal server error"}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
