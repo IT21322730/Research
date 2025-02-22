@@ -19,6 +19,10 @@ import BlinkEye from '../eye/BlinkEye'
 import EyeHome from '../eye/EyeHome';
 import StepHome from './StepHome';
 
+import FaceMappingPrediction from '../face/FaceMappingPrediction';
+import FaceVideoPrediction from '../face/FaceVideoPrediction';
+import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
+
 
 const Tabs: React.FC = () => {
 
@@ -53,6 +57,10 @@ const Tabs: React.FC = () => {
             <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
+
+            <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
+            <Route path="/app/face-mapping-prediction" component={FaceMappingPrediction} exact={true} />
+            <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
 
             
             <Route path="/app/final" component={FinalPrakurthi} />
