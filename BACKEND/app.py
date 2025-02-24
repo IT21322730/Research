@@ -52,18 +52,26 @@ cred = credentials.Certificate('D:\\Backend\\serviceAccountKey.json')
 initialize_app(cred)
 db = firestore.client()
 
-# Load the ML model for face images - IT21322730
+
+#### Analyse Prakurthi ###
+
+### MOdels ###
+# Load the DL model for face images - IT21322730
 facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
-# Load the ML model for eye images - IT21319488
+# Load the DL model for eye images - IT21319488
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
-# Load the ML model for hair images
+# Load the DL model for hair images
 hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
-# Load the ML model for hair images - IT21324024
+# Load the DL model for hair images - IT21324024
+import tensorflow as tf
+# Load the DL model for nail images - IT21324024
+MODEL_PATH = "./model/Nails.h5"  # Replace with actual model file
+
 try:
     model = tf.keras.models.load_model(MODEL_PATH)
+    print("Model loaded successfully!")
 except Exception as e:
     raise RuntimeError(f"Error loading model: {str(e)}")
-
 
 
 # Mapping of model output to Ayurvedic Prakriti classifications for images
@@ -80,7 +88,7 @@ prediction_mapping = {
     9: 'Vata-Pitta-Kapha'
 }
 
-#IT21322730
+#IT21322730 - Face Prakurthi
 @app.route('/process-face-images', methods=['POST'])
 def process_face_images():
     try:
@@ -176,141 +184,7 @@ def process_face_images():
         return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
     
 
-
-# Ensure the uploads directory exists
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
-
-# Function to analyze the video and detect dominant emotion
-def analyze_video(video_path):
-    cap = cv2.VideoCapture(video_path)
-    frame_count = 0
-    emotions = []  # List to store detected emotions
-
-    if not cap.isOpened():
-        print("Error: Cannot open the video file.")
-        return "Error: Cannot open the video file."
-
-    while True:
-        ret, frame = cap.read()
-
-        if not ret:
-            break
-
-        frame_count += 1
-
-        if frame is None:  # Ensure frame is valid
-            print(f"Skipping frame {frame_count} (Invalid frame)")
-            continue
-
-        frame_path = os.path.join("uploads", f"frame_{frame_count}.jpg")
-        cv2.imwrite(frame_path, frame)
-
-        try:
-            result = DeepFace.analyze(img_path=frame_path, actions=['emotion'], enforce_detection=False)
-
-            if isinstance(result, list):
-                dominant_emotion = result[0]['dominant_emotion']
-            else:
-                dominant_emotion = result['dominant_emotion']
-
-            emotions.append(dominant_emotion)
-
-        except Exception as e:
-            print(f"Error analyzing frame {frame_count}: {str(e)}")
-
-        # Clean up the frame image
-        if os.path.exists(frame_path):
-            os.remove(frame_path)
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-    emotion_counts = Counter(emotions)
-    final_emotion = emotion_counts.most_common(1)[0] if emotions else ("No emotion detected", 0)
-
-    return final_emotion
-
-@app.route('/analyze-micro-expressions', methods=['POST'])
-def analyze_micro_expressions():
-    if 'video' not in request.files:
-        return jsonify({"error": "No video file found"}), 400
-
-    video_file = request.files['video']
-    video_path = os.path.join("uploads", video_file.filename)
-    video_file.save(video_path)
-
-    try:
-        final_emotion = analyze_video(video_path)  # Ensure the video_path is passed correctly here
-        return jsonify({"dominant_emotion": final_emotion[0], "count": final_emotion[1]})
-    
-    finally:
-        if os.path.exists(video_path):
-            os.remove(video_path)
-
-
-
-# Map of questions and their corresponding Prakriti options
-questions = [
-    {"id": 1, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 2, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 3, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 4, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 5, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 6, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 7, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 8, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 9, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 10, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 11, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-    {"id": 12, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-]
-
-# Rule-based logic for Prakriti analysis
-def determine_prakriti(scores):
-    # If all three scores are equal, return Tri-doshic
-    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
-        return "Tri-doshic (Vata-Pitta-Kapha)"
-    
-    # Sort scores by value in descending order
-    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-
-    # If the top two scores are equal, return them as a tie
-    if sorted_scores[0][1] == sorted_scores[1][1]:
-        return f"{sorted_scores[0][0]}-{sorted_scores[1][0]}"
-    
-    # Return the single dominant Prakriti
-    return sorted_scores[0][0]
-
-@app.route("/analyze-prakriti/", methods=["POST"])
-def analyze_prakriti():
-    # Get JSON data from the request
-    data = request.get_json()
-    if not data or "answers" not in data:
-        return jsonify({"error": "Invalid data. 'answers' key is required."}), 400
-
-    answers = data["answers"]
-    
-    # Ensure the length of answers matches the number of questions
-    if len(answers) != len(questions):
-        return jsonify({"error": f"Expected {len(questions)} answers but received {len(answers)}."}), 400
-    
-    # Initialize scores
-    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
-
-    # Map answers to Prakriti and update scores
-    for index, answer in enumerate(answers):
-        prakriti = questions[index]["options"].get(answer)
-        if prakriti:
-            scores[prakriti] += 1
-        else:
-            return jsonify({"error": f"Invalid answer {answer} for question {index + 1}"}), 400
-
-    # Determine Prakriti using rule-based logic
-    result = determine_prakriti(scores)
-    return jsonify({"prakriti": result})
-
-#IT21319488
+#IT21319488 -  Eye prakurthi
 @app.route('/process-firebase-image', methods=['POST'])
 def process_firebase_image():
     try:
@@ -415,8 +289,424 @@ def get_prediction_by_id(doc_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+    
+
+#IT21319938 - Hair Prakurthi
+@app.route('/process-hair-images', methods=['POST'])
+def process_hair_images():
+    try:
+        # Get request data
+        data = request.json
+        image_list = data.get("image_data")  # Expecting a list of 3 Base64 strings
+        user_uid = data.get("user_uid")  # Firebase Auth UID (same for patient/doctor)
+        
+        if not image_list or len(image_list) != 3 or not user_uid:
+            return jsonify({"error": "Missing required data (images or user UID)"}), 400
+
+        print(f"Received {len(image_list)} images for user UID: {user_uid}")  # Log receipt
+
+        predictions = []
+
+        for image_base64 in image_list:
+            # Ensure proper padding for Base64 decoding
+            padding_needed = len(image_base64) % 4
+            if padding_needed != 0:
+                image_base64 += "=" * (4 - padding_needed)
+
+            # Decode Base64 to bytes
+            image_data = base64.b64decode(image_base64.split(",")[1] if "," in image_base64 else image_base64)
+            
+            # Convert bytes to PIL Image
+            image = Image.open(io.BytesIO(image_data))
+
+            # Convert to RGB if needed
+            if image.mode != "RGB":
+                image = image.convert("RGB")
+
+            # Resize image to the size expected by the model
+            image = image.resize((128, 128))
+
+            # Normalize image data
+            image_array = np.array(image) / 255.0
+            image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+
+            # Predict using the model
+            prediction = hair_model.predict(image_array)
+            predicted_class = np.argmax(prediction, axis=1)[0]
+            predictions.append(prediction_mapping[predicted_class])
+
+        # Determine the final prakruti using majority vote
+        overall_result = Counter(predictions).most_common(1)[0][0]
+
+        # Query Firestore for the user document
+        user_ref = db.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        # Get user document ID
+        user_doc_id = user_doc.id
+
+        # Store prediction result in Firestore
+        
+        # Define your local timezone (e.g., 'Asia/Colombo' for Sri Lanka)
+        local_tz = pytz.timezone('Asia/Colombo')
+
+        # Get the current UTC time and convert it to local time
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+
+        # Format the timestamp
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
+        
+        doc_ref = db.collection("hair_predictions").document()  # Auto-generate document ID
+
+        doc_ref.set({
+            "uuid": user_uid,  # Firebase UID
+            "user_id": user_doc_id,  # Firestore user document ID
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
+            "timestamp": timestamp
+        })
+
+        print(f"Prediction saved successfully for user {user_uid} at {timestamp}")
+
+        # Return response
+        return jsonify({
+            "message": "Hair images processed and stored successfully!",
+            "document_id": doc_ref.id,
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
+            "timestamp": timestamp
+        })
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")  
+        print(traceback.format_exc())  # Log detailed traceback
+        return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
         
 
+#IT21324024 - Nail Prakurthi
+def preprocess_image(image_data, target_size=(150, 150)):
+     
+    try:
+        if ',' in image_data:
+            image_data = image_data.split(',')[1]
+        image_bytes = base64.b64decode(image_data)
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        image = image.resize(target_size)
+        image_array = np.array(image) / 255.0
+        return np.expand_dims(image_array, axis=0)
+    except Exception as e:
+        print(f"Error processing image: {str(e)}")
+        return None
+
+def get_overall_prediction(prediction1, prediction2):
+    """Logic to determine the overall prediction."""
+    return prediction1  # Example logic
+
+@app.route('/nailpredict', methods=['POST'])
+def predict():
+    try:
+        data = request.json
+        image_data1 = data.get('image_data1')
+        image_data2 = data.get('image_data2')
+
+        if not image_data1 or not image_data2:
+            return jsonify({"error": "Both images are required"}), 400
+
+        prediction_uuid = str(uuid.uuid4())
+        user_uid = prediction_uuid
+
+        image_array1 = preprocess_image(image_data1)
+        image_array2 = preprocess_image(image_data2)
+
+        if image_array1 is None or image_array2 is None:
+            return jsonify({"error": "Invalid image data"}), 400
+
+        predictions1 = model.predict(image_array1)
+        predictions2 = model.predict(image_array2)
+        
+        predicted_class1 = np.argmax(predictions1, axis=1)[0]
+        predicted_class2 = np.argmax(predictions2, axis=1)[0]
+        prakriti_prediction1 = prediction_mapping.get(predicted_class1, "Unknown")
+        prakriti_prediction2 = prediction_mapping.get(predicted_class2, "Unknown")
+
+        overall_prediction = get_overall_prediction(prakriti_prediction1, prakriti_prediction2)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        doc_ref = db.collection('nails').document()
+        doc_ref.set({
+            "user_uid": user_uid,
+            "uuid": prediction_uuid,
+            "prediction1": prakriti_prediction1,
+            "prediction2": prakriti_prediction2,
+            "overall_prediction": overall_prediction,
+            "timestamp": timestamp
+        })
+
+        return jsonify({
+            "message": "Prediction successful",
+            "document_id": doc_ref.id,
+            "uuid": prediction_uuid,
+            "user_uid": user_uid,
+            "prediction1": prakriti_prediction1,
+            "prediction2": prakriti_prediction2,
+            "overall_prediction": overall_prediction,
+            "timestamp": timestamp
+        })
+    except Exception as e:
+        print(f"Server Error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": "Internal server error"}), 500    
+    
+
+#Final Prakurthi Identification
+@app.route('/get-final-prakriti', methods=['GET'])
+def get_final_prakriti():
+    try:
+        user_uid = request.args.get("user_uid")
+        if not user_uid:
+            return jsonify({"error": "Missing required parameter: user_uid"}), 400
+
+        # Fetch predictions from Firestore
+        try:
+            face_doc = db.collection("face_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+            eye_doc = db.collection("eye").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+            hair_doc = db.collection("hair_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+            nail_doc = db.collection("nails").where("user_uid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+        except Exception as e:
+            return jsonify({"error": "Firestore query error", "details": str(e)}), 500
+
+        predictions = {}  # Store component-wise results
+
+        # Collect predictions with labels
+        if face_doc and len(face_doc) > 0:
+            face_result = face_doc[0].to_dict().get("final_prakriti")
+            if face_result:
+                predictions["Face"] = face_result
+
+        if eye_doc and len(eye_doc) > 0:
+            eye_result = eye_doc[0].to_dict().get("prediction")
+            if eye_result:
+                predictions["Eye"] = eye_result
+
+        if hair_doc and len(hair_doc) > 0:
+            hair_result = hair_doc[0].to_dict().get("final_prakriti")
+            if hair_result:
+                predictions["Hair"] = hair_result
+
+        if nail_doc and len(nail_doc) > 0:
+            nail_result = nail_doc[0].to_dict().get("overall_prediction")
+            if nail_result:
+                predictions["Nails"] = nail_result
+
+        if not predictions:
+            return jsonify({"error": "No predictions found for the given user UID"}), 404
+
+        print(f"Predictions: {predictions}")
+
+        # Convert dictionary values to list for counting
+        scores = Counter(predictions.values())
+
+        # Determine final Prakriti
+        final_prakriti = determine_prakriti(scores)
+
+        if "-" in final_prakriti:  # Tie detected
+            return jsonify({
+                "message": "Tie detected. Please fill the questionnaire.",
+                "user_uid": user_uid,
+                "individual_predictions": predictions,
+                "next_step": "Fill the questionnaire",
+                "questions": questions  # Send questionnaire for tie-breaking
+            }), 400
+
+        return jsonify({
+            "message": "Final Prakriti determined successfully!",
+            "user_uid": user_uid,
+            "individual_predictions": predictions,  # Now shows component-wise mapping
+            "final_prakriti": final_prakriti,
+            "source": "Component Analysis"
+        })
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An error occurred while retrieving final Prakriti.", "details": str(e)}), 500
+
+# Updated function to determine Prakriti
+def determine_prakriti(scores):
+    if not scores:
+        return None
+
+    # Extract individual counts
+    vata_count = scores.get("Vata", 0)
+    pitta_count = scores.get("Pitta", 0)
+    kapha_count = scores.get("Kapha", 0)
+
+    # Check for a three-way tie
+    if vata_count == pitta_count == kapha_count and vata_count > 0:
+        return "Vata-Pitta-Kapha"
+
+    # Find the most common Prakriti
+    most_common = scores.most_common()
+
+    if len(most_common) == 1 or most_common[0][1] > most_common[1][1]:
+        return most_common[0][0]  # Return the highest occurring type
+
+    # Handle two-way tie
+    unique_counts = {count for _, count in most_common}
+    if len(unique_counts) == 2 and list(unique_counts)[0] == list(unique_counts)[1]:
+        return "Tie"  # Trigger the questionnaire
+
+    return max(scores, key=scores.get)  # Return the most frequent Prakriti
+
+
+### Questionnaire
+# Map of questions and their corresponding Prakriti options
+questions = [
+    {"id": 1, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 2, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 3, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 4, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 5, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 6, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 7, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 8, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 9, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 10, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 11, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+    {"id": 12, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
+]
+
+# Rule-based logic for Prakriti analysis
+def determine_prakriti(scores):
+    # If all three scores are equal, return Tri-doshic
+    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
+        return "Tri-doshic (Vata-Pitta-Kapha)"
+    
+    # Sort scores by value in descending order
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+
+    # If the top two scores are equal, return them as a tie
+    if sorted_scores[0][1] == sorted_scores[1][1]:
+        return f"{sorted_scores[0][0]}-{sorted_scores[1][0]}"
+    
+    # Return the single dominant Prakriti
+    return sorted_scores[0][0]
+
+@app.route("/analyze-prakriti/", methods=["POST"])
+def analyze_prakriti():
+    # Get JSON data from the request
+    data = request.get_json()
+    if not data or "answers" not in data:
+        return jsonify({"error": "Invalid data. 'answers' key is required."}), 400
+
+    answers = data["answers"]
+    
+    # Ensure the length of answers matches the number of questions
+    if len(answers) != len(questions):
+        return jsonify({"error": f"Expected {len(questions)} answers but received {len(answers)}."}), 400
+    
+    # Initialize scores
+    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
+
+    # Map answers to Prakriti and update scores
+    for index, answer in enumerate(answers):
+        prakriti = questions[index]["options"].get(answer)
+        if prakriti:
+            scores[prakriti] += 1
+        else:
+            return jsonify({"error": f"Invalid answer {answer} for question {index + 1}"}), 400
+
+    # Determine Prakriti using rule-based logic
+    result = determine_prakriti(scores)
+    return jsonify({"prakriti": result})
+
+
+
+
+
+# Face Novelty
+# Facial micro expression analysis
+# Ensure the uploads directory exists
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
+
+# Function to analyze the video and detect dominant emotion
+def analyze_video(video_path):
+    cap = cv2.VideoCapture(video_path)
+    frame_count = 0
+    emotions = []  # List to store detected emotions
+
+    if not cap.isOpened():
+        print("Error: Cannot open the video file.")
+        return "Error: Cannot open the video file."
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            break
+
+        frame_count += 1
+
+        if frame is None:  # Ensure frame is valid
+            print(f"Skipping frame {frame_count} (Invalid frame)")
+            continue
+
+        frame_path = os.path.join("uploads", f"frame_{frame_count}.jpg")
+        cv2.imwrite(frame_path, frame)
+
+        try:
+            result = DeepFace.analyze(img_path=frame_path, actions=['emotion'], enforce_detection=False)
+
+            if isinstance(result, list):
+                dominant_emotion = result[0]['dominant_emotion']
+            else:
+                dominant_emotion = result['dominant_emotion']
+
+            emotions.append(dominant_emotion)
+
+        except Exception as e:
+            print(f"Error analyzing frame {frame_count}: {str(e)}")
+
+        # Clean up the frame image
+        if os.path.exists(frame_path):
+            os.remove(frame_path)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+    emotion_counts = Counter(emotions)
+    final_emotion = emotion_counts.most_common(1)[0] if emotions else ("No emotion detected", 0)
+
+    return final_emotion
+
+@app.route('/analyze-micro-expressions', methods=['POST'])
+def analyze_micro_expressions():
+    if 'video' not in request.files:
+        return jsonify({"error": "No video file found"}), 400
+
+    video_file = request.files['video']
+    video_path = os.path.join("uploads", video_file.filename)
+    video_file.save(video_path)
+
+    try:
+        final_emotion = analyze_video(video_path)  # Ensure the video_path is passed correctly here
+        return jsonify({"dominant_emotion": final_emotion[0], "count": final_emotion[1]})
+    
+    finally:
+        if os.path.exists(video_path):
+            os.remove(video_path)
+
+ 
+
+
+
+
+### Eye Novelty
 # Initialize Mediapipe Face Mesh
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
@@ -563,176 +853,13 @@ def get_results(document_id):
         return jsonify({"error": str(e)}), 500
         
 
-    #IT21319938
-@app.route('/process-hair-images', methods=['POST'])
-def process_hair_images():
-    try:
-        # Get request data
-        data = request.json
-        image_list = data.get("image_data")  # Expecting a list of 3 Base64 strings
-        user_uid = data.get("user_uid")  # Firebase Auth UID (same for patient/doctor)
-        
-        if not image_list or len(image_list) != 3 or not user_uid:
-            return jsonify({"error": "Missing required data (images or user UID)"}), 400
-
-        print(f"Received {len(image_list)} images for user UID: {user_uid}")  # Log receipt
-
-        predictions = []
-
-        for image_base64 in image_list:
-            # Ensure proper padding for Base64 decoding
-            padding_needed = len(image_base64) % 4
-            if padding_needed != 0:
-                image_base64 += "=" * (4 - padding_needed)
-
-            # Decode Base64 to bytes
-            image_data = base64.b64decode(image_base64.split(",")[1] if "," in image_base64 else image_base64)
-            
-            # Convert bytes to PIL Image
-            image = Image.open(io.BytesIO(image_data))
-
-            # Convert to RGB if needed
-            if image.mode != "RGB":
-                image = image.convert("RGB")
-
-            # Resize image to the size expected by the model
-            image = image.resize((128, 128))
-
-            # Normalize image data
-            image_array = np.array(image) / 255.0
-            image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
-
-            # Predict using the model
-            prediction = hair_model.predict(image_array)
-            predicted_class = np.argmax(prediction, axis=1)[0]
-            predictions.append(prediction_mapping[predicted_class])
-
-        # Determine the final prakruti using majority vote
-        overall_result = Counter(predictions).most_common(1)[0][0]
-
-        # Query Firestore for the user document
-        user_ref = db.collection("users").document(user_uid)
-        user_doc = user_ref.get()
-
-        if not user_doc.exists:
-            return jsonify({"error": "User not found"}), 404
-
-        # Get user document ID
-        user_doc_id = user_doc.id
-
-        # Store prediction result in Firestore
-        
-        # Define your local timezone (e.g., 'Asia/Colombo' for Sri Lanka)
-        local_tz = pytz.timezone('Asia/Colombo')
-
-        # Get the current UTC time and convert it to local time
-        utc_now = datetime.utcnow()
-        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
-
-        # Format the timestamp
-        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
-        
-        doc_ref = db.collection("hair_predictions").document()  # Auto-generate document ID
-
-        doc_ref.set({
-            "uuid": user_uid,  # Firebase UID
-            "user_id": user_doc_id,  # Firestore user document ID
-            "individual_predictions": predictions,
-            "final_prakriti": overall_result,
-            "timestamp": timestamp
-        })
-
-        print(f"Prediction saved successfully for user {user_uid} at {timestamp}")
-
-        # Return response
-        return jsonify({
-            "message": "Hair images processed and stored successfully!",
-            "document_id": doc_ref.id,
-            "individual_predictions": predictions,
-            "final_prakriti": overall_result,
-            "timestamp": timestamp
-        })
-
-    except Exception as e:
-        print(f"Error occurred: {str(e)}")  
-        print(traceback.format_exc())  # Log detailed traceback
-        return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
+    #IT21319938-- Hair Novelty
 
 
-    #IT21324024
+
+    #IT21324024 -- Nail Novelty
     
-    def preprocess_image(image_data, target_size=(150, 150)):
-     """Decodes base64 image and preprocesses it for model prediction."""
-    try:
-        if ',' in image_data:
-            image_data = image_data.split(',')[1]
-        image_bytes = base64.b64decode(image_data)
-        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        image = image.resize(target_size)
-        image_array = np.array(image) / 255.0
-        return np.expand_dims(image_array, axis=0)
-    except Exception as e:
-        print(f"Error processing image: {str(e)}")
-        return None
-
-def get_overall_prediction(prediction1, prediction2):
-    """Logic to determine the overall prediction."""
-    return prediction1  # Example logic
-
-@app.route('/nailpredict', methods=['POST'])
-def predict():
-    try:
-        data = request.json
-        image_data1 = data.get('image_data1')
-        image_data2 = data.get('image_data2')
-
-        if not image_data1 or not image_data2:
-            return jsonify({"error": "Both images are required"}), 400
-
-        prediction_uuid = str(uuid.uuid4())
-        user_uid = prediction_uuid
-
-        image_array1 = preprocess_image(image_data1)
-        image_array2 = preprocess_image(image_data2)
-
-        if image_array1 is None or image_array2 is None:
-            return jsonify({"error": "Invalid image data"}), 400
-
-        predictions1 = model.predict(image_array1)
-        predictions2 = model.predict(image_array2)
-        
-        predicted_class1 = np.argmax(predictions1, axis=1)[0]
-        predicted_class2 = np.argmax(predictions2, axis=1)[0]
-        prakriti_prediction1 = class_labels.get(predicted_class1, "Unknown")
-        prakriti_prediction2 = class_labels.get(predicted_class2, "Unknown")
-
-        overall_prediction = get_overall_prediction(prakriti_prediction1, prakriti_prediction2)
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        doc_ref = db.collection('nails').document()
-        doc_ref.set({
-            "user_uid": user_uid,
-            "uuid": prediction_uuid,
-            "prediction1": prakriti_prediction1,
-            "prediction2": prakriti_prediction2,
-            "overall_prediction": overall_prediction,
-            "timestamp": timestamp
-        })
-
-        return jsonify({
-            "message": "Prediction successful",
-            "document_id": doc_ref.id,
-            "uuid": prediction_uuid,
-            "user_uid": user_uid,
-            "prediction1": prakriti_prediction1,
-            "prediction2": prakriti_prediction2,
-            "overall_prediction": overall_prediction,
-            "timestamp": timestamp
-        })
-    except Exception as e:
-        print(f"Server Error: {str(e)}")
-        print(traceback.format_exc())
-        return jsonify({"error": "Internal server error"}), 500
+    
     
 if __name__ == '__main__':
     app.run(debug=True)
