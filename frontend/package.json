@@ -23,7 +23,6 @@
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
-    "firebase": "^11.0.2",
     "firebase": "^11.2.0",
     "ionicons": "^7.4.0",
     "react": "^18.3.1",

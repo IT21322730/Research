@@ -6,8 +6,6 @@ import Home from '../all/Home';
 import Profile from '../all/Profile';
 import Search from '../all/Search';
 import Prakurthi from '../all/Prakurthi';
-import Patient from '../all/Patient';
-import EditPatient from '../all/EditPatient';
 
 
 import { home, person, search, logOut} from 'ionicons/icons';  // Import icons correctly
@@ -69,12 +67,16 @@ const Tabs: React.FC = () => {
             <Route path="/app/patient-info" component={Patient} />
             <Route path="/app/edit-patient/:patientId" component={EditPatient} />
 
-            <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/hairhome" component={HairHome} />
             <Route path="/app/hairprakurthi" component={HairPrakurthi} />
-
+            <Route path="/app/hairprakurthi" component={HairPrakurthi} />
+            
+            <Route path="/app/eyehome" component={EyeHome} />
+            <Route path="/app/eyeprakurthi" component={EyePredictionPage} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
+            <Route path="/app/prediction/:docId" component={EyePredictionPage} />
+            <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
 
             <Route path="/app/nailhome" component={NailHome} />
             <Route path="/app/nailprakurthi" component={NailPrakurthi} />
