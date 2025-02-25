@@ -15,7 +15,7 @@ import img from "../images/img_05.png";
 
 interface PredictionState {
   predictionResult?: {
-    overall_prediction: string;
+    final_prakriti: string;
     individual_predictions: string[];
   };
 }
@@ -32,18 +32,18 @@ const NailPredictionPage: React.FC = () => {
     console.log("🛠 Prediction Result:", location.state?.predictionResult);
 
     if (!location.state || !location.state.predictionResult) {
-      console.error("🚨 No prediction data! Redirecting...");
+      console.error("No prediction data! Redirecting...");
       setError("No prediction data available.");
       setLoading(false);
       setTimeout(() => history.replace("/app/step"), 2000);
       return;
     }
 
-    const { overall_prediction, prediction1, prediction2 } = location.state.predictionResult as any;
+    const { final_prakriti, individual_predictions } = location.state.predictionResult as any;
 
     setPredictionData({
-      overall_prediction,
-      individual_predictions: [prediction1, prediction2],
+      final_prakriti,
+      individual_predictions,
     });
 
     setLoading(false);
@@ -98,17 +98,17 @@ const NailPredictionPage: React.FC = () => {
               </h2>
               <h3>Overall Result:</h3>
               <p style={{ fontWeight: "bold", fontSize: "25px" }}>
-                {predictionData.overall_prediction}
+                {predictionData.final_prakriti}
               </p>
               <h3>Individual Image Predictions:</h3>
               {Array.isArray(predictionData.individual_predictions) &&
               predictionData.individual_predictions.length > 0 ? (
                 <>
                   <p style={{ fontSize: "16px" }}>
-                    Image1: {predictionData.individual_predictions[0]}
+                    Image 1: {predictionData.individual_predictions[0]}
                   </p>
                   <p style={{ fontSize: "16px" }}>
-                    Image2: {predictionData.individual_predictions[1]}
+                    Image 2: {predictionData.individual_predictions[1]}
                   </p>
                 </>
               ) : (
