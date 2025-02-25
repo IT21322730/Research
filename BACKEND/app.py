@@ -65,13 +65,7 @@ hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
 # Load the DL model for hair images - IT21324024
 import tensorflow as tf
 # Load the DL model for nail images - IT21324024
-MODEL_PATH = "./model/Nails.h5"  # Replace with actual model file
-
-try:
-    model = tf.keras.models.load_model(MODEL_PATH)
-    print("Model loaded successfully!")
-except Exception as e:
-    raise RuntimeError(f"Error loading model: {str(e)}")
+nail_model = tf.keras.models.load_model('./model/Nails.h5')
 
 
 # Mapping of model output to Ayurvedic Prakriti classifications for images
@@ -389,7 +383,6 @@ def process_hair_images():
 
 #IT21324024 - Nail Prakurthi
 def preprocess_image(image_data, target_size=(150, 150)):
-     
     try:
         if ',' in image_data:
             image_data = image_data.split(',')[1]
@@ -403,66 +396,118 @@ def preprocess_image(image_data, target_size=(150, 150)):
         return None
 
 def get_overall_prediction(prediction1, prediction2):
-    """Logic to determine the overall prediction."""
     return prediction1  # Example logic
 
 @app.route('/nailpredict', methods=['POST'])
-def predict():
+def process_nail_images():
     try:
         data = request.json
-        image_data1 = data.get('image_data1')
-        image_data2 = data.get('image_data2')
-
-        if not image_data1 or not image_data2:
-            return jsonify({"error": "Both images are required"}), 400
-
-        prediction_uuid = str(uuid.uuid4())
-        user_uid = prediction_uuid
-
-        image_array1 = preprocess_image(image_data1)
-        image_array2 = preprocess_image(image_data2)
-
-        if image_array1 is None or image_array2 is None:
-            return jsonify({"error": "Invalid image data"}), 400
-
-        predictions1 = model.predict(image_array1)
-        predictions2 = model.predict(image_array2)
+        image_list = [data.get('image_data1'), data.get('image_data2')]
+        user_uid = data.get("user_uid")  # Firebase Auth UID (same for patient/doctor)
         
-        predicted_class1 = np.argmax(predictions1, axis=1)[0]
-        predicted_class2 = np.argmax(predictions2, axis=1)[0]
-        prakriti_prediction1 = prediction_mapping.get(predicted_class1, "Unknown")
-        prakriti_prediction2 = prediction_mapping.get(predicted_class2, "Unknown")
+        if not all(image_list) or not user_uid:
+            return jsonify({"error": "Both images and user UID are required"}), 400
 
-        overall_prediction = get_overall_prediction(prakriti_prediction1, prakriti_prediction2)
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Received {len(image_list)} images for user UID: {user_uid}")
 
-        doc_ref = db.collection('nails').document()
+        predictions = []
+        for image_base64 in image_list:
+            padding_needed = len(image_base64) % 4
+            if padding_needed != 0:
+                image_base64 += "=" * (4 - padding_needed)
+
+            image_data = base64.b64decode(image_base64.split(",")[1] if "," in image_base64 else image_base64)
+            image = Image.open(io.BytesIO(image_data)).convert("RGB")
+            image = image.resize((150, 150))
+
+            image_array = np.array(image) / 255.0
+            image_array = np.expand_dims(image_array, axis=0)
+
+            prediction = nail_model.predict(image_array)
+            predicted_class = np.argmax(prediction, axis=1)[0]
+            predictions.append(prediction_mapping.get(predicted_class, "Unknown"))
+
+        overall_result = get_overall_prediction(predictions[0], predictions[1])
+
+        user_ref = db.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        user_doc_id = user_doc.id
+
+        local_tz = pytz.timezone('Asia/Colombo')
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        doc_ref = db.collection("nails").document()
         doc_ref.set({
-            "user_uid": user_uid,
-            "uuid": prediction_uuid,
-            "prediction1": prakriti_prediction1,
-            "prediction2": prakriti_prediction2,
-            "overall_prediction": overall_prediction,
+            "uuid": user_uid,
+            "user_id": user_doc_id,
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
             "timestamp": timestamp
         })
+
+        print(f"Prediction saved successfully for user {user_uid} at {timestamp}")
 
         return jsonify({
-            "message": "Prediction successful",
+            "message": "Nail images processed and stored successfully!",
             "document_id": doc_ref.id,
-            "uuid": prediction_uuid,
-            "user_uid": user_uid,
-            "prediction1": prakriti_prediction1,
-            "prediction2": prakriti_prediction2,
-            "overall_prediction": overall_prediction,
+            "individual_predictions": predictions,
+            "final_prakriti": overall_result,
             "timestamp": timestamp
         })
+    
     except Exception as e:
-        print(f"Server Error: {str(e)}")
+        print(f"Error occurred: {str(e)}")
         print(traceback.format_exc())
-        return jsonify({"error": "Internal server error"}), 500    
+        return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500  
     
 
+
 #Final Prakurthi Identification
+def determine_final_prakriti(individual_predictions):
+    # Count occurrences of each full combination
+    combination_counts = Counter(individual_predictions.values())
+
+    # Get the most common combination(s)
+    most_common = combination_counts.most_common()
+    
+    # If there's a single most frequent combination, return it
+    if len(most_common) == 1 or most_common[0][1] > most_common[1][1]:
+        return most_common[0][0]  # Return the most frequent Prakriti combination
+    
+    # If there is a tie, apply the tie-breaking logic
+    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
+    
+    # Count occurrences of each dosha within tied components
+    for prakriti in combination_counts.keys():
+        for dosha in prakriti.split("-"):  # Split if it's a combination like "Vata-Pitta"
+            scores[dosha] += combination_counts[prakriti]
+
+    # Now use the logic from determine_prakriti to resolve the tie
+    return determine_prakriti(scores)
+
+# Logic to break the tie properly
+def determine_prakriti(scores):
+    # If all three scores are equal, return Tri-doshic
+    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
+        return "Tri-doshic (Vata-Pitta-Kapha)"
+    
+    # Sort scores by value in descending order
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+
+    # If the top two scores are equal, return them as a tie (sorted order)
+    if sorted_scores[0][1] == sorted_scores[1][1]:
+        return "-".join(sorted([sorted_scores[0][0], sorted_scores[1][0]]))
+    
+    # Return the single dominant Prakriti
+    return sorted_scores[0][0]
+
+
 @app.route('/get-final-prakriti', methods=['GET'])
 def get_final_prakriti():
     try:
@@ -470,18 +515,16 @@ def get_final_prakriti():
         if not user_uid:
             return jsonify({"error": "Missing required parameter: user_uid"}), 400
 
-        # Fetch predictions from Firestore
         try:
             face_doc = db.collection("face_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
             eye_doc = db.collection("eye").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
             hair_doc = db.collection("hair_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
-            nail_doc = db.collection("nails").where("user_uid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+            nail_doc = db.collection("nails").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
         except Exception as e:
             return jsonify({"error": "Firestore query error", "details": str(e)}), 500
 
-        predictions = {}  # Store component-wise results
+        predictions = {}
 
-        # Collect predictions with labels
         if face_doc and len(face_doc) > 0:
             face_result = face_doc[0].to_dict().get("final_prakriti")
             if face_result:
@@ -498,7 +541,7 @@ def get_final_prakriti():
                 predictions["Hair"] = hair_result
 
         if nail_doc and len(nail_doc) > 0:
-            nail_result = nail_doc[0].to_dict().get("overall_prediction")
+            nail_result = nail_doc[0].to_dict().get("final_prakriti")
             if nail_result:
                 predictions["Nails"] = nail_result
 
@@ -507,60 +550,73 @@ def get_final_prakriti():
 
         print(f"Predictions: {predictions}")
 
-        # Convert dictionary values to list for counting
-        scores = Counter(predictions.values())
+        final_prakriti = determine_final_prakriti(predictions)
 
-        # Determine final Prakriti
-        final_prakriti = determine_prakriti(scores)
+        if final_prakriti == "Tie":
+            # Fetch questionnaire result before returning tie response
+            questionnaire_doc = db.collection("questionnaire").document(user_uid).get()
+            
+            if questionnaire_doc.exists:
+                questionnaire_data = questionnaire_doc.to_dict()
+                questionnaire_prakriti = questionnaire_data.get("final_prakriti")
 
-        if "-" in final_prakriti:  # Tie detected
+                if questionnaire_prakriti:
+                    predictions["Questionnaire"] = questionnaire_prakriti
+                    final_prakriti = determine_final_prakriti(predictions)
+
+                    # Save Final Prakriti to Firestore only after resolving tie
+                    save_final_prakriti_to_firestore(user_uid, final_prakriti, predictions, "Component + Questionnaire")
+
+                    return jsonify({
+                        "message": "Final Prakriti determined after questionnaire.",
+                        "user_uid": user_uid,
+                        "individual_predictions": predictions,
+                        "final_prakriti": final_prakriti,
+                        "source": "Component + Questionnaire"
+                    }), 200
+
             return jsonify({
                 "message": "Tie detected. Please fill the questionnaire.",
                 "user_uid": user_uid,
                 "individual_predictions": predictions,
                 "next_step": "Fill the questionnaire",
-                "questions": questions  # Send questionnaire for tie-breaking
-            }), 400
+                "questions": questions
+            }), 200
+
+        # Save Final Prakriti to Firestore only if no tie
+        save_final_prakriti_to_firestore(user_uid, final_prakriti, predictions, "Component Analysis")
 
         return jsonify({
             "message": "Final Prakriti determined successfully!",
             "user_uid": user_uid,
-            "individual_predictions": predictions,  # Now shows component-wise mapping
+            "individual_predictions": predictions,
             "final_prakriti": final_prakriti,
             "source": "Component Analysis"
-        })
+        }), 200
 
     except Exception as e:
         print(f"Error occurred: {str(e)}")
         print(traceback.format_exc())
         return jsonify({"error": "An error occurred while retrieving final Prakriti.", "details": str(e)}), 500
 
-# Updated function to determine Prakriti
-def determine_prakriti(scores):
-    if not scores:
-        return None
 
-    # Extract individual counts
-    vata_count = scores.get("Vata", 0)
-    pitta_count = scores.get("Pitta", 0)
-    kapha_count = scores.get("Kapha", 0)
-
-    # Check for a three-way tie
-    if vata_count == pitta_count == kapha_count and vata_count > 0:
-        return "Vata-Pitta-Kapha"
-
-    # Find the most common Prakriti
-    most_common = scores.most_common()
-
-    if len(most_common) == 1 or most_common[0][1] > most_common[1][1]:
-        return most_common[0][0]  # Return the highest occurring type
-
-    # Handle two-way tie
-    unique_counts = {count for _, count in most_common}
-    if len(unique_counts) == 2 and list(unique_counts)[0] == list(unique_counts)[1]:
-        return "Tie"  # Trigger the questionnaire
-
-    return max(scores, key=scores.get)  # Return the most frequent Prakriti
+def save_final_prakriti_to_firestore(user_uid, final_prakriti, individual_predictions, source):
+    """
+    Saves the final Prakriti result along with individual predictions, timestamp, and source in Firestore.
+    """
+    try:
+        doc_ref = db.collection("final_prakriti_results").document()  # Auto-generate document ID
+        doc_ref.set({
+            "final_prakriti": final_prakriti,
+            "individual_predictions": individual_predictions,
+            "message": "Final Prakriti determined successfully!",
+            "source": source,
+            "user_uid": user_uid,
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
+        print(f"Final Prakriti saved successfully for user {user_uid} with document ID {doc_ref.id}")
+    except Exception as e:
+        print(f"Error saving final Prakriti: {str(e)}")
 
 
 ### Questionnaire
@@ -578,52 +634,86 @@ questions = [
     {"id": 10, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
     {"id": 11, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
     {"id": 12, "options": {1: "Vata", 2: "Pitta", 3: "Kapha"}},
-]
+]    
 
-# Rule-based logic for Prakriti analysis
-def determine_prakriti(scores):
-    # If all three scores are equal, return Tri-doshic
-    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
-        return "Tri-doshic (Vata-Pitta-Kapha)"
-    
-    # Sort scores by value in descending order
-    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+@app.route("/submit-questionnaire", methods=["POST"])
+def submit_questionnaire():
+    try:
+        data = request.get_json()
+        if not data or "answers" not in data or "user_uid" not in data:
+            return jsonify({"error": "Invalid data. 'user_uid' and 'answers' are required."}), 400
 
-    # If the top two scores are equal, return them as a tie
-    if sorted_scores[0][1] == sorted_scores[1][1]:
-        return f"{sorted_scores[0][0]}-{sorted_scores[1][0]}"
-    
-    # Return the single dominant Prakriti
-    return sorted_scores[0][0]
+        user_uid = data["user_uid"]
+        answers = data["answers"]
 
-@app.route("/analyze-prakriti/", methods=["POST"])
-def analyze_prakriti():
-    # Get JSON data from the request
-    data = request.get_json()
-    if not data or "answers" not in data:
-        return jsonify({"error": "Invalid data. 'answers' key is required."}), 400
+        if len(answers) != len(questions):
+            return jsonify({"error": f"Expected {len(questions)} answers but received {len(answers)}."}), 400
 
-    answers = data["answers"]
-    
-    # Ensure the length of answers matches the number of questions
-    if len(answers) != len(questions):
-        return jsonify({"error": f"Expected {len(questions)} answers but received {len(answers)}."}), 400
-    
-    # Initialize scores
-    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
+        scores = Counter()
 
-    # Map answers to Prakriti and update scores
-    for index, answer in enumerate(answers):
-        prakriti = questions[index]["options"].get(answer)
-        if prakriti:
-            scores[prakriti] += 1
-        else:
-            return jsonify({"error": f"Invalid answer {answer} for question {index + 1}"}), 400
+        for index, answer in enumerate(answers):
+            prakriti = questions[index]["options"].get(answer)
+            if prakriti:
+                scores[prakriti] += 1
+            else:
+                return jsonify({"error": f"Invalid answer {answer} for question {index + 1}"}), 400
 
-    # Determine Prakriti using rule-based logic
-    result = determine_prakriti(scores)
-    return jsonify({"prakriti": result})
+        questionnaire_prakriti = determine_prakriti(scores)
 
+        db.collection("questionnaire").document(user_uid).set({
+            "final_prakriti": questionnaire_prakriti,
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
+
+        return get_final_prakriti_after_questionnaire(user_uid)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred while processing the questionnaire.", "details": str(e)}), 500
+
+def get_final_prakriti_after_questionnaire(user_uid):
+    try:
+        face_doc = db.collection("face_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+        eye_doc = db.collection("eye").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+        hair_doc = db.collection("hair_predictions").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+        nail_doc = db.collection("nails").where("uuid", "==", user_uid).order_by("timestamp", direction=firestore.Query.DESCENDING).limit(1).get()
+        questionnaire_doc = db.collection("questionnaire").document(user_uid).get()
+
+        predictions = {}
+
+        if face_doc and len(face_doc) > 0:
+            predictions["Face"] = face_doc[0].to_dict().get("final_prakriti")
+
+        if eye_doc and len(eye_doc) > 0:
+            predictions["Eye"] = eye_doc[0].to_dict().get("prediction")
+
+        if hair_doc and len(hair_doc) > 0:
+            predictions["Hair"] = hair_doc[0].to_dict().get("final_prakriti")
+
+        if nail_doc and len(nail_doc) > 0:
+            predictions["Nails"] = nail_doc[0].to_dict().get("final_prakriti")
+
+        if questionnaire_doc.exists:
+            predictions["Questionnaire"] = questionnaire_doc.to_dict().get("final_prakriti")
+
+        if not predictions:
+            return jsonify({"error": "No predictions found for the given user UID"}), 404
+
+        print(f"Updated Predictions After Questionnaire: {predictions}")
+
+        final_prakriti = determine_final_prakriti(predictions)
+
+        return jsonify({
+            "message": "Final Prakriti determined successfully after questionnaire submission!",
+            "user_uid": user_uid,
+            "individual_predictions": predictions,
+            "final_prakriti": final_prakriti,
+            "source": "Component + Questionnaire"
+        }), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred while analyzing final Prakriti.", "details": str(e)}), 500
 
 
 
