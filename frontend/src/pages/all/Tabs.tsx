@@ -32,7 +32,6 @@ import Step from './Step';
 
 import HairPrakurthi from '../hair/HairPrakurthi';
 
-import NailHome from '../nail/NailHome';
 import NailPrakurthi from '../nail/NailPrakurthi';
 import NailCap from '../nail/NailCap';
 import NailPredictionPage from '../nail/NailPredictionpage';
@@ -86,7 +85,6 @@ const Tabs: React.FC = () => {
             <Route path="/app/prediction/:docId" component={EyePredictionPage} />
             <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
 
-            <Route path="/app/nailhome" component={NailHome} />
             <Route path="/app/nailprakurthi" component={NailPrakurthi} />
             <Route path="/app/nailprediction" component={NailPredictionPage}/>
             <Route path="/app/cap" component={NailCap} />
