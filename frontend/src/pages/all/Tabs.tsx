@@ -38,7 +38,10 @@ import NailCap from '../nail/NailCap';
 import NailPredictionPage from '../nail/NailPredictionpage';
 import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
 import HairPrakruthiResults from '../hair/HairPrakurthiResults';
+import FaceVideoPrediction from '../face/FaceVideoPrediction';
 
+import FaceMicro from '../face/FaceMicro';
+import FaceMapping from '../face/FaceMapping'
 
 const Tabs: React.FC = () => {
 
@@ -89,6 +92,9 @@ const Tabs: React.FC = () => {
             <Route path="/app/cap" component={NailCap} />
 
             <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction}/>
+            <Route path="/app/facemapping" component={FaceMapping} />
+            <Route path="/app/facemicro" component={FaceMicro} />
+            <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
             
 
             <Route path="/app/patient-info" component={Patient} />
