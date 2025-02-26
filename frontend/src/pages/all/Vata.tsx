@@ -10,7 +10,7 @@ const Vata: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/final" />
           </IonButtons>
-          <IonTitle>VATA DOSHA</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

@@ -10,7 +10,7 @@ const VataKapaha: React.FC = () => {
           <IonButtons slot="start">
                       <IonBackButton defaultHref="/app/final" />
                     </IonButtons>
-          <IonTitle>VATA-KAPHA DOSHA</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

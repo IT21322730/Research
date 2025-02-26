@@ -72,6 +72,33 @@ const FinalPrakurthi: React.FC = () => {
       case "Kapha":
         path = "/app/kapha-body";
         break;
+      case "Vata-Pitta":
+        path = "/app/vata-pitta-body";
+        break;
+      case "Pitta-Vata":
+        path = "/app/vata-pitta-body";
+        break;
+      case "Pitta-Kapha":
+          path = "/app/pitta-kapha-body";
+          break;
+      case "Kapha-Pitta":
+          path = "/app/pitta-kapha-body";
+          break;
+      case "Vata-Kapha":
+          path = "/app/vata-kapha-body";
+          break;
+      case "Kapha-Vata":
+          path = "/app/vata-kapha-body";
+          break;
+      case "Vata-Pitta-Kapha":
+          path = "/app/vata-pitta-kapha-body";
+          break;
+      case "Pitta-Vata-Kapha":
+          path = "/app/vata-pitta-kapha-body";
+          break;
+      case "Kapha-Vata-Pitta":
+          path = "/app/vata-pitta-kapha-body";
+          break;
       default:
         alert("Unknown Prakurthi Type!");
         return;
@@ -117,6 +144,27 @@ const FinalPrakurthi: React.FC = () => {
           </div>
           <br />
 
+          {/* Recommendation Link */}
+          <p style={{ fontSize: "16px", fontFamily: "'Open Sans', sans-serif" }}>
+            For recommendation?{" "}
+            <a 
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                handleNavigation(); // Call the function
+              }} 
+              style={{ 
+                color: "#007bff", 
+                textDecoration: "underline", 
+                cursor: "pointer", 
+                fontWeight: "bold" 
+              }}
+            >
+              Click this
+            </a>
+          </p>
+
+
           {/* Button to navigate based on Final Prakurthi */}
           <button
             onClick={handleNavigation}
@@ -133,7 +181,7 @@ const FinalPrakurthi: React.FC = () => {
               fontFamily: "'Open Sans', sans-serif" /* Added Font Style */
             }}
           >
-            View Prakurthi Details
+            Update the Patient Details
           </button>
 
         </div>

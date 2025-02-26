@@ -10,7 +10,7 @@ const Kapha: React.FC = () => {
           <IonButtons slot="start">
                       <IonBackButton defaultHref="/app/final" />
                       </IonButtons>
-          <IonTitle>KAPHA DOSHA</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

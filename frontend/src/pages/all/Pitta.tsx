@@ -10,7 +10,7 @@ const Pitta = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/final" />
             </IonButtons>
-          <IonTitle>PITTA DOSHA</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="pitta-container">

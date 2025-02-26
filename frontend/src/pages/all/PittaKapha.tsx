@@ -7,7 +7,7 @@ const PittaKapha: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar style={{ backgroundColor: '#48D1CC' }}>
-          <IonTitle>Pitta - Kapha Dosha</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

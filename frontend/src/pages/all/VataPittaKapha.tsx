@@ -9,7 +9,7 @@ const VataPittaKapha: React.FC = () => {
         <IonButtons slot="start">
                                       <IonBackButton defaultHref="/app/final" />
                                     </IonButtons>
-          <IonTitle>VATA-PITTA-KAPHA DOSHA</IonTitle>
+          <IonTitle>RECOMANDATION</IonTitle>
      
       </IonHeader>
       <IonContent>
