@@ -167,7 +167,7 @@ const FinalPrakurthi: React.FC = () => {
 
           {/* Button to navigate based on Final Prakurthi */}
           <button
-            onClick={handleNavigation}
+            onClick={() => history.push('/app/patient-info')} // Navigate on click
             style={{ 
               backgroundColor: "#48D1CC", 
               color: "black", 
