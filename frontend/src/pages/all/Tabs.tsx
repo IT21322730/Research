@@ -10,8 +10,13 @@ import Prakurthi from '../all/Prakurthi';
 
 import { home, person, search, logOut} from 'ionicons/icons';  // Import icons correctly
 import FinalPrakurthi from '../all/FinalPrakurthi';
+import Vata from './Vata';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
+import VataPitta from './VataPitta';
+import PittaKapha from './PittaKapha';
+import VataKapaha from './VataKapaha';
+import VataPittaKapha from './VataPittaKapha'
 import EditPatient from '../all/EditPatient';
 import Patient from '../all/Patient'
 import EyePredictionPage from '../eye/Eyeprediction'
@@ -94,8 +99,13 @@ const Tabs: React.FC = () => {
             <Route path="/app/question" component={Question} />
 
             
+            <Route path="/app/vata-body" component={Vata} />
             <Route path="/app/pitta-body" component={Pitta} />
             <Route path="/app/kapha-body" component={Kapha} />
+            <Route path="/app/vata-pitta-body" component={VataPitta} />
+            <Route path="/app/pitta-kapha-body" component={PittaKapha} />
+            <Route path="/app/vata-kapha-body" component={VataKapaha} />
+            <Route path="/app/vata-pitta-kapha-body" component={VataPittaKapha} />
 
             
             <Route exact path="/app">

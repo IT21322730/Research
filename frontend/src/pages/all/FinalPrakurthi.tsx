@@ -12,6 +12,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { auth } from "../firebase/firebase"; // Firebase auth import
 import "../css/FinalPrakurthi.css"; // Import CSS
+import { useIonRouter } from "@ionic/react";
 
 // Import Image
 import finalImage from "../images/img_final.jpg"; // Adjust the path if needed
@@ -21,6 +22,7 @@ const FinalPrakurthi: React.FC = () => {
   const [finalPrakurthi, setFinalPrakurthi] = useState<string | null>(null);
   const [prakurthiDetails, setPrakurthiDetails] = useState<{ Face?: string; Eye?: string; Hair?: string; Nails?: string }>({});
   const [userUid, setUserUid] = useState<string | null>(null);
+  const router = useIonRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -58,16 +60,27 @@ const FinalPrakurthi: React.FC = () => {
     fetchFinalPrakurthi();
   }, [userUid]);
 
-  // Function to navigate based on Prakurthi
   const handleNavigation = () => {
-    if (finalPrakurthi === "Vata") {
-      history.push("/app/all/Vata"); // Navigate to Vata.tsx
-    } else if (finalPrakurthi === "Pitta") {
-      history.push("/app/all/Pitta"); // Navigate to Pitta.tsx
-    } else {
-      alert("Unknown Prakurthi Type!"); // Handle other cases
+    let path = "";
+    switch (finalPrakurthi) {
+      case "Vata":
+        path = "/app/vata-body";
+        break;
+      case "Pitta":
+        path = "/app/pitta-body";
+        break;
+      case "Kapha":
+        path = "/app/kapha-body";
+        break;
+      default:
+        alert("Unknown Prakurthi Type!");
+        return;
     }
+  
+    console.log("Navigating to:", path);
+    window.location.href = path; // Forces a full page reload
   };
+  
 
   return (
     <IonPage>
