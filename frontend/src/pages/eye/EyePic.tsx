@@ -171,7 +171,7 @@ const EyePic: React.FC = () => {
         )}
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={toggleCamera}>
+        <div className="tab-button" onClick={() => window.location.reload()}>
             <IonIcon icon={swapHorizontal} />
           </div>
           <div className="tab-button" onClick={takePicture}>
