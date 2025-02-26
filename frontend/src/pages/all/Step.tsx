@@ -71,39 +71,34 @@ const Step: React.FC = () => {
         }
     
         try {
-            // Step 1: Try fetching the final Prakriti first
-            const prakritiResponse = await fetch(
-                `http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`
-            );
+            // Fetch Final Prakriti
+            const response = await fetch(`http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`);
     
-            if (prakritiResponse.ok) {
-                const data = await prakritiResponse.json();
-                console.log("Final Prakriti already available:", data.final_prakriti);
-                alert(`Final Prakriti: ${data.final_prakriti}`);
-                history.push("/app/final");
-                return; // Stop execution if Prakriti is already available
-            } 
-    
-            // Step 3: Fetch Final Prakriti Again
-            const retryPrakritiResponse = await fetch(
-                `http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`
-            );
-    
-            if (!retryPrakritiResponse.ok) {
-                const errorData = await retryPrakritiResponse.json();
-                throw new Error(errorData.error || "Failed to fetch final Prakriti.");
+            if (!response.ok) {
+                throw new Error("Failed to fetch final Prakriti.");
             }
     
-            const finalData = await retryPrakritiResponse.json();
-            console.log("Final Prakriti (after submission):", finalData.final_prakriti);
+            const data = await response.json();
+            console.log("API Response:", data);
     
-            alert(`Final Prakriti: ${finalData.final_prakriti}`);
-            history.push("/app/final");
+            // Handle Tie Case (Redirect to /app/question)
+            if (data.next_step === "Fill the questionnaire") {
+                alert("A tie was detected. Redirecting to the questionnaire...");
+                history.push("/app/question");
+                return;
+            }
+    
+            // If no tie, show final Prakriti result
+            if (data.final_prakriti) {
+                alert(`Final Prakriti: ${data.final_prakriti}`);
+                history.push("/app/final");
+            }
+    
         } catch (error) {
             console.error("Error:", error);
             alert(`Error: ${error.message}`);
         }
-    };
+    };    
     
 
     return (
