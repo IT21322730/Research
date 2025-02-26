@@ -6,11 +6,13 @@ const VataPitta: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonButtons slot="start">
-                              <IonBackButton defaultHref="/app/final" />
-                            </IonButtons>
-        <IonTitle>RECOMANDATION</IonTitle>
-      </IonHeader>
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonBackButton defaultHref="/app/final" />
+                </IonButtons>
+                <IonTitle>RECOMANDATION</IonTitle>
+              </IonToolbar>
+            </IonHeader>
       <IonContent>
         <div className="Vata-Pitta-container">
           <h1>What Does Vata-Pitta Mean?</h1>
