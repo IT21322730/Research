@@ -73,7 +73,7 @@ const Question: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/nailhome" /> {/* Replace with your previous page path */}
+            <IonBackButton defaultHref="/app/final" /> {/* Replace with your previous page path */}
           </IonButtons>
           <IonTitle>SELF ASSIGNMENT</IonTitle>
         </IonToolbar>
