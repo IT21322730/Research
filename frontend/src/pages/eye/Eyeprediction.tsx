@@ -57,7 +57,7 @@ const PredictionPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Your Eye Prediction</IonTitle>
+          <IonTitle>EYE PRAKURTHI PREDICTION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>

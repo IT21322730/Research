@@ -31,8 +31,8 @@ import NailHome from '../nail/NailHome';
 import NailPrakurthi from '../nail/NailPrakurthi';
 import NailCap from '../nail/NailCap';
 import NailPredictionPage from '../nail/NailPredictionpage';
-
-
+import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
+import HairPrakruthiResults from '../hair/HairPrakurthiResults';
 
 
 const Tabs: React.FC = () => {
@@ -70,6 +70,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/hairhome" component={HairHome} />
             <Route path="/app/hairprakurthi" component={HairPrakurthi} />
             <Route path="/app/hairprakurthi" component={HairPrakurthi} />
+            <Route path="/app/hair-results" component={HairPrakruthiResults} />
             
             <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/blink" component={BlinkEye} />
@@ -79,7 +80,10 @@ const Tabs: React.FC = () => {
 
             <Route path="/app/nailhome" component={NailHome} />
             <Route path="/app/nailprakurthi" component={NailPrakurthi} />
+            <Route path="/app/nailprediction" component={NailPredictionPage}/>
             <Route path="/app/cap" component={NailCap} />
+
+            <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction}/>
             
 
             <Route path="/app/patient-info" component={Patient} />

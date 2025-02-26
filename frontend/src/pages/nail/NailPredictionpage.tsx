@@ -61,7 +61,7 @@ const NailPredictionPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Nail Prakruti Prediction</IonTitle>
+          <IonTitle>NAIL PRAKURTHI PREDICTION</IonTitle>
         </IonToolbar>
       </IonHeader>
 

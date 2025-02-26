@@ -84,24 +84,6 @@ const Step: React.FC = () => {
                 return; // Stop execution if Prakriti is already available
             } 
     
-            console.log("Final Prakriti not available. Submitting questionnaire...");
-    
-            // Step 2: Submit the questionnaire since Prakriti was not available
-            const questionnaireResponse = await fetch("http://127.0.0.1:5000/submit-questionnaire", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ user_uid: userUid, answers: userAnswers }), // Send user responses
-            });
-    
-            if (!questionnaireResponse.ok) {
-                const errorData = await questionnaireResponse.json();
-                throw new Error(errorData.error || "Failed to submit questionnaire.");
-            }
-    
-            console.log("Questionnaire submitted successfully!");
-    
             // Step 3: Fetch Final Prakriti Again
             const retryPrakritiResponse = await fetch(
                 `http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`

@@ -29,12 +29,10 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
 
-import HairPrakruthiResults from './pages/hair/HairPrakurthiResults';
 import HairPic from './pages/hair/HairPic';
 
 import NailVideo from './pages/nail/NailVedio'
 import NailPic from './pages/nail/NailPic';
-import NailPredictionPage from './pages/nail/NailPredictionpage';
 
 
 /**
@@ -51,7 +49,6 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import FacePic from './pages/face/FacePic';
-import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
 
 setupIonicReact();
 
@@ -69,16 +66,13 @@ const App: React.FC = () => (
 
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
-        <Route path="/app/hair-results" component={HairPrakruthiResults} exact={true}/>
         <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
         <Route path="/app/face-pic" component={FacePic} exact={true} />
-        <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true} />
 
 
         <Route path="/app/nail-pic" component={NailPic} exact={true} />
         <Route path="/app/nail-video" component={NailVideo} exact={true} />
-        <Route path="/app/nailprediction" component={NailPredictionPage} exact={true} />
        
 
         
