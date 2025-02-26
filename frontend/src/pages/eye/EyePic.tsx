@@ -160,7 +160,7 @@ const EyePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take Picture</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>

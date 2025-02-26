@@ -143,7 +143,7 @@ const NailPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take the Nail Picture</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
