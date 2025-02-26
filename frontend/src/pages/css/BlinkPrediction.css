@@ -64,3 +64,49 @@
 .color-coding td:first-child {
     font-size: 20px;
 }
+
+.page-title {
+    font-family: "Open Sans", sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+/* Left-aligning the sections */
+.home-remedies-section,
+.yoga-section,
+.food-section {
+  text-align: left;
+  margin-top: px; /* Reduce top margin */
+  margin-bottom: 10px; /* Keep consistency */
+  text-align: justify; /* Justify text alignment */
+}
+
+.yoga-section h2,
+.home-remedies-section h2,
+.food-section h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.yoga-section ul,
+.home-remedies-section ul,
+.food-section ul {
+  padding-left: 20px;
+}
+
+.yoga-section li,
+.home-remedies-section li,
+.food-section li {
+  margin-bottom: 10px;
+}
+
+.yoga-section p,
+.home-remedies-section p,
+.food-section p {
+  font-size: 16px;
+}
+
