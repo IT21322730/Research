@@ -1,23 +1,72 @@
-import React from 'react';
-import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonButtons, IonBackButton, IonText, IonButton } from '@ionic/react';
-import { useHistory } from 'react-router-dom'; // To programmatically navigate
-import '../css/FinalPrakurthi.css'; // Import your styles here
+import React, { useEffect, useState } from "react";
+import {
+  IonHeader,
+  IonPage,
+  IonContent,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,
+  IonText,
+} from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import { auth } from "../firebase/firebase"; // Firebase auth import
+import "../css/FinalPrakurthi.css"; // Import CSS
 
-const bodyTypes = [
-  { name: "Vata Body Type", color: "#FFCCCB", path: "/app/vata-body" },
-  { name: "Pitta Body Type", color: "#FFD700", path: "/app/pitta-body" },
-  { name: "Kapha Body Type", color: "#ADD8E6", path: "/app/kapha-body" },
-  { name: "Vata-Pitta Body Type", color: "#FFB6C1", path: "/app/vata-pitta-body" },
-  { name: "Pitta-Kapha Body Type", color: "#FF7F50", path: "/app/pitta-kapha-body" },
-  { name: "Vata-Kapha Body Type", color: "#90EE90", path: "/app/vata-kapha-body" },
-  { name: "Vata-Pitta-Kapha Body Type", color: "#DDA0DD", path: "/app/vata-pitta-kapha-body" },
-];
+// Import Image
+import finalImage from "../images/img_final.jpg"; // Adjust the path if needed
 
 const FinalPrakurthi: React.FC = () => {
   const history = useHistory();
+  const [finalPrakurthi, setFinalPrakurthi] = useState<string | null>(null);
+  const [prakurthiDetails, setPrakurthiDetails] = useState<{ Face?: string; Eye?: string; Hair?: string; Nails?: string }>({});
+  const [userUid, setUserUid] = useState<string | null>(null);
 
-  const handleNavigate = (path: string) => {
-    history.push(path); // Navigate programmatically
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserUid(user.uid);
+      } else {
+        console.error("Error: User UID is missing.");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!userUid) return;
+
+    const fetchFinalPrakurthi = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch Final Prakurthi");
+        }
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        setFinalPrakurthi(data.final_prakriti);
+        setPrakurthiDetails(data.individual_predictions);
+      } catch (error) {
+        console.error("Error fetching Prakurthi:", error);
+      }
+    };
+
+    fetchFinalPrakurthi();
+  }, [userUid]);
+
+  // Function to navigate based on Prakurthi
+  const handleNavigation = () => {
+    if (finalPrakurthi === "Vata") {
+      history.push("/app/all/Vata"); // Navigate to Vata.tsx
+    } else if (finalPrakurthi === "Pitta") {
+      history.push("/app/all/Pitta"); // Navigate to Pitta.tsx
+    } else {
+      alert("Unknown Prakurthi Type!"); // Handle other cases
+    }
   };
 
   return (
@@ -25,31 +74,55 @@ const FinalPrakurthi: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/previousPage" /> {/* Replace with your previous page path */}
+            <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Final Prakurthi</IonTitle>
+          <IonTitle>FINAL PRAKURTHI</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <div className="final-prakurthi-container">
-          <IonText>
-            <h2>Your Final Prakurthi is:</h2>
-            <p>Your analysis results will be displayed here.</p>
-          </IonText>
+        <div className="final-prakurthi-page">
+          <div className="final-prakurthi-container">
+            {/* Image Display */}
+            <div className="image-container">
+              <img src={finalImage} alt="Final Prakurthi" className="prakurthi-image" />
+            </div>
 
-          <div className="body-type-cards">
-            {bodyTypes.map((type, index) => (
-              <IonButton
-                key={index}
-                expand="full"
-                style={{ backgroundColor: type.color }}
-                onClick={() => handleNavigate(type.path)}
-              >
-                {type.name}
-              </IonButton>
-            ))}
+            <IonText>
+              <h2><strong>Your Final Prakurthi is:</strong></h2>
+              <h3 style={{ color: "#48D1CC", fontWeight: "bold" }}>{finalPrakurthi || "Loading..."}</h3>
+            </IonText>
+
+            <div className="prakurthi-details">
+              <IonText>
+                <p><strong>Face Prakurthi:</strong> {prakurthiDetails.Face || "Loading..."}</p>
+                <p><strong>Eye Prakurthi:</strong> {prakurthiDetails.Eye || "Loading..."}</p>
+                <p><strong>Hair Prakurthi:</strong> {prakurthiDetails.Hair || "Loading..."}</p>
+                <p><strong>Nail Prakurthi:</strong> {prakurthiDetails.Nails || "Loading..."}</p>
+              </IonText>
+            </div>
           </div>
+          <br />
+
+          {/* Button to navigate based on Final Prakurthi */}
+          <button
+            onClick={handleNavigation}
+            style={{ 
+              backgroundColor: "#48D1CC", 
+              color: "black", 
+              padding: "15px 20px", 
+              borderRadius: "5px", 
+              border: "none", 
+              cursor: "pointer", 
+              fontWeight: "bold", 
+              width: "100%", 
+              fontSize: "18px", /* Added font size */
+              fontFamily: "'Open Sans', sans-serif" /* Added Font Style */
+            }}
+          >
+            View Prakurthi Details
+          </button>
+
         </div>
       </IonContent>
     </IonPage>

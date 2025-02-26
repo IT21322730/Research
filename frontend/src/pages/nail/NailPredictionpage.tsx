@@ -49,6 +49,11 @@ const NailPredictionPage: React.FC = () => {
     setLoading(false);
   }, [location.state, history]);
 
+  // Function to handle the redirect
+  const handleRedirect = () => {
+    history.push('/app/step');
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -118,7 +123,31 @@ const NailPredictionPage: React.FC = () => {
           ) : (
             <p>No prediction data found.</p>
           )}
+          <button
+                className="take-picture-button"
+                style={{
+                  fontWeight: '600',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '5px',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.3s',
+                  fontFamily: '"Open Sans", sans-serif',
+                  width: '350px',
+                  height: '45px',
+                  textAlign: 'center',
+                  backgroundColor: 'rgb(72, 209, 204)',
+                  color: 'black',
+                  marginTop: '20px',
+                  marginBottom: '5px',
+                }}
+                onClick={handleRedirect} // Trigger redirect on button click
+              >
+                Take the next step
+              </button>
         </div>
+        
       </IonContent>
     </IonPage>
   );

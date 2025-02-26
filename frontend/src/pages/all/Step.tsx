@@ -2,12 +2,46 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom'; 
 import { IonPage,IonSelect,IonSelectOption,IonBadge, IonIcon,IonContent, IonAccordionGroup, IonAccordion, IonItem, IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, IonButton } from "@ionic/react";
 import '../css/Step.css';  // Importing the CSS file
-import { notificationsOutline } from 'ionicons/icons';
+import { auth } from "../firebase/firebase";  // Use auth instead of getAuth
+import { db, doc, getDoc } from "../firebase/firebase"; // Use db instead of getFirestore, getDocs instead of getDoc
+
 
 const Step: React.FC = () => {
     const history = useHistory();
     const [accordionValue, setAccordionValue] = useState<string[]>(['first']);  // Default open 'first' accordion
+    const [userUid, setUserUid] = useState<string | null>(null);
+    const [userDocId, setUserDocId] = useState<string | null>(null);
 
+    useEffect(() => {
+        // Fetch the authenticated user's UID
+        const fetchUser = () => {
+            const user = auth.currentUser;
+            if (user) {
+                setUserUid(user.uid);
+                getUserDocId(user.uid);
+            } else {
+                console.error("User not authenticated.");
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    // Function to get user document ID from Firestore
+    const getUserDocId = async (uid: string) => {
+        try {
+            const userRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+                setUserDocId(userDoc.id);
+            } else {
+                console.error("User not found in Firestore.");
+            }
+        } catch (error) {
+            console.error("Error fetching user document:", error);
+        }
+    };
 
     const handleTakeFacePicture = () => {
         console.log('Open camera to take a picture');
@@ -29,11 +63,66 @@ const Step: React.FC = () => {
         history.push('/app/nail-pic'); // Navigate to the desired page
         window.location.reload();
     };
-    const handleTakePicture = () => {
-        console.log('Open camera to take a picture');
-        history.push('/app/final-prakurthi'); // Navigate to the desired page
-        window.location.reload();
+    
+    const handleTakePicture = async () => {
+        if (!userUid) {
+            alert("Error: User UID is missing.");
+            return;
+        }
+    
+        try {
+            // Step 1: Try fetching the final Prakriti first
+            const prakritiResponse = await fetch(
+                `http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`
+            );
+    
+            if (prakritiResponse.ok) {
+                const data = await prakritiResponse.json();
+                console.log("Final Prakriti already available:", data.final_prakriti);
+                alert(`Final Prakriti: ${data.final_prakriti}`);
+                history.push("/app/final");
+                return; // Stop execution if Prakriti is already available
+            } 
+    
+            console.log("Final Prakriti not available. Submitting questionnaire...");
+    
+            // Step 2: Submit the questionnaire since Prakriti was not available
+            const questionnaireResponse = await fetch("http://127.0.0.1:5000/submit-questionnaire", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_uid: userUid, answers: userAnswers }), // Send user responses
+            });
+    
+            if (!questionnaireResponse.ok) {
+                const errorData = await questionnaireResponse.json();
+                throw new Error(errorData.error || "Failed to submit questionnaire.");
+            }
+    
+            console.log("Questionnaire submitted successfully!");
+    
+            // Step 3: Fetch Final Prakriti Again
+            const retryPrakritiResponse = await fetch(
+                `http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`
+            );
+    
+            if (!retryPrakritiResponse.ok) {
+                const errorData = await retryPrakritiResponse.json();
+                throw new Error(errorData.error || "Failed to fetch final Prakriti.");
+            }
+    
+            const finalData = await retryPrakritiResponse.json();
+            console.log("Final Prakriti (after submission):", finalData.final_prakriti);
+    
+            alert(`Final Prakriti: ${finalData.final_prakriti}`);
+            history.push("/app/final");
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Error: ${error.message}`);
+        }
     };
+    
 
     return (
         <IonPage>
@@ -71,8 +160,17 @@ const Step: React.FC = () => {
                                 <li>Review the images for clarity before uploading.</li>
                             </ul>
                             <button
-                                className="take-picture-button"
-                                style={{ backgroundColor: '#48D1CC', color: 'black' }}
+                                style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                                 onClick={handleTakeFacePicture}
                             >
                                 Take Your Picture
@@ -92,7 +190,7 @@ const Step: React.FC = () => {
                                 Please follow the instructions for capturing your eye images for accurate analysis.
                             </p>
                             <h3 className="instructions-heading">Instructions:</h3>
-                            <ul className="instructions-list">
+                            <ul>
                                 <li>Ensure good lighting and clean the camera lens.</li>
                                 <li>Sit or stand comfortably, facing the camera.</li>
                                 <li>Focus on each eye separately, avoiding reflections and glare.</li>
@@ -100,8 +198,17 @@ const Step: React.FC = () => {
                                 <li>Review the images for clarity before uploading.</li>
                             </ul>
                             <button
-                                className="take-picture-button"
-                                style={{ backgroundColor: '#48D1CC', color: 'black' }}
+                                style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                                 onClick={handleTakeEyePicture}
                             >
                                 Take Your Picture
@@ -120,7 +227,7 @@ const Step: React.FC = () => {
                                 Please follow the instructions for capturing your hair images for accurate analysis.
                             </p>
                             <h3 className="instructions-heading">Instructions:</h3>
-                            <ul className="instructions-list">
+                            <ul>
                                 <li>Ensure good lighting and clean the camera lens.</li>
                                 <li>Sit or stand comfortably, facing the camera.</li>
                                 <li>Front Weave: Face the camera directly, showing your hairline clearly.</li>
@@ -129,8 +236,18 @@ const Step: React.FC = () => {
                                 <li>Review the images for clarity before uploading.</li>
                             </ul>
                             <button
-                                className="take-picture-button"
-                                style={{ backgroundColor: '#48D1CC', color: 'black' }}
+                                
+                                style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                                 onClick={handleTakeHairPicture}
                             >
                                 Take Your Picture
@@ -149,14 +266,23 @@ const Step: React.FC = () => {
                                 Please follow the instructions for capturing your eye images for accurate analysis.
                             </p>
                             <h3 className="instructions-heading">Instructions:</h3>
-                            <ul className="instructions-list">
+                            <ul>
                                 <li>Ensure good lighting and clean the camera lens.</li>
                                 <li>Place your hand flat on a neutral background, keep your fingers relaxed, and take a photo from directly above, ensuring your whole hand is visible.</li>
                                 <li>Hold your hand slightly clenched on a plain background with good lighting, and capture the top of your hand clearly showing the nails and fingertips.</li>
                             </ul>
                             <button
-                                className="take-picture-button"
-                                style={{ backgroundColor: '#48D1CC', color: 'black' }}
+                                style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                                 onClick={handleTakeNailPicture}
                             >
                                 Take Your Picture
@@ -165,43 +291,29 @@ const Step: React.FC = () => {
                     </IonAccordion>
 
                     <IonAccordion value="fifth">
-  <IonItem slot="header" color="light">
-    Step 05
-  </IonItem>
-  <div className="ion-padding" slot="content">
-    <p className="justified-text">You need to complete the above steps as mentioned.</p>
-    
-    <div>
-    <p className="justified-text">Your Face prakurthi</p>
-    <input type="text" readOnly className="ion-input" />
-    </div>
-    
-    <div>
-      <p className="justified-text">Your Eye prakurthi</p>
-      <input type="text" readOnly className="ion-input" />
-    </div>
-    
-    <div>
-      <p className="justified-text">Your Hair prakurthi</p>
-      <input type="text" readOnly className="ion-input" />
-    </div>
-    
-    <div>
-      <p className="justified-text">Your Nail prakurthi</p>
-      <input type="text" readOnly className="ion-input" />
-    </div>
-
-    <button
-      className="take-picture-button"
-      style={{ backgroundColor: '#48D1CC', color: 'black' }}
-      onClick={handleTakePicture}
-    >
-      Final
-    </button>
-  </div>
-</IonAccordion>
-
-
+                    <IonItem slot="header" color="light">
+                        Step 05
+                    </IonItem>
+                    <div className="ion-padding" slot="content">
+                        <p className="justified-text">You need to complete the above steps as mentioned.</p>
+                        <button
+                        style={{ 
+                            backgroundColor: '#48D1CC', 
+                            color: 'black',
+                            padding: "15px 20px", 
+                            borderRadius: "5px", 
+                            border: "none", 
+                            cursor: "pointer", 
+                            fontWeight: "bold", 
+                            width: "100%", 
+                            fontSize: "18px", /* Added font size */
+                            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
+                        onClick={handleTakePicture}
+                        >
+                        Final
+                        </button>
+                    </div>
+                    </IonAccordion>
 
                 </IonAccordionGroup>
             </IonContent>

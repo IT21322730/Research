@@ -57,7 +57,7 @@ db = firestore.client()
 
 ### MOdels ###
 # Load the DL model for face images - IT21322730
-facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
+facePrakrurthi_model = tf.keras.models.load_model('./model/FacePrakurthiFinal_CNN_Model.h5')
 # Load the DL model for eye images - IT21319488
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
 # Load the DL model for hair images
