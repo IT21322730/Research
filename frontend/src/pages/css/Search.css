@@ -65,4 +65,13 @@
   .patient-details-text strong {
     font-weight: bold;
   }
+
+  .custom-searchbar {
+    --background: #ffffff; /* White background */
+    --color: #333; /* Dark text color */
+    font-family: "Open Sans", sans-serif;
+  }
+  
+  
+ 
   
