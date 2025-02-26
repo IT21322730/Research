@@ -6,7 +6,6 @@ import { IonReactRouter } from '@ionic/react-router';
 import FirstLook from './pages/all/FirstLook';
 import LoginHome from './pages/all/LoginPage'
 import ForgotPassword from './pages/all/ForgotPassword';
-import Question from './pages/all/Question';
 import Tabs from './pages/all/Tabs';
 import Signup from './pages/all/Signup';
 import VerificationCode from './pages/all/VerificationCode'
@@ -53,10 +52,6 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 import FacePic from './pages/face/FacePic';
 import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
-import FaceMicro from './pages/face/FaceMicro';
-import FaceVideo from './pages/face/FaceVideo';
-import FaceVideoPrediction from './pages/face/FaceVideoPrediction';
-
 
 setupIonicReact();
 
@@ -70,7 +65,7 @@ const App: React.FC = () => (
         <Route path="/register" component={Signup} />
         <Route path="/forgot-password" component={ForgotPassword} exact={true} />
         <Route path="/verify-code" component={VerificationCode} exact={true} />
-        <Route path="/app/question" component={Question} exact={true} />
+        
 
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />

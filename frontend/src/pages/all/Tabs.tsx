@@ -17,8 +17,8 @@ import Patient from '../all/Patient'
 import EyePredictionPage from '../eye/Eyeprediction'
 import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye';
-import EyePrakurthi from '../eye/Eyeprakurthi';
 import BlinkPrediction from '../eye/BlinkPrediction';
+import Question from '../all/Question';
 
 
 import EyeHome from '../eye/EyeHome';
@@ -72,7 +72,6 @@ const Tabs: React.FC = () => {
             <Route path="/app/hairprakurthi" component={HairPrakurthi} />
             
             <Route path="/app/eyehome" component={EyeHome} />
-            <Route path="/app/eyeprakurthi" component={EyePredictionPage} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
             <Route path="/app/prediction/:docId" component={EyePredictionPage} />
@@ -88,6 +87,7 @@ const Tabs: React.FC = () => {
 
             
             <Route path="/app/final" component={FinalPrakurthi} />
+            <Route path="/app/question" component={Question} />
 
             
             <Route path="/app/pitta-body" component={Pitta} />

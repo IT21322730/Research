@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle } from "@ionic/react";
 import "../css/Question.css";
 import img_02 from "../images/img_02.png";
+import { auth } from "../firebase/firebase"; // Ensure auth is imported
 
 const questions = [
   { question: "How do you usually respond to stress or pressure?", answers: ["Feel anxious", "Become irritable", "Remain calm"] },
@@ -35,18 +36,33 @@ const Question: React.FC = () => {
       console.log("Please answer all questions.");
       return;
     }
-
+  
+    // Get the current user
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User not logged in.");
+      return;
+    }
+  
     try {
-      const response = await fetch("http://localhost:5000/analyze-prakriti/", {
+      const response = await fetch("http://localhost:5000/submit-questionnaire", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ answers: selectedAnswers }),
+        body: JSON.stringify({
+          user_uid: user.uid,  // ✅ Include user UID
+          answers: selectedAnswers, // ✅ Send answers
+        }),
       });
-
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server Error: ${response.status} - ${errorText}`);
+      }
+  
       const result = await response.json();
-      setResponse(result.prakriti); // Store the response under the 'Done' button
+      setResponse(result.prakriti);
     } catch (error) {
       console.error("Error sending answers:", error);
     }
@@ -88,32 +104,22 @@ const Question: React.FC = () => {
         <div className="button-container" style={{ marginTop: "10px" }}> {/* Reduce margin */}
           <button
             className="question-button"
-            style={{
-              backgroundColor: "#48D1CC",
-              color: "#fff",
-              width: "500px",
-              height: "50px",
-              fontSize: "16px",
-              borderRadius: "10px",
-            }}
+            style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
             onClick={handleSubmit} // Call function on click
           >
             Done
           </button>
-        </div>
-
-         {/* Display Prakriti result */}
-         {response && (
-          <div className="prakriti-result" style={{ 
-            marginTop: "20px", 
-            fontSize: "18px", 
-            marginBottom: "60px", 
-            fontWeight: "bold", 
-            textAlign: "center" 
-          }}>
-            <p>Final Prakriti type is <strong>{response}</strong></p>
-          </div>
-        )}
+        </div><br/><br/>
       </div>
     </>
   );

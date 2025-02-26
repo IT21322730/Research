@@ -308,6 +308,8 @@ const Step: React.FC = () => {
                             width: "100%", 
                             fontSize: "18px", /* Added font size */
                             fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
+                        className="take-picture-button"
+                        style={{ backgroundColor: '#48D1CC', color: 'black' }}
                         onClick={handleTakePicture}
                         >
                         Final

@@ -3,7 +3,7 @@
 // Import the functions you need from the Firebase SDKs
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc, onSnapshot,deleteDoc,doc,  getDoc, query,updateDoc, getDocs ,onAuthStateChanged } from "firebase/firestore";
+import { getFirestore, collection, addDoc, onSnapshot,deleteDoc,doc,  getDoc, query,updateDoc, getDocs } from "firebase/firestore";
 import {Timestamp, FieldValue } from "firebase/firestore"; // <-- Added FieldValue
 import { getStorage,ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -25,7 +25,7 @@ export const db = getFirestore(app);// Firestore Database
 export const storage = getStorage(app);// Firebase Storage
 
 // Export Firestore utilities
-export { ref, uploadBytes, getDownloadURL,collection, addDoc,onSnapshot, deleteDoc,doc,getDoc, query,updateDoc,getDocs,onAuthStateChanged };
+export { ref, uploadBytes, getDownloadURL,collection, addDoc,onSnapshot, deleteDoc,doc,getDoc, query,updateDoc,getDocs};
 
 // Export FieldValue for usage in Firestore operations - eye video
 export { FieldValue, Timestamp };
