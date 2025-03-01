@@ -1056,7 +1056,7 @@ if not os.path.exists("uploads"):
     os.makedirs("uploads")
 
 # Function to analyze the video and detect dominant emotion
-def analyze_video(video_path):
+def analyze_video(video_path, user_uid):
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
     all_emotions = []
@@ -1249,6 +1249,8 @@ def analyze_emotions():
     # Clean up the uploaded video file
     if os.path.exists(video_path):
         os.remove(video_path)
+
+    return jsonify(result)
 
 
 
