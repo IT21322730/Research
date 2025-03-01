@@ -27,12 +27,16 @@ import Question from '../all/Question';
 
 
 import EyeHome from '../eye/EyeHome';
-import StepHome from './StepHome';
+import Step from './Step';
 
 import FaceMappingPrediction from '../face/FaceMappingPrediction';
 import FaceVideoPrediction from '../face/FaceVideoPrediction';
 import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
 
+import HairHome from '../hair/HairHome';
+import HairPic from '../hair/HairPic';
+import HairPrakurthi from '../hair/HairPrakurthi';
+import HairPrakruthiResults from '../hair/HairPrakurthiResults';
 
 const Tabs: React.FC = () => {
 
