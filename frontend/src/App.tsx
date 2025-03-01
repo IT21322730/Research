@@ -49,7 +49,10 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import FacePic from './pages/face/FacePic';
+import FaceMicro from './pages/face/FaceMicro';
 import FaceVideo from './pages/face/FaceVideo';
+import FaceMapping from './pages/face/FaceMapping';
+import FaceMappingPic from './pages/face/FaceMappingPic';
 
 setupIonicReact();
 
@@ -71,13 +74,12 @@ const App: React.FC = () => (
         <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
         <Route path="/app/face-pic" component={FacePic} exact={true} />
+        
+        <Route path="/app/facemicro" component={FaceMicro} />
         <Route path="/app/face-video" component={FaceVideo} exact={true} />
-
-
-        <Route path="/app/nail-pic" component={NailPic} exact={true} />
-        <Route path="/app/nail-video" component={NailVideo} exact={true} />
+        <Route path="/app/facemapping" component={FaceMapping} exact={true} />
+        <Route path="/app/face-mapping-pic" component={FaceMappingPic} exact={true} />
        
-
         
       </IonRouterOutlet>
     </IonReactRouter>

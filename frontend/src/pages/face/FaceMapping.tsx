@@ -8,7 +8,7 @@ const FaceMapping: React.FC = () => {
 
   const handleTakePicture = () => {
     console.log('Open camera to take a picture');
-    history.push('/app/face-pic-micro'); // Navigate to the desired page
+    history.push('/app/face-mapping-pic'); // Navigate to the desired page
     window.location.reload()
   };
 

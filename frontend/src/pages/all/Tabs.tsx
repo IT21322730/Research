@@ -27,20 +27,12 @@ import Question from '../all/Question';
 
 
 import EyeHome from '../eye/EyeHome';
-import HairHome from '../hair/HairHome';
-import Step from './Step';
+import StepHome from './StepHome';
 
-import HairPrakurthi from '../hair/HairPrakurthi';
-
-import NailPrakurthi from '../nail/NailPrakurthi';
-import NailCap from '../nail/NailCap';
-import NailPredictionPage from '../nail/NailPredictionpage';
-import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
-import HairPrakruthiResults from '../hair/HairPrakurthiResults';
+import FaceMappingPrediction from '../face/FaceMappingPrediction';
 import FaceVideoPrediction from '../face/FaceVideoPrediction';
+import FacePrakurthiPrediction from '../face/FacePrakurthiPrediction';
 
-import FaceMicro from '../face/FaceMicro';
-import FaceMapping from '../face/FaceMapping'
 
 const Tabs: React.FC = () => {
 
@@ -82,21 +74,10 @@ const Tabs: React.FC = () => {
             <Route path="/app/eyehome" component={EyeHome} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
-            <Route path="/app/prediction/:docId" component={EyePredictionPage} />
-            <Route path="/app/blink-prediction/:docId" component={BlinkPrediction} />
 
-            <Route path="/app/nailprakurthi" component={NailPrakurthi} />
-            <Route path="/app/nailprediction" component={NailPredictionPage}/>
-            <Route path="/app/cap" component={NailCap} />
-
-            <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction}/>
-            <Route path="/app/facemapping" component={FaceMapping} />
-            <Route path="/app/facemicro" component={FaceMicro} />
+            <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
+            <Route path="/app/face-mapping-prediction" component={FaceMappingPrediction} exact={true} />
             <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
-            
-
-            <Route path="/app/patient-info" component={Patient} />
-            <Route path="/app/edit-patient/:patientId" component={EditPatient} />
 
             
             <Route path="/app/final" component={FinalPrakurthi} />

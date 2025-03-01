@@ -11,6 +11,7 @@ import traceback
 import os
 import cv2
 from deepface import DeepFace
+import mediapipe as mp
 from collections import Counter
 from datetime import datetime
 import pytz
@@ -52,21 +53,12 @@ cred = credentials.Certificate('D:\\Backend\\serviceAccountKey.json')
 initialize_app(cred)
 db = firestore.client()
 
+# Ensure the uploads directory exists
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
 
-#### Analyse Prakurthi ###
-
-### MOdels ###
-# Load the DL model for face images - IT21322730
-facePrakrurthi_model = tf.keras.models.load_model('./model/FacePrakurthiFinal_CNN_Model.h5')
-# Load the DL model for eye images - IT21319488
-image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
-# Load the DL model for hair images
-hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
-# Load the DL model for hair images - IT21324024
-import tensorflow as tf
-# Load the DL model for nail images - IT21324024
-nail_model = tf.keras.models.load_model('./model/Nails.h5')
-
+# Load the ML model for images
+facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
 
 # Mapping of model output to Ayurvedic Prakriti classifications for images
 prediction_mapping = {
@@ -165,7 +157,7 @@ def process_face_images():
 
         # Return response
         return jsonify({
-            "message": "Face images processed and stored successfully!",
+            "message": "Face images processed and stored successfully!!!",
             "document_id": doc_ref.id,
             "individual_predictions": predictions,
             "final_prakriti": overall_result,
@@ -176,7 +168,7 @@ def process_face_images():
         print(f"Error occurred: {str(e)}")  
         print(traceback.format_exc())  # Log detailed traceback
         return jsonify({"error": "An error occurred during processing. Please try again.", "details": str(e)}), 500
-    
+
 
 #IT21319488 -  Eye prakurthi
 @app.route('/process-firebase-image', methods=['POST'])
@@ -728,21 +720,19 @@ if not os.path.exists("uploads"):
 def analyze_video(video_path):
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
-    emotions = []  # List to store detected emotions
+    all_emotions = []
 
     if not cap.isOpened():
         print("Error: Cannot open the video file.")
-        return "Error: Cannot open the video file."
+        return {"error": "Cannot open the video file."}
 
     while True:
         ret, frame = cap.read()
-
         if not ret:
             break
 
         frame_count += 1
-
-        if frame is None:  # Ensure frame is valid
+        if frame is None:
             print(f"Skipping frame {frame_count} (Invalid frame)")
             continue
 
@@ -751,47 +741,177 @@ def analyze_video(video_path):
 
         try:
             result = DeepFace.analyze(img_path=frame_path, actions=['emotion'], enforce_detection=False)
-
+            
             if isinstance(result, list):
-                dominant_emotion = result[0]['dominant_emotion']
+                detected_emotions = result[0]['emotion']  # Store all detected emotions
             else:
-                dominant_emotion = result['dominant_emotion']
+                detected_emotions = result['emotion']
 
-            emotions.append(dominant_emotion)
+            all_emotions.append(detected_emotions)  # Store all emotions from the frame
 
         except Exception as e:
             print(f"Error analyzing frame {frame_count}: {str(e)}")
 
-        # Clean up the frame image
         if os.path.exists(frame_path):
             os.remove(frame_path)
 
     cap.release()
     cv2.destroyAllWindows()
 
-    emotion_counts = Counter(emotions)
-    final_emotion = emotion_counts.most_common(1)[0] if emotions else ("No emotion detected", 0)
+    if not all_emotions:
+        return {"message": "No emotions detected."}
 
-    return final_emotion
+    # Aggregate all detected emotions across frames
+    aggregated_emotions = Counter()
+    total_frames = len(all_emotions)
+
+    for emotion_set in all_emotions:
+        for emotion, score in emotion_set.items():
+            aggregated_emotions[emotion] += score
+
+    # Calculate average emotion percentages
+    emotion_percentages = {
+        emotion.capitalize(): round((score / total_frames), 2) for emotion, score in aggregated_emotions.items()
+    }
+
+    # Generate psychological insights
+    psychological_insights = generate_psychological_insights(emotion_percentages)
+
+    # **Generate recommendations**
+    recommendations = get_recommendations(psychological_insights)
+
+    # If no concerning insights, add a positive message
+    if not psychological_insights:
+        psychological_insights.append("No concerning emotional patterns detected. You seem mentally stable and balanced.")
+
+    # **Save to Firestore & get doc ID + timestamp**
+    doc_id, timestamp = save_to_micro_expressions_firestore(user_uid, emotion_percentages, psychological_insights, recommendations)
+
+    response_data = {
+        "message": "Your micro-expression analysis is done!!!",
+        "emotion_percentages": emotion_percentages,
+        "psychological_insights": psychological_insights,
+        "recommendations": recommendations,
+        "timestamp": timestamp,  # ⬅️ Include Timestamp
+        "doc_id": doc_id  # ⬅️ Include Firestore Document ID
+    }
+
+    return response_data
+
+
+# **Function to Generate Dynamic Psychological Insights**
+def generate_psychological_insights(emotion_percentages):
+    insights = []
+
+    if "Sad" in emotion_percentages and emotion_percentages["Sad"] > 60:
+        insights.append("High sadness detected → Possible emotional distress or depression.")
+
+    if "Fear" in emotion_percentages and emotion_percentages["Fear"] > 60:
+        insights.append("High fear detected → Possible anxiety or heightened stress response.")
+
+    if "Happy" in emotion_percentages and "Sad" in emotion_percentages:
+        happiness = emotion_percentages["Happy"]
+        sadness = emotion_percentages["Sad"]
+        if abs(happiness - sadness) < 20:
+            insights.append("Mood fluctuations detected → Possible emotional instability.")
+
+    if "Neutral" in emotion_percentages and emotion_percentages["Neutral"] > 50:
+        insights.append("High neutrality detected → Possible emotional detachment or suppression.")
+
+    return insights
+
+
+# **Function to Provide Recommendations Based on Psychological Insights**
+def get_recommendations(psychological_insights):
+    recommendations = []
+
+    for insight in psychological_insights:
+        if "sadness" in insight.lower():
+            recommendations.append("Consider engaging in social activities or talking to a trusted friend.")
+            recommendations.append("Daily exercise and mindfulness practices can help improve mood.")
+
+        if "fear" in insight.lower():
+            recommendations.append("Try relaxation techniques such as deep breathing or meditation.")
+            recommendations.append("Consider gradual exposure therapy to overcome anxiety triggers.")
+
+        if "mood fluctuations" in insight.lower():
+            recommendations.append("Maintaining a daily routine can help stabilize emotions.")
+            recommendations.append("Journaling your feelings might help you track emotional patterns.")
+
+        if "neutrality" in insight.lower():
+            recommendations.append("Engaging in hobbies or creative activities can boost emotional expression.")
+            recommendations.append("Consider practicing gratitude exercises to enhance emotional engagement.")
+
+    if not recommendations:
+        recommendations.append("Maintain a balanced lifestyle with proper sleep, diet, and exercise.")
+        recommendations.append("Stay socially connected and seek support when needed.")
+
+    return recommendations
+
+
+# **Function to Save Data to Firestore & Return Doc ID + Timestamp**
+def save_to_micro_expressions_firestore(user_uid, emotion_percentages, psychological_insights, recommendations):
+    try:
+        # Define timezone
+        local_tz = pytz.timezone('Asia/Colombo')
+
+        # Get the current UTC time and convert it to local time
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+
+        # Format the timestamp
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        # Get user document reference
+        user_ref = db.collection("users").document(user_uid)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            print(f"User {user_uid} not found in Firestore")
+            return None, None
+
+        # 🔹 **Store analysis result in Firestore & Get Doc ID**
+        doc_ref = db.collection("expression_analysis").document()
+        doc_ref.set({
+            "uuid": user_uid,
+            "user_id": user_doc.id,
+            "emotion_percentages": emotion_percentages,
+            "psychological_insights": psychological_insights,
+            "recommendations": recommendations,
+            "timestamp": timestamp
+        })
+
+        print(f"Expression analysis saved successfully for user {user_uid} at {timestamp}")
+
+        return doc_ref.id, timestamp  # ⬅️ Return Firestore Document ID & Timestamp
+
+    except Exception as e:
+        print(f"Error saving to Firestore: {str(e)}")
+        print(traceback.format_exc())
+        return None, None
+
 
 @app.route('/analyze-micro-expressions', methods=['POST'])
-def analyze_micro_expressions():
-    if 'video' not in request.files:
-        return jsonify({"error": "No video file found"}), 400
-
-    video_file = request.files['video']
-    video_path = os.path.join("uploads", video_file.filename)
-    video_file.save(video_path)
-
-    try:
-        final_emotion = analyze_video(video_path)  # Ensure the video_path is passed correctly here
-        return jsonify({"dominant_emotion": final_emotion[0], "count": final_emotion[1]})
+def analyze_emotions():
+    print("Received request:", request.files, request.form)  # Debugging line
     
-    finally:
-        if os.path.exists(video_path):
-            os.remove(video_path)
+    if 'video' not in request.files or 'user_uid' not in request.form:
+        return jsonify({"error": "Missing video file or user UID"}), 400
 
- 
+    video = request.files['video']
+    user_uid = request.form['user_uid']
+
+    video_path = os.path.join("uploads", video.filename)
+    video.save(video_path)
+
+    # Process the video
+    result = analyze_video(video_path, user_uid)
+
+    # Clean up the uploaded video file
+    if os.path.exists(video_path):
+        os.remove(video_path)
+
+
 
 
 
