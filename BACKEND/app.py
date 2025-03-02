@@ -44,7 +44,7 @@ if not os.path.exists("uploads"):
     os.makedirs("uploads")
 
 # Load the ML model for face images
-facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
+facePrakrurthi_model = tf.keras.models.load_model('./model/FacePrakurthiFinal_CNN_Model.h5')
 # Load the DL model for eye images - IT21319488
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
 # Load the DL model for hair images
@@ -1409,7 +1409,35 @@ def get_results(document_id):
 
 
     #IT21324024 -- Nail Novelty
-    
+
+@app.route('/patients/<patient_id>', methods=['GET', 'PUT'])
+def handle_patient(patient_id):
+    if request.method == 'GET':
+        doc_ref = db.collection('patients').document(patient_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            return jsonify(doc.to_dict()), 200
+        else:
+            return jsonify({'error': 'Patient not found'}), 404
+
+    elif request.method == 'PUT':
+        data = request.json
+        doc_ref = db.collection('patients').document(patient_id)
+        doc_ref.update(data)
+        return jsonify({'success': True}), 200
+        
+
+@app.route('/patients/<patient_id>', methods=['PUT'])
+def update_patient(patient_id):
+    """Update an existing patient."""
+    data = request.json
+    patient_ref = db.collection('patients').document(patient_id)
+
+    if not patient_ref.get().exists:
+        return jsonify({'error': 'Patient not found'}), 404
+
+    patient_ref.update(data)
+    return jsonify({'message': 'Patient updated'}), 200    
     
     
 if __name__ == '__main__':
