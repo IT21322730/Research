@@ -43,8 +43,16 @@ db = firestore.client()
 if not os.path.exists("uploads"):
     os.makedirs("uploads")
 
-# Load the ML model for images
+# Load the ML model for face images
 facePrakrurthi_model = tf.keras.models.load_model('D:\\Backend\\model\\FacePrakurthiFinal_CNN_Model.h5')
+# Load the DL model for eye images - IT21319488
+image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
+# Load the DL model for hair images
+hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
+# Load the DL model for hair images - IT21324024
+import tensorflow as tf
+# Load the DL model for nail images - IT21324024
+nail_model = tf.keras.models.load_model('./model/Nails.h5')
 
 # Mapping of model output to Ayurvedic Prakriti classifications for images
 prediction_mapping = {
@@ -1038,7 +1046,7 @@ def analyze_face_endpoint():
 
 ### Micro expression analysis
 # **Function to analyze the video and return psychological insights**
-def analyze_video(video_path, user_uid):
+def analyze_face_video(video_path, user_uid):
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
     all_emotions = []
@@ -1214,23 +1222,35 @@ def save_to_micro_expressions_firestore(user_uid, emotion_percentages, psycholog
 
 @app.route('/analyze-micro-expressions', methods=['POST'])
 def analyze_emotions():
-    print("Received request:", request.files, request.form)  # Debugging line
+    print("Received request files:", request.files)
+    print("Received request form:", request.form)
     
-    if 'video' not in request.files or 'user_uid' not in request.form:
-        return jsonify({"error": "Missing video file or user UID"}), 400
+    if 'video' not in request.files:
+        return jsonify({"error": "Missing video file"}), 400
+
+    if 'user_uid' not in request.form:
+        return jsonify({"error": "Missing user UID"}), 400
 
     video = request.files['video']
     user_uid = request.form['user_uid']
 
+    if video.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
     video_path = os.path.join("uploads", video.filename)
     video.save(video_path)
 
-    # Process the video
-    result = analyze_video(video_path, user_uid)
+    try:
+        # Process the video
+        result = analyze_face_video(video_path, user_uid)
 
-    # Clean up the uploaded video file
-    if os.path.exists(video_path):
-        os.remove(video_path)
+    except Exception as e:
+        print(f"Error processing video: {str(e)}")
+        result = {"error": "Internal server error"}
+
+    finally:
+        if os.path.exists(video_path):
+            os.remove(video_path)
 
     return jsonify(result)
 
@@ -1334,7 +1354,7 @@ def analyze_stress_fatigue_pupil(video_source):
         return {"error": str(e)}
 
 @app.route('/analyze', methods=['POST'])
-def analyze_video():
+def analyze_eye_video():
     if 'video' not in request.files:
         return jsonify({'error': 'No video file provided'}), 400
 
