@@ -16,18 +16,15 @@ from collections import Counter
 from datetime import datetime
 import pytz
 from flask_cors import cross_origin
-
-
-#IT21319488
 import sys
-import mediapipe as mp
 import time
-
-#IT21324024
 import uuid
+
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
+CORS(app, resources={r"/*": {"origins": ["http://localhost:8100"]}})
 
 #IT21319488
 UPLOAD_FOLDER = 'uploads'
@@ -36,8 +33,6 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase setup
 cred = credentials.Certificate('D:\\Backend\\serviceAccountKey.json')
@@ -1041,12 +1036,8 @@ def analyze_face_endpoint():
     return jsonify(result)
 
 
-# Facial micro expression analysis
-# Ensure the uploads directory exists
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
-
-# Function to analyze the video and detect dominant emotion
+### Micro expression analysis
+# **Function to analyze the video and return psychological insights**
 def analyze_video(video_path, user_uid):
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
@@ -1222,7 +1213,6 @@ def save_to_micro_expressions_firestore(user_uid, emotion_percentages, psycholog
 
 
 @app.route('/analyze-micro-expressions', methods=['POST'])
-@cross_origin(origin='*', headers=['Content-Type'])
 def analyze_emotions():
     print("Received request:", request.files, request.form)  # Debugging line
     
@@ -1243,8 +1233,6 @@ def analyze_emotions():
         os.remove(video_path)
 
     return jsonify(result)
-
-
 
 
 
