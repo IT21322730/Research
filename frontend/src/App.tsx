@@ -33,7 +33,6 @@ import HairPic from './pages/hair/HairPic';
 
 import NailVideo from './pages/nail/NailVedio'
 import NailPic from './pages/nail/NailPic';
-import NailPredictionPage from './pages/nail/NailPredictionpage';
 
 
 /**
@@ -77,7 +76,6 @@ const App: React.FC = () => (
         <Route path="/app/face-pic" component={FacePic} exact={true} />
 
         <Route path="/app/nail-pic" component={NailPic} exact={true}/>
-        <Route path="/app/nailprediction" component={NailPredictionPage} exact={true}/>
 
         
         <Route path="/app/facemicro" component={FaceMicro} />
