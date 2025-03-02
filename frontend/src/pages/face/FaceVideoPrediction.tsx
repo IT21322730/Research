@@ -86,7 +86,7 @@ const FaceVideoPrediction: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/home" />
           </IonButtons>
-          <IonTitle>Micro Expression Results</IonTitle>
+          <IonTitle>MICRO EXPRESSIONS ANALYSIS</IonTitle>
         </IonToolbar>
       </IonHeader>
 

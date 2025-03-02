@@ -76,6 +76,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/hair-results" component={HairPrakruthiResults} />
             
             <Route path="/app/eyehome" component={EyeHome} />
+            <Route path="/app/prediction/:docId" component={EyePredictionPage} />
             <Route path="/app/blink" component={BlinkEye} />
             <Route path="/app/blinkfinal" component={BlinkFinal} />
 
