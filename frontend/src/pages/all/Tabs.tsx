@@ -24,6 +24,7 @@ import BlinkFinal from '../eye/BlinkFinal';
 import BlinkEye from '../eye/BlinkEye';
 import BlinkPrediction from '../eye/BlinkPrediction';
 import Question from '../all/Question';
+import NailPredictionPage from '../nail/NailPredictionpage';
 
 
 import EyeHome from '../eye/EyeHome';
@@ -89,6 +90,8 @@ const Tabs: React.FC = () => {
             
             <Route path="/app/final" component={FinalPrakurthi} />
             <Route path="/app/question" component={Question} />
+
+            <Route path="/app/nailprediction" component={NailPredictionPage} exact={true}/>
 
             
             <Route path="/app/vata-body" component={Vata} />
