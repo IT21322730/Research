@@ -15,6 +15,7 @@ import mediapipe as mp
 from collections import Counter
 from datetime import datetime
 import pytz
+from flask_cors import cross_origin
 
 
 #IT21319488
@@ -36,17 +37,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-CORS(app)
-
-@app.route('/')
-def home():
-    return "Welcome to the Prakruti Diagnosis API!"
-
-@app.route('/favicon.ico')
-def favicon():
-    return '', 204
-
-CORS(app, resources={r"/*": {"origins": ["http://localhost:8100"]}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase setup
 cred = credentials.Certificate('D:\\Backend\\serviceAccountKey.json')
@@ -1231,6 +1222,7 @@ def save_to_micro_expressions_firestore(user_uid, emotion_percentages, psycholog
 
 
 @app.route('/analyze-micro-expressions', methods=['POST'])
+@cross_origin(origin='*', headers=['Content-Type'])
 def analyze_emotions():
     print("Received request:", request.files, request.form)  # Debugging line
     

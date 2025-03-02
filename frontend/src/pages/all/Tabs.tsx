@@ -83,6 +83,8 @@ const Tabs: React.FC = () => {
             <Route path="/app/face-mapping-prediction" component={FaceMappingPrediction} exact={true} />
             <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
 
+            <Route path="/app/blink-prediction/:docId" component={BlinkPrediction}/>
+
             
             <Route path="/app/final" component={FinalPrakurthi} />
             <Route path="/app/question" component={Question} />
