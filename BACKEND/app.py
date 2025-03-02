@@ -19,15 +19,6 @@ import pytz
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
-
-@app.route('/')
-def home():
-    return "Welcome to the Prakruti Diagnosis API!"
-
-@app.route('/favicon.ico')
-def favicon():
-    return '', 204
-
 CORS(app, resources={r"/*": {"origins": ["http://localhost:8100"]}})
 
 # Firebase setup
