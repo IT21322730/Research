@@ -3,7 +3,7 @@ import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonText, IonImg, 
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import '../css/Hairalophecia.css'; // Import your styles here
 
-const HairPrakurthi: React.FC = () => {
+const HairAlophecia: React.FC = () => {
   const history = useHistory();
 
   const handleTakePicture = () => {
@@ -60,4 +60,4 @@ const HairPrakurthi: React.FC = () => {
   );
 };
 
-export default HairPrakurthi;
+export default HairAlophecia;

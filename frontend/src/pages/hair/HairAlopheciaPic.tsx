@@ -15,18 +15,22 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal } from "ionicons/icons";
-import { db } from "../firebase/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
-
-const HairPic: React.FC = () => {
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true); // Front camera initially
-  const [showAlert, setShowAlert] = useState(false);
-  const [currentTab, setCurrentTab] = useState<number>(1); // Default to tab 1
-  const [capturedPhotos, setCapturedPhotos] = useState<{ [tab: number]: string }>({}); // Store images for each tab
+const HairAlopheciaPic: React.FC = () => {
+  const history = useHistory();
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [capturedViews, setCapturedViews] = useState<{ [view: string]: string }>({});
+  const [currentView, setCurrentView] = useState<string>("Front View");
+  const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View", "Top of the Head View"]);
+  const [capturedPhotos, setCapturedPhotos] = useState<{ [tab: number]: string }>({});
+
 
   useEffect(() => {
     const startCamera = async () => {
@@ -54,7 +58,7 @@ const HairPic: React.FC = () => {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [useFrontCamera, currentTab]); // Watch both useFrontCamera and currentTab for changes
+  }, [useFrontCamera, currentView]);
 
   const takePicture = () => {
     const video = videoRef.current;
@@ -69,61 +73,81 @@ const HairPic: React.FC = () => {
         const dataUrl = canvas.toDataURL("image/png");
         setPhoto(dataUrl);
 
-        // Save the captured image for the current tab
-        setCapturedPhotos((prev) => ({
-          ...prev,
-          [currentTab]: dataUrl,
-        }));
+        setCapturedViews((prev) => {
+          const updatedViews = { ...prev, [currentView]: dataUrl };
+          validateCapturedViews(updatedViews);
+          return updatedViews;
+        });
       }
     }
-  };
-
-  const toggleCamera = () => {
-    setUseFrontCamera(!useFrontCamera);
-  };
-
-  const handleSaveToFirebase = async () => {
-    try {
-      const batch = collection(db, "hairalophecia");
-      // Save the captured images for all tabs to Firebase
-      for (const [tab, imageUrl] of Object.entries(capturedPhotos)) {
-        await addDoc(batch, { tab, imageUrl, timestamp: new Date() });
-      }
-      console.log("Images saved to Firebase");
-    } catch (error) {
-      console.error("Error saving images to Firebase: ", error);
-    }
-  };
-
-  const confirmSave = () => {
-    setShowAlert(true);
   };
 
   const resetPhotos = () => {
     setPhoto(null);
-    setCapturedPhotos({});
+    setCapturedViews({});
+    setMissingViews(["Front View", "Back View", "Scalp View", "Top of the Head View"]);
   };
 
-  const handleSaveAlertResponse = (isSave: boolean) => {
-    if (isSave) {
-      // Save the captured images to Firebase
-      handleSaveToFirebase();
+  const validateCapturedViews = (views: { [view: string]: string }) => {
+    const requiredViews = ["Front View", "Back View", "Scalp View", "Top of the Head View"];
+    const missing = requiredViews.filter((view) => !views[view]);
+    setMissingViews(missing);
+  };
+  const handleSaveToBackend = async () => {
+    const auth = getAuth(); // Get Firebase Auth instance
+    const user = auth.currentUser; // Get the currently logged-in user
 
-      // After saving, reset the photo and switch to the next tab
-      setPhoto(null);
-      setCapturedPhotos({}); // Clear captured images
+    if (!user) {
+      console.error("No authenticated user found. Please log in.");
+      return;
+    }
 
-      if (currentTab === 3) {
-        setCurrentTab(1); // Reset to tab 1 after tab 5
-        setUseFrontCamera(true); // Switch to front camera
-      } else {
-        setCurrentTab((prev) => prev + 1); // Switch to the next tab
+    const capturedImages = Object.values(capturedViews);
+
+    if (capturedImages.length !== 4) {
+      console.error("You must provide exactly 3 images.");
+      return;
+    }
+
+    const requestData = {
+      user_uid: user.uid, // Automatically retrieve the UID of the logged-in doctor
+      patient_uid: "patient456", // Keep or update as needed
+      image_data: capturedImages.map(img => img.split(",")[1]) // Remove metadata prefix
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000//novelty-function", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+
       }
-    } else {
-      // If user clicked "No", just hide the alert and keep the current tab
-      setShowAlert(false);
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+
+      // Navigate to HairAlopheciaiResults with the full result data
+      history.push({
+        pathname: "/app/hair-alohecia-results",
+        state: {
+          final_diagnosis: data.final_diagnosis,
+          hair_texture: data.hair_texture,
+          solution: data.solution,
+          illness_percentages: data.illness_percentages,
+        }
+      });
+
+    } catch (error) {
+      console.error("Error uploading images:", error);
     }
   };
+
+
 
   return (
     <IonPage>
@@ -137,56 +161,85 @@ const HairPic: React.FC = () => {
       </IonHeader>
       <IonContent>
         {!photo ? (
-          <video
-            key={currentTab} // Force re-render when switching tabs
-            ref={videoRef}
-            id="video"
-            autoPlay
-            playsInline
-          ></video>
+          <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
           <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
         )}
 
         <IonSegment
-          value={String(currentTab)} // Set the segment to current tab
-          onIonChange={(e) => setCurrentTab(Number(e.detail.value))}
+          value={currentView}
+          onIonChange={(e) => {
+            setCurrentView(e.detail.value as string);
+            setPhoto(null);
+          }}
         >
-          {[1, 2, 3].map((tabNumber) => (
-            <IonSegmentButton key={tabNumber} value={String(tabNumber)}>
-              <IonLabel style={{ fontFamily: '"Open Sans", sans-serif' }}>
-                {tabNumber}
-              </IonLabel>
-            </IonSegmentButton>
-          ))}
+          <IonSegmentButton value="Front View">
+            <IonLabel>Front View</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="Back View">
+            <IonLabel>Back View</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="Scalp View">
+            <IonLabel>Scalp View</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="Top of the Head View">
+            <IonLabel>Top of the Head View</IonLabel>
+          </IonSegmentButton>
         </IonSegment>
 
+
         <div className="tab-bar">
-          <div className="tab-button" onClick={toggleCamera}>
+          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
             <IonIcon icon={swapHorizontal} />
           </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
-          <div className="tab-button" onClick={confirmSave}>
-            <IonIcon icon={save} />
+          <div className="tab-button">
+            <IonButton onClick={() => setShowSaveAlert(true)} disabled={missingViews.length > 0}>
+              <IonIcon icon={save} />
+            </IonButton>
           </div>
         </div>
 
+        {missingViews.length > 0 && (
+          <p className="missing-warning">
+            <IonIcon icon={warning} /> Please capture: {missingViews.join(", ")}
+          </p>
+        )}
+
         <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          header={"Save Image"}
-          message={`Do you want to save the picture for tab ${currentTab}?`}
+          isOpen={showSaveAlert}
+          onDidDismiss={() => setShowSaveAlert(false)}
+          header={"Save Images"}
+          message={"Are you sure you want to save the captured images?"}
           buttons={[
             {
               text: "No",
               role: "cancel",
-              handler: () => handleSaveAlertResponse(false),
+              handler: () => setShowSaveAlert(false),
             },
             {
               text: "Yes",
-              handler: () => handleSaveAlertResponse(true),
+              handler: handleSaveToBackend,
+            },
+          ]}
+        />
+
+        <IonAlert
+          isOpen={showSaveAlert}
+          onDidDismiss={() => setShowSaveAlert(false)}
+          header={"Save Images"}
+          message={"Are you sure you want to save the captured images?"}
+          buttons={[
+            {
+              text: "No",
+              role: "cancel",
+              handler: () => setShowSaveAlert(false),
+            },
+            {
+              text: "Yes",
+              handler: handleSaveToBackend, // Navigate to PredictionPage
             },
           ]}
         />
@@ -195,4 +248,4 @@ const HairPic: React.FC = () => {
   );
 };
 
-export default HairPic;
+export default HairAlopheciaPic;
