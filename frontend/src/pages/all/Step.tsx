@@ -272,25 +272,23 @@ const Step: React.FC = () => {
                         Step 05
                     </IonItem>
                     <div className="ion-padding" slot="content">
-                        <p className="justified-text">You need to complete the above steps as mentioned.</p>
+                        <p className="justified-text">To complete the Prakriti Analysis, you must follow all five steps. First, capture images for Face, Eye, Hair, and Nail Analysis, ensuring proper lighting and clarity. Each step focuses on specific features that help determine your Ayurvedic body type. Finally, the system will analyze your data to identify your dominant dosha. If a tie is detected, you'll need to complete a questionnaire. Otherwise, your Final Prakriti Result will be displayed.</p>
                         <button
-                        style={{ 
-                            backgroundColor: '#48D1CC', 
-                            color: 'black',
-                            padding: "15px 20px", 
-                            borderRadius: "5px", 
-                            border: "none", 
-                            cursor: "pointer", 
-                            fontWeight: "bold", 
-                            width: "100%", 
-                            fontSize: "18px", /* Added font size */
-                            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
-                        className="take-picture-button"
-                        style={{ backgroundColor: '#48D1CC', color: 'black' }}
-                        onClick={handleTakePicture}
-                        >
-                        Final
-                        </button>
+                                style={{ 
+                                    backgroundColor: '#48D1CC', 
+                                    color: 'black',
+                                    padding: "15px 20px", 
+                                    borderRadius: "5px", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    fontWeight: "bold", 
+                                    width: "100%", 
+                                    fontSize: "18px", /* Added font size */
+                                    fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
+                                onClick={handleTakePicture}
+                            >
+                                Find the Final Prakurthi
+                            </button>
                     </div>
                     </IonAccordion>
 
