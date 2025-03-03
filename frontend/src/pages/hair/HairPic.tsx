@@ -15,7 +15,7 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
  
@@ -87,6 +87,10 @@ const HairPic: React.FC = () => {
     const requiredViews = ["Front View", "Back View", "Scalp View"];
     const missing = requiredViews.filter((view) => !views[view]);
     setMissingViews(missing);
+  };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
   };
  
   const handleSaveToBackend = async () => {
@@ -181,8 +185,11 @@ const HairPic: React.FC = () => {
 
         <div className="tab-bar">
         <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
-          </div>
+        </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
