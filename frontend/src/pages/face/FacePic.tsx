@@ -15,7 +15,7 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning, refreshCircle } from "ionicons/icons";
 import "../css/FacePic.css";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
@@ -89,6 +89,11 @@ const FacePic: React.FC = () => {
     const missing = requiredViews.filter((view) => !views[view]);
     setMissingViews(missing);
   };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+  
 
   const handleSaveToBackend = async () => {
     const auth = getAuth(); // Get Firebase Auth instance
@@ -181,6 +186,9 @@ const FacePic: React.FC = () => {
 
         <div className="tab-bar">
         <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
           </div>
           <div className="tab-button" onClick={takePicture}>
