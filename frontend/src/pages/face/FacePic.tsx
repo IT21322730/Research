@@ -155,12 +155,35 @@ const FacePic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {!photo ? (
-          <video ref={videoRef} id="video" autoPlay playsInline></video>
-        ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
-        )}
-
+        <div className="video-container">
+          {!photo ? (
+            <>
+              <video ref={videoRef} id="video" autoPlay playsInline></video>
+              <div className="face-overlay">
+                <svg viewBox="0 0 300 400" className="face-mask">
+                  <g transform="scale(1.3) translate(-35, -50)">
+                    <path
+                      d="
+              M150 50 
+              C100 50, 60 100, 60 180
+              C50 200, 50 250, 80 290
+              C90 310, 110 350, 150 360
+              C190 350, 210 310, 220 290
+              C250 250, 250 200, 240 180
+              C240 100, 200 50, 150 50
+              Z"
+                      fill="transparent"
+                      stroke="white"
+                      strokeWidth="4"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </>
+          ) : (
+            <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          )}
+        </div>
         <IonSegment
           value={currentView}
           onIonChange={(e) => {
