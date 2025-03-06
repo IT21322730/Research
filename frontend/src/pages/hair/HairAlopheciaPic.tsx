@@ -18,6 +18,7 @@ import {
 import { camera, save, swapHorizontal, warning } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import "../css/Hairalophecia.css";
 
 const HairAlopheciaPic: React.FC = () => {
   const history = useHistory();
@@ -163,7 +164,7 @@ const HairAlopheciaPic: React.FC = () => {
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment

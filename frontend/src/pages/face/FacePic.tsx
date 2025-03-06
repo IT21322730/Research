@@ -163,7 +163,7 @@ const FacePic: React.FC = () => {
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
