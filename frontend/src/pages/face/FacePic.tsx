@@ -64,25 +64,36 @@ const FacePic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/png");
-        setPhoto(dataUrl);
+        const context = canvas.getContext("2d");
+        if (context) {
+            // Clear the canvas before drawing
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Save the captured image for the current view
-        setCapturedViews((prev) => {
-          const updatedViews = { ...prev, [currentView]: dataUrl };
-          validateCapturedViews(updatedViews);
-          return updatedViews;
-        });
-      }
+            // Flip the canvas horizontally (mirror effect)
+            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Reset transformations to prevent future issues
+            context.setTransform(1, 0, 0, 1, 0, 0);
+
+            const dataUrl = canvas.toDataURL("image/png");
+            setPhoto(dataUrl);
+
+            // Save the captured image for the current view
+            setCapturedViews((prev) => {
+                const updatedViews = { ...prev, [currentView]: dataUrl };
+                validateCapturedViews(updatedViews);
+                return updatedViews;
+            });
+        }
     }
-  };
+};
 
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Front View", "Left View", "Right View"];
@@ -155,35 +166,12 @@ const FacePic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <div className="video-container">
-          {!photo ? (
-            <>
-              <video ref={videoRef} id="video" autoPlay playsInline></video>
-              <div className="face-overlay">
-                <svg viewBox="0 0 300 400" className="face-mask">
-                  <g transform="scale(1.3) translate(-35, -50)">
-                    <path
-                      d="
-              M150 50 
-              C100 50, 60 100, 60 180
-              C50 200, 50 250, 80 290
-              C90 310, 110 350, 150 360
-              C190 350, 210 310, 220 290
-              C250 250, 250 200, 240 180
-              C240 100, 200 50, 150 50
-              Z"
-                      fill="transparent"
-                      stroke="white"
-                      strokeWidth="4"
-                    />
-                  </g>
-                </svg>
-              </div>
-            </>
-          ) : (
-            <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
-          )}
-        </div>
+        {!photo ? (
+          <video ref={videoRef} id="video" autoPlay playsInline></video>
+        ) : (
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+        )}
+
         <IonSegment
           value={currentView}
           onIonChange={(e) => {
