@@ -175,7 +175,9 @@ const Eyevideo: React.FC = () => {
 
       <div className="tab-bar">
         <div className="tab-button">
+        <div className="tab-button" onClick={() => window.location.reload()}>
           <IonIcon icon={swapHorizontal} />
+        </div>
         </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">

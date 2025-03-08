@@ -3,16 +3,6 @@ import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
-import FirstLook from './pages/all/FirstLook';
-import LoginHome from './pages/all/LoginPage'
-import ForgotPassword from './pages/all/ForgotPassword';
-import Question from './pages/all/Question';
-import Tabs from './pages/all/Tabs';
-import Signup from './pages/all/Signup';
-import VerificationCode from './pages/all/VerificationCode'
-import EyePic from './pages/eye/EyePic'
-import Eyevideo from './pages/eye/Eyevideo'
-
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -28,29 +18,36 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
-
-
-import HairPrakruthiResults from './pages/hair/HairPrakurthiResults';
-import HairPic from './pages/hair/HairPic';
-
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+
+import FirstLook from './pages/all/FirstLook';
+import LoginHome from './pages/all/LoginPage'
+import ForgotPassword from './pages/all/ForgotPassword';
+import Tabs from './pages/all/Tabs';
+import Signup from './pages/all/Signup';
+import VerificationCode from './pages/all/VerificationCode'
+
+
+// IT21322730
 import FacePic from './pages/face/FacePic';
-import FacePrakurthiPrediction from './pages/face/FacePrakurthiPrediction';
-import FaceMicro from './pages/face/FaceMicro';
 import FaceVideo from './pages/face/FaceVideo';
-import FaceVideoPrediction from './pages/face/FaceVideoPrediction';
+import FaceMappingPic from './pages/face/FaceMappingPic';
+
+// IT21319488
+import EyePic from './pages/eye/EyePic'
+import Eyevideo from './pages/eye/Eyevideo'
+
+// IT21319938
+import HairPic from './pages/hair/HairPic';
+import HairAlopheciaPic from './pages/hair/HairAlopheciaPic';
+import HairAlopeciaResults from './pages/hair/HairAlopheciaResults';
+
+//IT21324024
+import NailVideo from './pages/nail/NailVedio'
+import NailPic from './pages/nail/NailPic';
 
 
 setupIonicReact();
@@ -65,18 +62,25 @@ const App: React.FC = () => (
         <Route path="/register" component={Signup} />
         <Route path="/forgot-password" component={ForgotPassword} exact={true} />
         <Route path="/verify-code" component={VerificationCode} exact={true} />
-        <Route path="/app/question" component={Question} exact={true} />
 
+        {/* IT21322730 */}
+        <Route path="/app/face-pic" component={FacePic} exact={true} />
+        <Route path="/app/face-video" component={FaceVideo} exact={true} />
+        <Route path="/app/face-mapping-pic" component={FaceMappingPic} exact={true} />
+        
+        {/* IT21319488 */}
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
-        <Route path="/app/hair-results" component={HairPrakruthiResults} exact={true}/>
-        <Route path="/app/hair-pic" component={HairPic} exact={true} />
 
-        <Route path="/app/face-pic" component={FacePic} exact={true} />
-        <Route path="/app/face-prakurthi-prediction" component={FacePrakurthiPrediction} exact={true}/>
-        <Route path="/app/facemicro" component={FaceMicro} />
-        <Route path="/app/face-video" component={FaceVideo} exact={true} />
-        <Route path="/app/face-video-prediction" component={FaceVideoPrediction} />
+        {/* IT21319938 */}
+        <Route path="/app/hair-pic" component={HairPic} exact={true} />
+        <Route path="/app/hair-pic-alophecia" component={HairAlopheciaPic} exact={true} />
+        <Route path="/app/hair-alohecia-results" component={HairAlopeciaResults} exact={true} />
+        
+
+        {/* IT21324024 */}
+        <Route path="/app/nail-pic" component={NailPic} exact={true}/>
+       
         
       </IonRouterOutlet>
     </IonReactRouter>

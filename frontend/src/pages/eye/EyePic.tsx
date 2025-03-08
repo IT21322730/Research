@@ -3,7 +3,7 @@ import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonImg,
   IonButtons, IonBackButton, IonAlert, IonLoading
 } from '@ionic/react';
-import { camera, swapHorizontal, save } from 'ionicons/icons';
+import { camera, swapHorizontal, save,refreshCircle } from 'ionicons/icons';
 import { useHistory } from "react-router-dom";
 import { auth } from "../firebase/firebase";  // Use auth instead of getAuth
 import { db, doc, getDoc } from "../firebase/firebase"; // Use db instead of getFirestore, getDocs instead of getDoc
@@ -83,8 +83,9 @@ const EyePic: React.FC = () => {
   };
 
   const toggleCamera = () => {
-    setUseFrontCamera(!useFrontCamera);
+    setUseFrontCamera((prev) => !prev);
   };
+  
 
   const handleSaveToBackend = async () => {
     try {
@@ -160,17 +161,34 @@ const EyePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take Picture</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         {!photo ? (
+          <>
           <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
+          <div className="face-overlay">
+          <div className="eye left-eye"></div>
+          <div className="eye right-eye"></div>
+          <div className="vertical-line"></div>
+          <div className="horizontal-line"></div>
+          <div className="cheek-line left-cheek"></div>
+          <div className="cheek-line right-cheek"></div>
+          <div className="corner top-left"></div>
+          <div className="corner top-right"></div>
+          <div className="corner bottom-left"></div>
+          <div className="corner bottom-right"></div>
+        </div>
+          </>
         ) : (
           <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh'}} />
         )}
 
         <div className="tab-bar">
+        <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
           <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
           </div>

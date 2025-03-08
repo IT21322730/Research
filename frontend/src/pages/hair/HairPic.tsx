@@ -15,7 +15,7 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
  
@@ -88,6 +88,10 @@ const HairPic: React.FC = () => {
     const missing = requiredViews.filter((view) => !views[view]);
     setMissingViews(missing);
   };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
  
   const handleSaveToBackend = async () => {
     const auth = getAuth(); // Get Firebase Auth instance
@@ -151,14 +155,14 @@ const HairPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
@@ -180,9 +184,12 @@ const HairPic: React.FC = () => {
         </IonSegment>
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
+        <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
-          </div>
+        </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>

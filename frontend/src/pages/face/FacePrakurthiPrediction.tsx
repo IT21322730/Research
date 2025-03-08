@@ -37,7 +37,7 @@ const FacePrakurthiPrediction: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Face Prakurthi Prediction</IonTitle>
+          <IonTitle>FACE PRAKURTHI PREDICTION</IonTitle>
         </IonToolbar>
       </IonHeader>
 

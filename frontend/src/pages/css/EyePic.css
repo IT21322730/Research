@@ -71,4 +71,83 @@
     color: #333; /* You can change the color to your desired one */
     margin: 10px 0;
   }
+
+  /***********************
+   Face Outline Styling
+***********************/
+.corner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid white;
+    position: absolute;
+  }
+  
+  .top-left {
+    top: 10%;
+    left: 10%;
+  }
+  
+  .top-right {
+    top: 10%;
+    right: 10%;
+  }
+  
+  .bottom-left {
+    bottom: 10%;
+    left: 10%;
+  }
+  
+  .bottom-right {
+    bottom: 10%;
+    right: 10%;
+  }
+  
+  .vertical-line {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background-color: white;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .horizontal-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    top: 45%;
+  }
+  
+  .eye {
+    width: 30%;
+    height: 12%;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: absolute;
+    background-color: transparent;
+  }
+  
+  .left-eye {
+    left: 10%;
+    top: 40%;
+  }
+  
+  .right-eye {
+    right: 10%;
+    top: 40%;
+  }
+  
+  .face-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 60%;
+    border: 4px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50% / 60%;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  }
+  
   

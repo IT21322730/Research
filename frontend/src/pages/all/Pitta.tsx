@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent ,IonButtons,IonBackButton} from '@ionic/react';
 import '../css/Pitta.css'; // Importing the external CSS file
 
 const Pitta = () => {
@@ -7,7 +7,10 @@ const Pitta = () => {
     <>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Pitta Balance Tips</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/app/final" />
+            </IonButtons>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="pitta-container">

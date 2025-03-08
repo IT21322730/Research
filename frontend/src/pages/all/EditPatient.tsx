@@ -1,109 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonButtons, IonBackButton, IonPage, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonTextarea, IonDatetime, IonButton, IonAlert } from '@ionic/react';
-import { db, updateDoc, doc, getDoc, deleteDoc } from '../firebase/firebase';
-import { useParams, useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import { 
+  IonContent, 
+  IonButtons, 
+  IonBackButton, 
+  IonPage, 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonItem, 
+  IonLabel, 
+  IonTextarea, 
+  IonButton, 
+  IonAlert 
+} from '@ionic/react';
+import { useParams, useHistory } from 'react-router-dom';
 import '../css/EditPatient.css';
 
-interface Patient {
-  id: string;
-  name: string;
-  age: string;
-  date: string;
-  prakurthiType: string;
-  user_id: string;
-}
-
 const EditPatient: React.FC = () => {
-  const { patientId } = useParams<{ patientId: string }>(); // Extract patientId from route params
-  const history = useHistory(); // Access history for navigation
-  const [patientName, setPatientName] = useState('');
-  const [patientAge, setPatientAge] = useState('');
+  const { patientId } = useParams<{ patientId: string }>();
+  const history = useHistory();
+  
   const [prakurthiType, setPrakurthiType] = useState('');
-  const [patientDate, setPatientDate] = useState('');
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
+  // Fetch Patient Data
   useEffect(() => {
-    if (!patientId) {
-      console.error("No patient ID provided");
-      return;
-    }
-
-    const fetchPatientDetails = async () => {
-        const patientRef = doc(db, 'patients', patientId);
-        try {
-          const docSnap = await getDoc(patientRef);
-          if (docSnap.exists()) {
-            const patientData = docSnap.data() as Patient;
-            console.log("Fetched Patient Data:", patientData); // Debug log
-            setPatientName(patientData.name);
-            setPatientAge(patientData.age);
-            setPrakurthiType(patientData.prakurthiType);
-            setPatientDate(patientData.date);
-          } else {
-            console.log('No such document!');
-          }
-        } catch (error) {
-          console.error('Error fetching patient details: ', error);
+    if (!patientId) return;
+  
+    const fetchPatientData = async () => {
+      const apiUrl = `http://127.0.0.1:5000/patients/${patientId}`;
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        if (response.ok) {
+          setPrakurthiType(data.prakurthiType || '');
+        } else {
+          console.error("⚠️ No patient found!");
         }
-      };      
-
-    fetchPatientDetails();
+      } catch (error) {
+        console.error("❌ Error fetching patient data:", error);
+      }
+    };
+    
+    fetchPatientData();
   }, [patientId]);
-
+  
+  // Handle Save Changes (Only updating Prakurthi Type)
   const handleSave = async () => {
     if (!patientId) {
-      console.error("No patient ID provided");
+      console.error("❌ No patient ID provided");
       return;
     }
-
-    const patientRef = doc(db, 'patients', patientId);
-    try {
-      console.log("Updating patient data:", {
-        name: patientName,
-        age: patientAge,
-        prakurthiType,
-        date: patientDate,
-      });
-
-      await updateDoc(patientRef, {
-        name: patientName,
-        age: patientAge,
-        prakurthiType: prakurthiType,
-        date: patientDate,
-      });
-
-      // Directly update the state with the new data to immediately reflect the change
-      setPatientName(patientName);
-      setPatientAge(patientAge);
-      setPrakurthiType(prakurthiType);
-      setPatientDate(patientDate);
-
-      console.log('Patient details updated successfully!');
-      history.push('/app/patient-info');
-    } catch (error) {
-      console.error('Error updating patient details: ', error);
-    }
-  };
-
-  const handleDeletePatient = async () => {
-    if (!patientId) {
-      console.error("No patient ID provided");
+  
+    // Get the latest input value directly
+    const inputElement = document.querySelector('ion-textarea');
+    const updatedPrakurthiType = (inputElement as HTMLIonTextareaElement)?.value?.trim() || '';
+  
+    if (!updatedPrakurthiType) {
+      console.error("❌ Prakurthi Type cannot be empty!");
       return;
     }
-
-    const patientRef = doc(db, 'patients', patientId);
+  
     try {
-      await deleteDoc(patientRef);
-      console.log('Patient deleted successfully');
-      
-      // Navigate back to the patient list after deletion
-      history.push('/app/patient');
+      const apiUrl = `http://127.0.0.1:5000/patients/${patientId}`;
+      const requestBody = { prakurthiType: updatedPrakurthiType };
+  
+      console.log("🔥 Sending update request to backend:", requestBody);
+  
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        console.log("✅ Prakurthi Type updated successfully!", responseData);
+        history.push('/app/patient-info'); // Navigate after update
+      } else {
+        console.error("❌ Failed to update Prakurthi Type:", responseData.error);
+      }
     } catch (error) {
-      console.error('Error deleting patient: ', error);
+      console.error("❌ Error updating Prakurthi Type:", error);
     }
-    setShowDeleteAlert(false);
   };
-
+  
+  
+  
   return (
     <IonPage>
       <IonHeader>
@@ -111,73 +95,32 @@ const EditPatient: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/patient" />
           </IonButtons>
-          <IonTitle>Edit Patient Details</IonTitle>
+          <IonTitle>EDIT PRAKURTHI TYPE</IonTitle>
         </IonToolbar>
       </IonHeader>
+
       <IonContent>
         <div className="edit-patient-form">
+          {/* Prakurthi Type */}
           <IonItem>
-            <IonLabel position="floating">Patient Name</IonLabel>
-            <IonTextarea
-              value={patientName}
-              onIonChange={e => setPatientName(e.detail.value!)}
-              placeholder="Enter Patient Name"
-            />
-          </IonItem>
+          <IonLabel position="floating" style={{ fontFamily: "Open Sans, sans-serif" }}>
+            Prakurthi Type
+          </IonLabel><br/>
+          <IonTextarea
+            style={{ fontFamily: "Open Sans, sans-serif" }}
+            value={prakurthiType}
+            onIonInput={(e) => setPrakurthiType(e.detail.value!)}
+            placeholder="Enter Prakurthi Type"
+          />
 
-          <IonItem>
-            <IonLabel position="floating">Patient Age</IonLabel>
-            <IonTextarea
-              value={patientAge}
-              onIonChange={e => setPatientAge(e.detail.value!)}
-              placeholder="Enter Patient Age"
-            />
-          </IonItem>
 
-          <IonItem>
-            <IonLabel position="floating">Prakurthi Type</IonLabel>
-            <IonTextarea
-              value={prakurthiType}
-              onIonChange={e => setPrakurthiType(e.detail.value!)}
-              placeholder="Enter Prakurthi Type"
-            />
-          </IonItem>
+          </IonItem><br/>
 
-          <IonItem>
-            <IonLabel position="floating">Date</IonLabel>
-            <IonDatetime
-              value={patientDate}
-              onIonChange={e => setPatientDate(e.detail.value?.toString() || '')}  // Convert to string
-            />
-          </IonItem>
-
+          {/* Save Changes Button */}
           <IonButton className='save-patient' expand="full" color="primary" onClick={handleSave}>
             Save Changes
           </IonButton>
-
-          <IonButton className='delete-patient' expand="full" color="danger" onClick={() => setShowDeleteAlert(true)}>
-            Delete Patient
-          </IonButton>
         </div>
-
-        {/* Delete Confirmation Alert */}
-        <IonAlert
-          isOpen={showDeleteAlert}
-          onDidDismiss={() => setShowDeleteAlert(false)}
-          header="Confirm"
-          message="Are you sure you want to delete this patient?"
-          buttons={[
-            {
-              text: 'No',
-              role: 'cancel',
-              handler: () => setShowDeleteAlert(false),
-            },
-            {
-              text: 'Yes',
-              handler: handleDeletePatient,
-            },
-          ]}
-        />
       </IonContent>
     </IonPage>
   );

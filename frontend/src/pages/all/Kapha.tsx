@@ -1,13 +1,16 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonButtons,IonBackButton } from '@ionic/react';
 import '../css/Kapha.css';
 
 const Kapha: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar style={{ backgroundColor: '#48D1CC' }}>
-          <IonTitle>Kapha Dosha</IonTitle>
+        <IonToolbar>
+          <IonButtons slot="start">
+                      <IonBackButton defaultHref="/app/final" />
+                      </IonButtons>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
