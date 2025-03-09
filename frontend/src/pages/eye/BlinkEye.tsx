@@ -49,24 +49,19 @@ const Blinkeye: React.FC = () => {
             <li>After recording, review the footage to ensure the images are clear for analysis.</li>
           </ol>
 
-          <button className="take-picture-button" 
-          style={{
-            fontWeight: '600',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '5px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            fontFamily: '"Open Sans", sans-serif',
-            width: '350px',
-            height: '45px',
-            textAlign: 'center',
-            backgroundColor: 'rgb(72, 209, 204)',
+          <button 
+          style={{ 
+            backgroundColor: '#48D1CC', 
             color: 'black',
-            marginTop: '20px', // Added space above the button
-            marginBottom: '5px', // Space below the button
-          }}onClick={handleTakePicture}>
+            padding: "15px 20px", 
+            borderRadius: "5px", 
+            border: "none", 
+            cursor: "pointer", 
+            fontWeight: "bold", 
+            width: "90%", 
+            fontSize: "18px", /* Added font size */
+            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
+          onClick={handleTakePicture}>
             Start Video Recording
           </button>
         </div><br/>

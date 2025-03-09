@@ -44,16 +44,6 @@
     margin: 8px 0; /* Small space between each list item */
 }
 
-.take-picture-button {
-    margin-top: 10px; /* Decrease space above the button */
-    margin-bottom: 5px; /* Space below the button */
-    background-color: #48D1CC; /* Customize button color */
-    color: black; /* Text color */
-    width: 100%; /* Make the button full width */
-    max-width: 500px; /* Set a max width if you want to limit size */
-    font-family: "Open Sans", sans-serif; /* Explicit font declaration */
-}
-
 .ion-tabbar {
     margin-top: 0; /* Remove any default margin */
 }
