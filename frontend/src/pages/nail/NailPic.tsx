@@ -64,18 +64,28 @@ const NailPic: React.FC = () => {
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-
+  
       const context = canvas.getContext("2d");
       if (context) {
+        if (useFrontCamera) {
+          // Flip the image back to normal if using the front camera
+          context.translate(canvas.width, 0);
+          context.scale(-1, 1);
+        }
+  
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+        // Reset transformations (optional, for safety)
+        context.setTransform(1, 0, 0, 1, 0, 0);
+  
         const dataUrl = canvas.toDataURL("image/png");
-
+  
         setCapturedViews((prev) => {
           const updatedViews = { ...prev, [currentView]: dataUrl };
           validateCapturedViews(updatedViews);
           return updatedViews;
         });
-
+  
         if (currentView === "Left Hand") {
           setPhoto1(dataUrl);
         } else {
@@ -84,7 +94,7 @@ const NailPic: React.FC = () => {
       }
     }
   };
-
+  
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Left Hand", "Right Hand"];
     const missing = requiredViews.filter((view) => !views[view]);

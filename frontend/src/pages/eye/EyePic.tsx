@@ -69,18 +69,33 @@ const EyePic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      const context = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+  
+      // Ensure the canvas matches the video dimensions
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+  
+      const context = canvas.getContext("2d");
       if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/png');
+        // Flip the image horizontally for front camera correction
+        context.translate(videoWidth, 0);
+        context.scale(-1, 1); // Mirror horizontally
+  
+        // Draw the flipped image
+        context.drawImage(video, 0, 0, videoWidth, videoHeight);
+  
+        // Reset transformations (optional, but good practice)
+        context.setTransform(1, 0, 0, 1, 0, 0);
+  
+        // Convert to image and store
+        const dataUrl = canvas.toDataURL("image/png");
         setPhoto(dataUrl);
       }
     }
   };
+  
 
   const toggleCamera = () => {
     setUseFrontCamera((prev) => !prev);
