@@ -1699,15 +1699,26 @@ def get_health_insights(crt_duration):
     if crt_duration < 2:
         vascular_efficiency = "90%"  # 90% efficiency
         circulatory_health = "95%"  # 95% circulatory health
-        recommendation = "Your circulatory health is excellent. Keep up a healthy lifestyle."
+        recommendation = [
+        "Maintain a balanced diet rich in iron and vitamin C.",
+        "Stay hydrated to support optimal blood circulation.",
+        "Engage in regular exercise to sustain excellent vascular efficiency."]
     elif 2 <= crt_duration < 3:
         vascular_efficiency = "70%"  # 70% efficiency
         circulatory_health = "75%"  # 75% circulatory health
-        recommendation = "Your circulatory health is slightly concerning. Regular physical activity is advised."
+        recommendation = [
+            "Increase daily physical activity such as walking or jogging.",
+            "Monitor blood pressure regularly and reduce sodium intake.",
+            "Incorporate heart-healthy foods like nuts, fish, and leafy greens."
+        ]
     else:
         vascular_efficiency = "50%"  # 50% efficiency
         circulatory_health = "55%"  # 55% circulatory health
-        recommendation = "Your circulatory health shows signs of concern. Consult a doctor."
+        recommendation = [
+             "Consult a healthcare provider for further cardiovascular assessment.",
+            "Avoid smoking and limit alcohol consumption to improve circulation.",
+            "Consider stress management techniques like meditation or yoga."
+        ]
     
     return vascular_efficiency, circulatory_health, recommendation
 

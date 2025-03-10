@@ -22,7 +22,7 @@ const NailVideo: React.FC = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showSaveAlert, setShowSaveAlert] = useState(false);  // State for showing the save confirmation alert
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -136,7 +136,7 @@ const NailVideo: React.FC = () => {
       } else {
         console.log("No CRT data received!");
       }
-      console.log('Result before navigating:', data); // Check the result being passed
+      console.log('Result before navigating:', data);
 
     } catch (error) {
       console.error('Error saving video:', error);
