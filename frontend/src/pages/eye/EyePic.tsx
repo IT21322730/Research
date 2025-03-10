@@ -75,6 +75,10 @@ const EyePic: React.FC = () => {
 
       const context = canvas.getContext('2d');
       if (context) {
+        if (useFrontCamera) {
+          context.translate(canvas.width, 0); // Move the canvas origin to the right
+          context.scale(-1, 1); // Flip the image horizontally
+        }
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/png');
         setPhoto(dataUrl);
@@ -167,7 +171,7 @@ const EyePic: React.FC = () => {
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh'}} />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh', objectFit: 'cover'}} />
         )}
 
         <div className="tab-bar">
