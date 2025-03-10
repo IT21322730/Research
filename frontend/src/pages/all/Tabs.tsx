@@ -46,6 +46,7 @@ import HairAlopeciaResults from '../hair/HairAlopheciaResults';
 // IT21324024
 import NailPredictionPage from '../nail/NailPredictionpage';
 
+
 const Tabs: React.FC = () => {
 
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
@@ -110,6 +111,7 @@ const Tabs: React.FC = () => {
 
             {/* IT21324024 */}
             <Route path="/app/nailprediction" component={NailPredictionPage} exact={true}/>
+            
 
 
             

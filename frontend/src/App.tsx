@@ -48,7 +48,7 @@ import HairAlopeciaResults from './pages/hair/HairAlopheciaResults';
 //IT21324024
 import NailVideo from './pages/nail/NailVedio'
 import NailPic from './pages/nail/NailPic';
-
+import CRTprediction from './pages/nail/CRTPrediction';
 
 setupIonicReact();
 
@@ -80,6 +80,8 @@ const App: React.FC = () => (
 
         {/* IT21324024 */}
         <Route path="/app/nail-pic" component={NailPic} exact={true}/>
+        <Route path="/app/cap" component={NailVideo} />
+        <Route path="/app/crt-prediction" component={CRTprediction} exact={true} />
        
         
       </IonRouterOutlet>
