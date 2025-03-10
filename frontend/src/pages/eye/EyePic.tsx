@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+ import React, { useState, useEffect, useRef } from 'react';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonImg,
   IonButtons, IonBackButton, IonAlert, IonLoading
@@ -69,26 +69,38 @@ const EyePic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      const context = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+  
+      // Ensure the canvas matches the video dimensions
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+  
+      const context = canvas.getContext("2d");
       if (context) {
-        if (useFrontCamera) {
-          context.translate(canvas.width, 0); // Move the canvas origin to the right
-          context.scale(-1, 1); // Flip the image horizontally
-        }
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/png');
+        // Flip the image horizontally for front camera correction
+        context.translate(videoWidth, 0);
+        context.scale(-1, 1); // Mirror horizontally
+  
+        // Draw the flipped image
+        context.drawImage(video, 0, 0, videoWidth, videoHeight);
+  
+        // Reset transformations (optional, but good practice)
+        context.setTransform(1, 0, 0, 1, 0, 0);
+  
+        // Convert to image and store
+        const dataUrl = canvas.toDataURL("image/png");
         setPhoto(dataUrl);
       }
     }
   };
+  
 
   const toggleCamera = () => {
-    setUseFrontCamera(!useFrontCamera);
+    setUseFrontCamera((prev) => !prev);
   };
+  
 
   const handleSaveToBackend = async () => {
     try {
@@ -164,18 +176,20 @@ const EyePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>TAKE PICTURE</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         {!photo ? (
+
           <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
+
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh', objectFit: 'cover'}} />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh'}} />
         )}
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => window.location.reload()}>
+        <div className="tab-button" onClick={() => window.location.reload()}>
             <IonIcon icon={refreshCircle} />
           </div>
           <div className="tab-button" onClick={toggleCamera}>
