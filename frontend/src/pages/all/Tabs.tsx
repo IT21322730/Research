@@ -36,15 +36,15 @@ import BlinkPrediction from '../eye/BlinkPrediction';
 
 // IT21319938
 import HairHome from '../hair/HairHome';
-import HairPic from '../hair/HairPic';
 import HairPrakurthi from '../hair/HairPrakurthi';
 import HairPrakruthiResults from '../hair/HairPrakurthiResults';
 import HairAlophecia from '../hair/Hairalophecia';
-import HairAlopheciaPic from '../hair/HairAlopheciaPic';
 import HairAlopeciaResults from '../hair/HairAlopheciaResults';
 
 // IT21324024
 import NailPredictionPage from '../nail/NailPredictionpage';
+import NailCap from '../nail/NailCap';
+import CRTprediction from '../nail/CRTPrediction';
 
 
 const Tabs: React.FC = () => {
@@ -108,9 +108,13 @@ const Tabs: React.FC = () => {
             <Route path="/app/hairprakurthi" component={HairPrakurthi} />
             <Route path="/app/hair-results" component={HairPrakruthiResults} />
             <Route path="/app/alophecia" component={HairAlophecia} />
+            <Route path="/app/hair-alohecia-results" component={HairAlopeciaResults} exact={true} />
 
             {/* IT21324024 */}
             <Route path="/app/nailprediction" component={NailPredictionPage} exact={true}/>
+            <Route path="/app/cap" component={NailCap}  exact={true} />
+            <Route path="/app/crt-prediction" component={CRTprediction} exact={true} />
+            
             
 
 
