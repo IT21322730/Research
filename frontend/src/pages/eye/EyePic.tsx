@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+ import React, { useState, useEffect, useRef } from 'react';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonImg,
   IonButtons, IonBackButton, IonAlert, IonLoading
@@ -181,21 +181,9 @@ const EyePic: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
         {!photo ? (
-          <>
+
           <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
-          <div className="face-overlay">
-          <div className="eye left-eye"></div>
-          <div className="eye right-eye"></div>
-          <div className="vertical-line"></div>
-          <div className="horizontal-line"></div>
-          <div className="cheek-line left-cheek"></div>
-          <div className="cheek-line right-cheek"></div>
-          <div className="corner top-left"></div>
-          <div className="corner top-right"></div>
-          <div className="corner bottom-left"></div>
-          <div className="corner bottom-right"></div>
-        </div>
-          </>
+
         ) : (
           <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh'}} />
         )}
