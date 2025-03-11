@@ -1648,6 +1648,128 @@ def novelty_function():
 ### IT21324024 - Nail Novelty ###
 
 ### Capillary refil time analysis
+# Function to calculate the average color intensity of the nail region
+def get_color_intensity(frame, roi):
+    nail_region = frame[roi[1]:roi[3], roi[0]:roi[2]]
+    hsv = cv2.cvtColor(nail_region, cv2.COLOR_BGR2HSV)
+    intensity = np.mean(hsv[:, :, 2])  # Use V channel for brightness
+    return intensity
+
+# Function to monitor CRT based on color intensity change
+def track_crt(video_path, roi):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return None
+
+    intensities = []
+    frame_timestamps = []
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        timestamp = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0  # Convert to seconds
+        intensity = get_color_intensity(frame, roi)
+        
+        intensities.append(intensity)
+        frame_timestamps.append(timestamp)
+    
+    cap.release()
+
+    if len(intensities) < 2:
+        return None  # Not enough data to analyze
+
+    # Normalize intensity values
+    intensities = np.array(intensities)
+    intensities = (intensities - intensities.min()) / (intensities.max() - intensities.min())
+
+    # Detect recovery time (CRT)
+    initial_drop_index = np.argmax(np.diff(intensities) < -0.05)  # Find initial intensity drop
+    recovery_index = np.argmax(intensities[initial_drop_index:] > 0.85) + initial_drop_index  # Find recovery time
+
+    if recovery_index <= initial_drop_index:
+        return None  # No valid recovery detected
+
+    crt_time = frame_timestamps[recovery_index] - frame_timestamps[initial_drop_index]
+    return round(crt_time, 2)
+
+# Function to determine vascular efficiency and circulatory health in percentages
+def get_health_insights(crt_duration):
+    if crt_duration < 2:
+        vascular_efficiency = "90%"  # 90% efficiency
+        circulatory_health = "95%"  # 95% circulatory health
+        recommendation = [
+        "Maintain a balanced diet rich in iron and vitamin C.",
+        "Stay hydrated to support optimal blood circulation.",
+        "Engage in regular exercise to sustain excellent vascular efficiency."]
+    elif 2 <= crt_duration < 3:
+        vascular_efficiency = "70%"  # 70% efficiency
+        circulatory_health = "75%"  # 75% circulatory health
+        recommendation = [
+            "Increase daily physical activity such as walking or jogging.",
+            "Monitor blood pressure regularly and reduce sodium intake.",
+            "Incorporate heart-healthy foods like nuts, fish, and leafy greens."
+        ]
+    else:
+        vascular_efficiency = "50%"  # 50% efficiency
+        circulatory_health = "55%"  # 55% circulatory health
+        recommendation = [
+             "Consult a healthcare provider for further cardiovascular assessment.",
+            "Avoid smoking and limit alcohol consumption to improve circulation.",
+            "Consider stress management techniques like meditation or yoga."
+        ]
+    
+    return vascular_efficiency, circulatory_health, recommendation
+
+@app.route('/crt-analysis', methods=['POST'])
+def analyze_crt():
+    if 'video' in request.files:
+        video_file = request.files['video']
+        video_path = os.path.join("uploads", video_file.filename)
+        
+        try:
+            video_file.save(video_path)
+        except Exception as e:
+            return jsonify({"error": f"Error saving video: {str(e)}"}), 500
+        
+        roi = (100, 100, 300, 200)  # Adjust based on your video
+        
+        try:
+            crt_time = track_crt(video_path, roi)
+            if crt_time is None:
+                return jsonify({"error": "CRT analysis failed, unable to determine CRT duration."}), 500
+
+            vascular_efficiency, circulatory_health, recommendation = get_health_insights(crt_time)
+            
+            local_tz = pytz.timezone('Asia/Colombo')
+            timestamp = datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')
+            
+            doc_ref = db.collection("crt_results").document()
+            doc_ref.set({
+                "crt_duration": crt_time,
+                "vascular_efficiency": vascular_efficiency,
+                "circulatory_health": circulatory_health,
+                "recommendation": recommendation,
+                "timestamp": timestamp
+            })
+            
+            return jsonify({
+                "message": "CRT Analysis Successfully Completed!!!",
+                "crt_duration": crt_time,
+                "vascular_efficiency": vascular_efficiency,
+                "circulatory_health": circulatory_health,
+                "recommendation": recommendation,
+                "timestamp": timestamp
+            })
+        except Exception as e:
+            return jsonify({"error": f"Error processing video: {str(e)}"}), 500
+        
+        finally:
+            if os.path.exists(video_path):
+                os.remove(video_path)
+    else:
+        return jsonify({"error": "No video file found"}), 400
 
 
 

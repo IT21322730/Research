@@ -64,32 +64,37 @@ const HairPic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement("canvas");
-  
-      // Ensure the canvas matches the video dimensions
-      const videoWidth = video.videoWidth;
-      const videoHeight = video.videoHeight;
-      canvas.width = videoWidth;
-      canvas.height = videoHeight;
-  
-      const context = canvas.getContext("2d");
-      if (context) {
-        // Flip the image horizontally for front camera correction
-        context.translate(videoWidth, 0);
-        context.scale(-1, 1); // Mirror horizontally
-  
-        // Draw the flipped image
-        context.drawImage(video, 0, 0, videoWidth, videoHeight);
-  
-        // Reset transformations (optional, but good practice)
-        context.setTransform(1, 0, 0, 1, 0, 0);
-  
-        // Convert to image and store
-        const dataUrl = canvas.toDataURL("image/png");
-        setPhoto(dataUrl);
-      }
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext("2d");
+        if (context) {
+            // Clear the canvas before drawing
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Flip the canvas horizontally (mirror effect)
+            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Reset transformations to prevent future issues
+            context.setTransform(1, 0, 0, 1, 0, 0);
+
+            const dataUrl = canvas.toDataURL("image/png");
+            setPhoto(dataUrl);
+
+            // Save the captured image for the current view
+            setCapturedViews((prev) => {
+                const updatedViews = { ...prev, [currentView]: dataUrl };
+                validateCapturedViews(updatedViews);
+                return updatedViews;
+            });
+        }
     }
-  };
+};
+  
   
 
   const validateCapturedViews = (views: { [view: string]: string }) => {

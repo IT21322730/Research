@@ -11,17 +11,19 @@ import {
   IonTitle,
   IonAlert,
 } from '@ionic/react';
-import '../css/NailVideo.css';
+import '../css/NailVedio.css';
 import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+import { useHistory } from 'react-router-dom';
 
 const NailVideo: React.FC = () => {
+  const history = useHistory();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -38,11 +40,7 @@ const NailVideo: React.FC = () => {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch((error) => {
-            console.error('Error playing video:', error);
-          });
-        };
+        videoRef.current.play().catch((error) => console.error('Error playing video:', error));
       }
 
       chunksRef.current = [];
@@ -67,80 +65,89 @@ const NailVideo: React.FC = () => {
       timerRef.current = setInterval(() => {
         seconds += 1;
         setRecordingTime(seconds);
+        if (seconds >= 10) handleStopRecording();
       }, 1000);
 
       setIsRecording(true);
       setRecordedVideoURL(null);
     } catch (error) {
-      console.error('Error accessing media devices or starting recording.', error);
-      alert('Unable to access your camera or start recording.');
+      console.error('Error accessing media devices:', error);
+      alert('Unable to access camera.');
     }
   };
 
   const handleStopRecording = async () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      mediaStreamRef.current = null;
-    }
-
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
+    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+    if (mediaStreamRef.current) mediaStreamRef.current.getTracks().forEach(track => track.stop());
+    if (videoRef.current) videoRef.current.srcObject = null;
+    if (timerRef.current) clearInterval(timerRef.current);
     setRecordingTime(0);
     setIsRecording(false);
-
-    if (chunksRef.current.length > 0) {
-      const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-      const videoFile = new File([videoBlob], 'video.webm', { type: 'video/webm' });
-
-      try {
-        setIsUploading(true);
-        const storage = getStorage();
-        const storageRef = ref(storage, `nailvideos/${Date.now()}_video.webm`);
-        await uploadBytes(storageRef, videoFile);
-
-        const videoURL = await getDownloadURL(storageRef);
-        setRecordedVideoURL(videoURL);
-        setIsUploading(false);
-      } catch (error) {
-        console.error('Error uploading video:', error);
-        setIsUploading(false);
-      }
-    } else {
-      console.warn('No recorded chunks available!');
-    }
   };
 
   const handleSaveVideo = async () => {
-    if (recordedVideoURL) {
-      setShowAlert(true);
-    } else {
+    if (!recordedVideoURL) {
       console.log('No video recorded!');
+      return;
+    }
+
+    setIsUploading(true);
+    setErrorMessage(null);
+
+    try {
+      // Fetch video data from URL
+      const response = await fetch(recordedVideoURL);
+      if (!response.ok) throw new Error('Failed to fetch video');
+
+      const videoBlob = await response.blob();
+      const formData = new FormData();
+      formData.append('video', videoBlob, `nail_video_${Date.now()}.webm`);
+
+      console.log('Uploading video to backend...');
+
+      // Send to backend
+      const backendResponse = await fetch('http://127.0.0.1:5000/crt-analysis', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!backendResponse.ok) {
+        const errorText = await backendResponse.text();
+        console.error(`Backend error: ${backendResponse.status} - ${errorText}`);
+        throw new Error(`Backend error: ${backendResponse.status}`);
+      }
+
+      // Here, use the backendResponse to get the JSON data
+      const data = await backendResponse.json();
+      console.log("Backend response:", data);
+
+      if (data) {
+        // Send the CRT data to the next page (CRT prediction result page)
+        history.push({
+          pathname: "/app/crt-prediction", // Redirect to the CRT prediction result page
+          state: {
+            circulatory_health: data.circulatory_health,
+            crt_duration: data.crt_duration,
+            vascular_efficiency: data.vascular_efficiency,
+            recommendation: data.recommendation,
+            message: data.message,
+          },
+        });
+      } else {
+        console.log("No CRT data received!");
+      }
+      console.log('Result before navigating:', data);
+
+    } catch (error) {
+      console.error('Error saving video:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const confirmSave = async () => {
-    try {
-      await addDoc(collection(db, 'nailvideo'), {
-        videoUrl: recordedVideoURL,
-        timestamp: serverTimestamp(),
-      });
-      console.log('Video saved successfully!');
-      setShowAlert(false);
-    } catch (error) {
-      console.error('Error saving video:', error);
-      setShowAlert(false);
-    }
+  const handleShowSaveAlert = () => {
+    setShowSaveAlert(true);
   };
 
   return (
@@ -153,61 +160,41 @@ const NailVideo: React.FC = () => {
           <IonTitle>TAKE VIDEO</IonTitle>
         </IonToolbar>
       </IonHeader>
-
       <IonContent className="video-content">
-        <video
-          ref={videoRef}
-          className="video-fullscreen"
-          autoPlay
-          muted
-          style={{ display: isRecording ? 'block' : 'none' }}
-        />
-
-        {isRecording && (
-          <div className={`recording-time ${!isRecording && recordingTime > 0 ? 'stopped' : ''}`}>
-            Recording Time: {recordingTime}s
-          </div>
-        )}
-
-        {recordedVideoURL && (
-          <div className="playback-container">
-            <video src={recordedVideoURL} controls className="video-playback" />
-          </div>
-        )}
-
+        <video ref={videoRef} className="video-fullscreen" autoPlay muted style={{ display: isRecording ? 'block' : 'none' }} />
+        {recordedVideoURL && <div className="playback-container"><video src={recordedVideoURL} controls className="video-playback" /></div>}
         {isUploading && <div className="loading-spinner">Uploading...</div>}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </IonContent>
-
       <div className="tab-bar">
-        <div className="tab-button">
-          <IonIcon icon={swapHorizontal} />
-        </div>
+        <div className="tab-button"><IonIcon icon={swapHorizontal} /></div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
           </IonButton>
         </div>
         <div className="tab-button">
-          <IonButton onClick={handleSaveVideo} fill="clear">
+          <IonButton onClick={handleShowSaveAlert} fill="clear">
             <IonIcon icon={save} />
           </IonButton>
         </div>
       </div>
-
+      {/* Save Confirmation Alert */}
       <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
+        isOpen={showSaveAlert}
+        onDidDismiss={() => setShowSaveAlert(false)}
         header="Save Video"
-        message="Do you want to save this video?"
+        message="Are you sure you want to save and analyze the video?"
         buttons={[
           {
-            text: 'No',
+            text: 'Cancel',
             role: 'cancel',
-            handler: () => console.log('Video not saved'),
           },
           {
-            text: 'Yes',
-            handler: confirmSave,
+            text: 'Save',
+            handler: () => {
+              handleSaveVideo(); // Call function to save and analyze
+            },
           },
         ]}
       />
