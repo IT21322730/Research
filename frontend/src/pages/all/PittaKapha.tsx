@@ -1,15 +1,18 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonButtons ,IonBackButton} from '@ionic/react';
 import '../css/PittaKapha.css';
 
 const PittaKapha: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar style={{ backgroundColor: '#48D1CC' }}>
-          <IonTitle>RECOMANDATION</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonBackButton defaultHref="/app/final" />
+                      </IonButtons>
+                      <IonTitle>RECOMANDATION</IonTitle>
+                    </IonToolbar>
+                  </IonHeader>
       <IonContent>
         <div className="Pitta-Kapha-container">
           <h2>What Does Pitta-Kapha Mean?</h2>
