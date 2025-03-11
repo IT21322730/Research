@@ -8,7 +8,8 @@ import {
     IonButtons,
     IonBackButton,
 } from "@ionic/react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useHistory } from "react-router-dom";
 import { Pie } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
@@ -17,23 +18,28 @@ Chart.register(...registerables);
 
 const FaceMappingPrediction: React.FC = () => {
     const location = useLocation();
+    const history = useHistory();
+    
 
-    const data = location.state as {
-        diagnosis_percentages?: Record<string, number>;
-        message?: string;
-        recommendations?: {
-            general?: string;
-        };
-    };
+    const storedState = sessionStorage.getItem("faceMappingResult");
+    const parsedState = storedState ? JSON.parse(storedState) : null;
 
-    console.log("Received Data:", data);
-    console.log("Debugging Recommendations Data:", data.recommendations);
+    const data = location.state || parsedState || {};
+
+
+    useEffect(() => {
+        if (!data.diagnosis_percentages) {
+            console.log("🔴 State lost! Redirecting to Face Mapping Pic...");
+            history.replace("/app/face-mapping-pic");
+        }
+    }, [data, history]);
 
     const diagnosisPercentages = data?.diagnosis_percentages || {};
-    const recommendations =
-        typeof data?.recommendations?.general === "object"
-            ? data.recommendations.general.general
-            : data?.recommendations?.general || "";
+    const recommendations = data?.recommendations?.general
+        ? (typeof data.recommendations.general === "string"
+            ? data.recommendations.general
+            : (data.recommendations.general as any)?.general || "")
+        : "";
     const message = data?.message || "Face Mapping Analysis Completed!";
     const hasDiagnosisData = Object.keys(diagnosisPercentages).length > 0;
 
@@ -69,15 +75,19 @@ const FaceMappingPrediction: React.FC = () => {
         },
         plugins: {
             legend: {
-                display: false, // ✅ Custom labels below
+                display: false, // ✅ Labels are below the chart
             },
             tooltip: {
+                enabled: true, // ✅ Enables tooltips when hovering
                 callbacks: {
                     label: (tooltipItem: any) => {
                         const value = tooltipItem.raw;
                         return `${value}%`; // ✅ Show percentage in tooltip
                     },
                 },
+            },
+            datalabels: {
+                display: false, // ❌ Hide data labels from the chart itself
             },
         },
     };

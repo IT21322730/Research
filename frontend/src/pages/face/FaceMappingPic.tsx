@@ -117,16 +117,13 @@ const FaceMappingPic: React.FC = () => {
       const result = await response.json();
       console.log("Backend response:", result);
 
-      // ✅ Pass the result as state when navigating
-      history.push({
-        pathname: "/app/face-mapping-prediction",
-        state: {
-          diagnosis_percentages: result.diagnosis_percentages,
-          recommendations: result.recommendations,
-          message: result.message,
-        },
-      });
+      sessionStorage.setItem("faceMappingResult", JSON.stringify(result));
 
+      // ✅ Pass the result as state when navigating
+      history.push("/app/face-mapping-prediction", result);
+
+      
+      
     } catch (error) {
       console.error("Error sending image to backend:", error);
     }
@@ -144,7 +141,7 @@ const FaceMappingPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-      <LuxMeter onLuxChange={setLux} />
+        <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
