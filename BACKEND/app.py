@@ -1564,10 +1564,9 @@ def calculate_illness_percentages(alopecia_diagnoses):
         del illness_counts["No significant hair loss detected"]
 
     total_valid_diagnoses = sum(illness_counts.values())
-    illness_percentages = {illness: (count / total_valid_diagnoses) * 100 for illness, count in illness_counts.items()}
+    illness_percentages = {illness: round((count / total_valid_diagnoses) * 100, 2) for illness, count in illness_counts.items()}
     
     return illness_percentages
-
 @app.route('/novelty-function', methods=['POST'])
 def novelty_function():
     try:
