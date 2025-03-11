@@ -1755,7 +1755,7 @@ def analyze_crt():
             })
             
             return jsonify({
-                "message": "CRT analysis completed successfully!",
+                "message": "CRT Analysis Successfully Completed!!!",
                 "crt_duration": crt_time,
                 "vascular_efficiency": vascular_efficiency,
                 "circulatory_health": circulatory_health,

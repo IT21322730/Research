@@ -106,7 +106,7 @@ const CRTPrediction: React.FC = () => {
         grid: { drawBorder: false, color: "rgba(0, 0, 0, 0.1)" }, // Light grid lines
       },
       x: {
-        ticks: { font: { size: 14, weight: 'bold' },},
+        ticks: { font: { size: 14, weight: 'bold' }, },
         grid: { display: false },
       },
     },
@@ -127,7 +127,7 @@ const CRTPrediction: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Nail CRT Prediction Results</IonTitle>
+          <IonTitle>CRT PREDICTION RESULTS</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -141,7 +141,6 @@ const CRTPrediction: React.FC = () => {
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             maxWidth: "380px",
             margin: "15px auto",
-            textAlign: "center",
           }}
         >
           {loading ? (
@@ -152,45 +151,45 @@ const CRTPrediction: React.FC = () => {
             </IonText>
           ) : (
             <>
-              <h2>CRT Duration: {crtDuration} minutes</h2>
-              <h3> {message}</h3>
+              {/* Success Message at the Top */}
+              <IonText style={{ color: "turquoise", fontWeight: "bold", fontSize: "22px", display: "block", marginBottom: "10px", textAlign: "center", }}>
+                {message}
+              </IonText>
+
+              {/* CRT Duration Above the Chart */}
+              <IonText style={{ color: "blue", fontWeight: "bold", fontSize: "16px", display: "block", textAlign: "left", marginBottom: "5px" }}>
+                CRT Duration: {crtDuration} minutes
+              </IonText>
 
               {/* Bar Chart Card */}
               <div
                 style={{
-                  width: '100%',
-                  height: '350px', // Increased height of the card
-                  background: '#fff',
-                  padding: '20px 30px 20px 10px',
-                  borderRadius: '10px',
-                  marginTop: '20px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid #ddd',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  width: "100%",
+                  height: "350px",
+                  background: "#fff",
+                  padding: "20px 30px 20px 10px",
+                  borderRadius: "10px",
+                  marginTop: "20px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  border: "1px solid #ddd",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                {chartData && (
-                  <Bar
-                    data={chartData}
-                    options={chartOptions}
-                    height={200} // Increased the height of the chart
-                    width={400}  // Increased the width of the chart
-                  />
-                )}
+                {chartData && <Bar data={chartData} options={chartOptions} height={200} width={400} />}
               </div>
 
-              {/* Recommendation Section Card */}
+              {/* Recommendation Section */}
               <div
                 style={{
-                  marginTop: '20px',
-                  padding: '15px',
-                  backgroundColor: '#BFEFFF',
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid #ddd',
-                  textAlign: 'left',
+                  marginTop: "20px",
+                  padding: "15px",
+                  backgroundColor: "#BFEFFF",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  border: "1px solid #ddd",
+                  textAlign: "left",
                 }}
               >
                 <h3>Recommendations</h3>
@@ -204,6 +203,7 @@ const CRTPrediction: React.FC = () => {
           )}
         </div>
       </IonContent>
+
     </IonPage>
   );
 };
