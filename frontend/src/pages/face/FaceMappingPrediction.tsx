@@ -87,9 +87,9 @@ const FaceMappingPrediction: React.FC = () => {
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonBackButton defaultHref="/app/home" />
+                        <IonBackButton defaultHref="/app/face-mapping-pic" />
                     </IonButtons>
-                    <IonTitle>Face Mapping Results</IonTitle>
+                    <IonTitle>FACE MAPPING RESULTS</IonTitle>
                 </IonToolbar>
             </IonHeader>
 

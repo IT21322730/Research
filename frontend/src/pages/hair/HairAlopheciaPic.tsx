@@ -173,7 +173,7 @@ const HairAlopheciaPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/alophecia" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>TAKE THE PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

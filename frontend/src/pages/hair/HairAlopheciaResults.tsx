@@ -53,7 +53,7 @@ const HairAlopeciaResults: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Hair Diagnosis Results</IonTitle>
+          <IonTitle>HAIR DIAGNOSIS RESULTS</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -65,7 +65,7 @@ const HairAlopeciaResults: React.FC = () => {
             padding: "20px",
             backgroundColor: "white",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            maxWidth: "500px",
+            maxWidth: "380px",
             margin: "20px auto",
             textAlign: "center",
           }}

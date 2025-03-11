@@ -140,7 +140,7 @@ const FaceMappingPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/facemapping" />
           </IonButtons>
-          <IonTitle>Take a Picture</IonTitle>
+          <IonTitle>TAKE A PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

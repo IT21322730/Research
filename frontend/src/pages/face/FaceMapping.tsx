@@ -44,6 +44,9 @@ const FaceMapping: React.FC = () => {
             <li>Right Side View:Turn your head slightly to the right, ensuring your profile is fully visible.Keep your posture consistent.</li>
             <li>Review the images for clarity before uploading.</li>
           </ol>
+          <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+                                Remember:To get the optimal result, maintain the optimal lux value
+                            </p>
 
           <button
           style={{ 

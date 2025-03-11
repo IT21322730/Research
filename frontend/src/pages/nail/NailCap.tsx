@@ -49,7 +49,19 @@ const NailCap: React.FC = () => {
             <li>Start recording a video or take multiple photos during the refill process, ensuring the camera is stable and your hand remains in the same position.</li>
           </ol>
 
-          <button className="take-picture-button" onClick={handleTakePicture}>
+          <button className="take-picture-button" 
+          style={{ 
+            backgroundColor: '#48D1CC', 
+            color: 'black',
+            padding: "15px 20px", 
+            borderRadius: "5px", 
+            border: "none", 
+            cursor: "pointer", 
+            fontWeight: "bold", 
+            width: "90%", 
+            fontSize: "18px", /* Added font size */
+            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
+          onClick={handleTakePicture}>
             Start Video Recording
           </button>
         </div><br/>
