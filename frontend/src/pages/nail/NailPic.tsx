@@ -15,10 +15,11 @@ import {
   IonLabel,
   IonImg
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
+import { camera, save, swapHorizontal, warning, refreshCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import "../css/NailPic.css";
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
 
 const NailPic: React.FC = () => {
   const history = useHistory();
@@ -30,6 +31,7 @@ const NailPic: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("Left Hand");
   const [capturedViews, setCapturedViews] = useState<{ [view: string]: string }>({});
   const [missingViews, setMissingViews] = useState<string[]>(["Left Hand", "Right Hand"]);
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
   const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ const NailPic: React.FC = () => {
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-  
+
       const context = canvas.getContext("2d");
       if (context) {
         if (useFrontCamera) {
@@ -72,29 +74,30 @@ const NailPic: React.FC = () => {
           context.translate(canvas.width, 0);
           context.scale(-1, 1);
         }
-  
+
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  
+
         // Reset transformations (optional, for safety)
         context.setTransform(1, 0, 0, 1, 0, 0);
-  
+
         const dataUrl = canvas.toDataURL("image/png");
-  
+
         setCapturedViews((prev) => {
           const updatedViews = { ...prev, [currentView]: dataUrl };
           validateCapturedViews(updatedViews);
           return updatedViews;
         });
-  
+
         if (currentView === "Left Hand") {
           setPhoto1(dataUrl);
         } else {
           setPhoto2(dataUrl);
         }
       }
+      console.log("Captured Lux Value:", lux);
     }
   };
-  
+
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Left Hand", "Right Hand"];
     const missing = requiredViews.filter((view) => !views[view]);
@@ -161,10 +164,11 @@ const NailPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <LuxMeter onLuxChange={setLux} />
         {!capturedViews[currentView] ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={capturedViews[currentView]} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }}  />
+          <IonImg src={capturedViews[currentView]} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
@@ -182,12 +186,12 @@ const NailPic: React.FC = () => {
         </IonSegment>
 
         <div className="tab-bar">
-        <div className="tab-button" onClick={() => window.location.reload()}>
-                    <IonIcon icon={refreshCircle} />
-                  </div>
-                  <div className="tab-button" onClick={toggleCamera}>
-                    <IonIcon icon={swapHorizontal} />
-                  </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
+          <div className="tab-button" onClick={toggleCamera}>
+            <IonIcon icon={swapHorizontal} />
+          </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>

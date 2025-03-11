@@ -18,6 +18,7 @@ import {
 import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
  
 
 
@@ -31,6 +32,7 @@ const HairPic: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("Front View");
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View"]);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
   const [showWarningAlert, setShowWarningAlert] = useState(false);
 
   useEffect(() => {
@@ -84,6 +86,8 @@ const HairPic: React.FC = () => {
 
             const dataUrl = canvas.toDataURL("image/png");
             setPhoto(dataUrl);
+
+            console.log("Captured Lux Value:", lux);
 
             // Save the captured image for the current view
             setCapturedViews((prev) => {
@@ -173,6 +177,7 @@ const HairPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+      <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
