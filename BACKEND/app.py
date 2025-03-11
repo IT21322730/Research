@@ -50,8 +50,6 @@ facePrakrurthi_model = tf.keras.models.load_model('./model/FacePrakurthiFinal_CN
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
 # Load the DL model for hair images
 hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
-# Load the DL model for hair images - IT21324024
-import tensorflow as tf
 # Load the DL model for nail images - IT21324024
 nail_model = tf.keras.models.load_model('./model/Nails.h5')
 
@@ -1772,7 +1770,7 @@ def analyze_crt():
         return jsonify({"error": "No video file found"}), 400
     
 
-    # Lux Value Detector
+# Lux Value Detector
 @app.route('/analyze-light', methods=['POST'])
 def analyze_light():
     try:
