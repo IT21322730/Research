@@ -23,7 +23,7 @@ interface LocationState {
   final_diagnosis?: string;
   hair_texture?: string;
   solution?: string;
-//   texture_solution?: string;
+  texture_solution?: string;
   illness_percentages?: { [key: string]: number }; // Mapping illness names to percentages
 }
 
@@ -37,7 +37,7 @@ const HairAlopeciaResults: React.FC = () => {
   const finalDiagnosis = location.state?.final_diagnosis ?? "No diagnosis found.";
   const hairTexture = location.state?.hair_texture ?? "No texture found.";
   const solution = location.state?.solution ?? "Solution not available.";
-//   const texture_solution = location.state?.texture_solution ?? "Texture Solution not available.";
+  const texture_solution = location.state?.texture_solution ?? "Texture Solution not available.";
   const illnessPercentages = location.state?.illness_percentages ?? {};
 
   // Prepare chart data
