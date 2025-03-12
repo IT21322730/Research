@@ -1,84 +1,3 @@
-// import React from "react";
-// import {
-//   IonPage,
-//   IonHeader,
-//   IonToolbar,
-//   IonTitle,
-//   IonContent,
-//   IonList,
-//   IonItem,
-//   IonLabel,
-//   IonText,
-// } from "@ionic/react";
-// import { useLocation } from "react-router-dom";
-// import img from '../images/img_04.png'; 
-
-// interface LocationState {
-//   prakrutiResult?: {
-//     overall_result: string;
-//     timestamp: string;
-//     individual_predictions: string[];
-//   };
-// }
-
-// const HairPrakruthiResults: React.FC = () => {
-//   const location = useLocation<LocationState>();
-//   const prakrutiData = location.state?.prakrutiResult || null;
-
-//   return (
-//     <IonPage>
-//       <IonHeader>
-//         <IonToolbar>
-//           <IonTitle>Prakruti Prediction</IonTitle>
-//         </IonToolbar>
-//       </IonHeader>
-
-//       <IonContent className="ion-padding">
-//         {prakrutiData ? (
-//           <IonList>
-//             <IonItem>
-//               <IonLabel>
-//                 <h2>Overall Result:</h2>
-//                 <IonText color="primary">
-//                   <p>{prakrutiData.overall_result}</p>
-//                 </IonText>
-//               </IonLabel>
-//             </IonItem>
-
-//             {/* <IonItem>
-//               <IonLabel>
-//                 <h3>Timestamp:</h3>
-//                 <IonText>
-//                   <p>{prakrutiData.timestamp}</p>
-//                 </IonText>
-//               </IonLabel>
-//             </IonItem> */}
-
-//             <IonLabel>
-//               <h3>Individual Image Predictions:</h3>
-//             </IonLabel>
-//             {prakrutiData.individual_predictions.map(
-//               (prediction: string, index: number) => (
-//                 <IonItem key={index}>
-//                   <IonLabel>
-//                     <p>Image {index + 1}: {prediction}</p>
-//                   </IonLabel>
-//                 </IonItem>
-//               )
-//             )}
-//           </IonList>
-//         ) : (
-//           <IonText>
-//             <p>No prediction data available.</p>
-//           </IonText>
-//         )}
-//       </IonContent>
-//     </IonPage>
-//   );
-// };
-
-// export default HairPrakruthiResults;
-
 import React, { useState, useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import {
@@ -131,7 +50,7 @@ const HairPrakruthiResults: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Prakruti Prediction</IonTitle>
+          <IonTitle>HAIR PRAKURTHI PREDICTION</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -166,7 +85,7 @@ const HairPrakruthiResults: React.FC = () => {
                   display: "block",
                 }}
               />
-              <h2
+              {/* <h2
                 style={{
                   margin: "0",
                   padding: "5px",
@@ -177,7 +96,7 @@ const HairPrakruthiResults: React.FC = () => {
               >
                 <b>Successful!!!</b>
                 <br />
-                 
+
                 Hair prakurthi analysis is done!
               </h2>
 
@@ -187,18 +106,21 @@ const HairPrakruthiResults: React.FC = () => {
                   <p style={{ fontWeight: 'bold', fontSize: '25px' }}>{prakrutiData.final_prakriti}</p>
 
                   <h3>Individual Image Predictions:</h3>
-                  
-                  {prakrutiData.individual_predictions.map(
-                    (prediction: string, index: number) => (
-                      <p style={{fontSize: '16px' }} key={index}>Image {index + 1}: {prediction}</p>
-                    )
+
+                  {prakrutiData?.individual_predictions?.length ? (
+                    prakrutiData.individual_predictions.map((prediction: string, index: number) => (
+                      <p style={{ fontSize: '16px' }} key={index}>Image {index + 1}: {prediction}</p>
+                    ))
+                  ) : (
+                    <p style={{ fontSize: '16px', color: 'gray' }}>No individual predictions available.</p>
                   )}
+
                 </div>
               ) : (
                 <IonText>No prediction data available.</IonText>
-              )}
+              )} */}
 
-              <button
+              {/* <button
                 className="take-picture-button"
                 style={{
                   fontWeight: "600",
@@ -220,7 +142,7 @@ const HairPrakruthiResults: React.FC = () => {
                 onClick={handleRedirect}
               >
                 Take the next step
-              </button>
+              </button> */}
             </div>
           )}
         </div>
