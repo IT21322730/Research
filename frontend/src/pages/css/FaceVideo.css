@@ -36,7 +36,7 @@
 /* Tab bar styling */
 .tab-bar {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly; /* Ensure even spacing between buttons */
     align-items: center;
     height: 90px;
     background-color: #000; /* Black background for the tab bar */
@@ -44,15 +44,20 @@
     bottom: 0;
     width: 100%;
     z-index: 3; /* Ensure the tab bar is above the video */
+    padding: 10px 0;
 }
 
+/* Ensures each button gets an equal amount of space */
 .tab-button {
+    flex: 1; /* Makes each button take equal width */
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
     color: #fff; /* White text for labels */
 }
 
+/* Styling for IonIcons inside buttons */
 .tab-button ion-icon {
     font-size: 24px;
     background-color: #fff; /* White background for the icons */
@@ -60,12 +65,12 @@
     border-radius: 50%; /* Rounded background */
     padding: 10px; /* Space around the icon */
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* Optional shadow for a subtle 3D effect */
-    margin-bottom: 4px; /* Small space between icon and label */
 }
 
+/* Ensure the label (if used) has proper spacing */
 .tab-button ion-label {
-    font-size: 12px; /* Small text for labels */
-    margin-top: 8px; /* No margin on top */
+    font-size: 12px;
+    margin-top: 5px;
     color: #fff; /* White color for labels */
 }
 
