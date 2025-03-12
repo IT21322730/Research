@@ -97,7 +97,7 @@ const HairPrakruthiResults: React.FC = () => {
                 <b>Successful!!!</b>
                 <br />
 
-                {/* Hair prakurthi analysis is done! */}
+                Hair prakurthi analysis is done!
               </h2>
 
               {prakrutiData ? (
