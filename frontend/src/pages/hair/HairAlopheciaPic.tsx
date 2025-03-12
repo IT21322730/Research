@@ -19,7 +19,7 @@ import { camera, save, swapHorizontal, warning } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import "../css/Hairalophecia.css";
-// import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
 
 const HairAlopheciaPic: React.FC = () => {
   const history = useHistory();
@@ -178,7 +178,7 @@ const HairAlopheciaPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-      {/* <LuxMeter onLuxChange={setLux} /> */}
+      <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
