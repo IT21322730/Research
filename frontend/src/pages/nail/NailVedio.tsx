@@ -12,9 +12,11 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/NailVedio.css';
-import { videocam, videocamOff, save, swapHorizontal, refreshCircle } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
 import { getFirestore } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
+import { IonToast } from '@ionic/react';
+
 
 const NailVideo: React.FC = () => {
   const history = useHistory();
@@ -24,13 +26,14 @@ const NailVideo: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPressToast, setShowPressToast] = useState(false);
+  const [showReleaseToast, setShowReleaseToast] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
 
   const db = getFirestore();
 
@@ -71,11 +74,19 @@ const NailVideo: React.FC = () => {
 
       setIsRecording(true);
       setRecordedVideoURL(null);
+
+      // Show "Press Finger" toast
+      setShowPressToast(true);
+      setTimeout(() => {
+        setShowPressToast(false);
+        setShowReleaseToast(true); // Show "Release Finger" toast
+      }, 5000);
     } catch (error) {
       console.error('Error accessing media devices:', error);
       alert('Unable to access camera.');
     }
   };
+
 
   const handleStopRecording = async () => {
     if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
@@ -96,20 +107,14 @@ const NailVideo: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      // Fetch video data from the recorded URL
+      // Fetch video data from URL
       const response = await fetch(recordedVideoURL);
       if (!response.ok) throw new Error('Failed to fetch video');
 
       const videoBlob = await response.blob();
-      const videoFile = new File([videoBlob], `nail_video_${Date.now()}.webm`, { type: 'video/webm' });
-
       const formData = new FormData();
-      formData.append('video', videoFile);
+      formData.append('video', videoBlob, `nail_video_${Date.now()}.webm`);
 
-      // Debugging - Log FormData contents
-      for (let [key, value] of formData.entries()) {
-        console.log(`FormData key: ${key}, value:`, value);
-      }
 
       console.log('Uploading video to backend...');
 
@@ -119,19 +124,23 @@ const NailVideo: React.FC = () => {
         body: formData,
       });
 
+
       if (!backendResponse.ok) {
         const errorText = await backendResponse.text();
         console.error(`Backend error: ${backendResponse.status} - ${errorText}`);
-        throw new Error(`Backend error: ${backendResponse.status}`);
+        setErrorMessage(`Backend error: ${backendResponse.status} - ${errorText}`);
+        throw new Error(`Backend error: ${backendResponse.status} - ${errorText}`);
+
       }
 
+      // Here, use the backendResponse to get the JSON data
       const data = await backendResponse.json();
-      console.log("Backend response:", data);
+      console.log('Backend response:', data);
 
       if (data) {
-        // Navigate to CRT prediction result page with the received data
+        // Send the CRT data to the next page (CRT prediction result page)
         history.push({
-          pathname: "/app/crt-prediction",
+          pathname: '/app/crt-prediction', // Redirect to the CRT prediction result page
           state: {
             circulatory_health: data.circulatory_health,
             crt_duration: data.crt_duration,
@@ -141,9 +150,9 @@ const NailVideo: React.FC = () => {
           },
         });
       } else {
-        console.log("No CRT data received!");
+        console.log('No CRT data received!');
       }
-
+      console.log('Result before navigating:', data);
     } catch (error) {
       console.error('Error saving video:', error);
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -152,13 +161,8 @@ const NailVideo: React.FC = () => {
     }
   };
 
-
   const handleShowSaveAlert = () => {
     setShowSaveAlert(true);
-  };
-
-  const toggleCamera = () => {
-    setUseFrontCamera((prev) => !prev);
   };
 
   return (
@@ -178,12 +182,7 @@ const NailVideo: React.FC = () => {
         {errorMessage && <div className="error-message">{errorMessage}</div>}
       </IonContent>
       <div className="tab-bar">
-        <div className="tab-button" onClick={() => window.location.reload()}>
-          <IonIcon icon={refreshCircle} />
-        </div>
-        <div className="tab-button" onClick={toggleCamera}>
-          <IonIcon icon={swapHorizontal} />
-        </div>
+        <div className="tab-button"><IonIcon icon={swapHorizontal} /></div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
@@ -195,6 +194,27 @@ const NailVideo: React.FC = () => {
           </IonButton>
         </div>
       </div>
+
+      {/* Press Finger Toast */}
+      <IonToast
+        isOpen={showPressToast}
+        message="Please press your finger now."
+        duration={3000} // Automatically disappears after 3 seconds
+        position="top"
+        onDidDismiss={() => setShowPressToast(false)}
+        style={{ marginTop: '60px' }} // Moves the toast 60px down
+      />
+
+      {/* Release Finger Toast */}
+      <IonToast
+        isOpen={showReleaseToast}
+        message="Now, release your finger slowly."
+        duration={3000} // Automatically disappears after 3 seconds
+        position="top"
+        onDidDismiss={() => setShowReleaseToast(false)}
+        style={{ marginTop: '60px' }} // Moves the toast 60px down
+      />
+
       {/* Save Confirmation Alert */}
       <IonAlert
         isOpen={showSaveAlert}
