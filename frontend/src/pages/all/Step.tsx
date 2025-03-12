@@ -106,7 +106,7 @@ const Step: React.FC = () => {
             <IonHeader>
             <IonToolbar>
                 <IonButtons slot="start">
-                    <IonBackButton defaultHref="/login" />
+                    <IonBackButton defaultHref="/app/home" />
                 </IonButtons>
                 <IonTitle>PRAKURTHI ANALYSIS</IonTitle>
                 <IonButtons slot="end">
