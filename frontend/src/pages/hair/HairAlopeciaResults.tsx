@@ -28,7 +28,7 @@ interface LocationState {
 }
 
 // Colors for pie chart
-const COLORS = ["#a569dd", "#4CAF50", "#1E90FF", "#FFD700", "#34495e", "#FF4500"];
+const COLORS = ["#a569bd", "#4CAF50", "#1E90FF", "#FFD700", "#34495e", "#FF4500"];
 
 const HairAlopeciaResults: React.FC = () => {
   const location = useLocation<LocationState>();
