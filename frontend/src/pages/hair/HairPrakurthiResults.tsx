@@ -85,7 +85,7 @@ const HairPrakruthiResults: React.FC = () => {
                   display: "block",
                 }}
               />
-              {/* <h2
+              <h2
                 style={{
                   margin: "0",
                   padding: "5px",
@@ -94,10 +94,10 @@ const HairPrakruthiResults: React.FC = () => {
                   marginBottom: "15px",
                 }}
               >
-                <b>Successful!!!</b>
+                {/* <b>Successful!!!</b> */}
                 <br />
 
-                Hair prakurthi analysis is done!
+                {/* Hair prakurthi analysis is done! */}
               </h2>
 
               {prakrutiData ? (
@@ -105,7 +105,7 @@ const HairPrakruthiResults: React.FC = () => {
                   <h3>Overall Result:</h3>
                   <p style={{ fontWeight: 'bold', fontSize: '25px' }}>{prakrutiData.final_prakriti}</p>
 
-                  <h3>Individual Image Predictions:</h3>
+                  {/* <h3>Individual Image Predictions:</h3> */}
 
                   {prakrutiData?.individual_predictions?.length ? (
                     prakrutiData.individual_predictions.map((prediction: string, index: number) => (
@@ -118,7 +118,7 @@ const HairPrakruthiResults: React.FC = () => {
                 </div>
               ) : (
                 <IonText>No prediction data available.</IonText>
-              )} */}
+              )}
 
               <button
                 className="take-picture-button"
