@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/NailVedio.css';
-import { videocam, videocamOff, save, swapHorizontal ,refreshCircle} from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal, refreshCircle } from 'ionicons/icons';
 import { getFirestore } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
 
@@ -96,13 +96,20 @@ const NailVideo: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      // Fetch video data from URL
+      // Fetch video data from the recorded URL
       const response = await fetch(recordedVideoURL);
       if (!response.ok) throw new Error('Failed to fetch video');
 
       const videoBlob = await response.blob();
+      const videoFile = new File([videoBlob], `nail_video_${Date.now()}.webm`, { type: 'video/webm' });
+
       const formData = new FormData();
-      formData.append('video', videoBlob, `nail_video_${Date.now()}.webm`);
+      formData.append('video', videoFile);
+
+      // Debugging - Log FormData contents
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData key: ${key}, value:`, value);
+      }
 
       console.log('Uploading video to backend...');
 
@@ -118,14 +125,13 @@ const NailVideo: React.FC = () => {
         throw new Error(`Backend error: ${backendResponse.status}`);
       }
 
-      // Here, use the backendResponse to get the JSON data
       const data = await backendResponse.json();
       console.log("Backend response:", data);
 
       if (data) {
-        // Send the CRT data to the next page (CRT prediction result page)
+        // Navigate to CRT prediction result page with the received data
         history.push({
-          pathname: "/app/crt-prediction", // Redirect to the CRT prediction result page
+          pathname: "/app/crt-prediction",
           state: {
             circulatory_health: data.circulatory_health,
             crt_duration: data.crt_duration,
@@ -137,7 +143,6 @@ const NailVideo: React.FC = () => {
       } else {
         console.log("No CRT data received!");
       }
-      console.log('Result before navigating:', data);
 
     } catch (error) {
       console.error('Error saving video:', error);
@@ -146,6 +151,7 @@ const NailVideo: React.FC = () => {
       setIsUploading(false);
     }
   };
+
 
   const handleShowSaveAlert = () => {
     setShowSaveAlert(true);
@@ -173,11 +179,11 @@ const NailVideo: React.FC = () => {
       </IonContent>
       <div className="tab-bar">
         <div className="tab-button" onClick={() => window.location.reload()}>
-                    <IonIcon icon={refreshCircle} />
-                  </div>
-                  <div className="tab-button" onClick={toggleCamera}>
-                    <IonIcon icon={swapHorizontal} />
-                  </div>
+          <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
+          <IonIcon icon={swapHorizontal} />
+        </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
