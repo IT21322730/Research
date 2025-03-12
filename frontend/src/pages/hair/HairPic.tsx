@@ -18,7 +18,8 @@ import {
 import { camera, save, swapHorizontal, warning } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
- 
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
+
 
 
 const HairPic: React.FC = () => {
