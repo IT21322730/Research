@@ -105,7 +105,7 @@ const HairPrakruthiResults: React.FC = () => {
                   <h3>Overall Result:</h3>
                   <p style={{ fontWeight: 'bold', fontSize: '25px' }}>{prakrutiData.final_prakriti}</p>
 
-                  {/* <h3>Individual Image Predictions:</h3> */}
+                  <h3>Individual Image Predictions:</h3>
 
                   {prakrutiData?.individual_predictions?.length ? (
                     prakrutiData.individual_predictions.map((prediction: string, index: number) => (
