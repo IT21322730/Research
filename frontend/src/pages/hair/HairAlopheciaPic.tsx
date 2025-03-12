@@ -149,16 +149,16 @@ const HairAlopheciaPic: React.FC = () => {
       console.log("Response from server:", data);
 
       // Navigate to HairAlopheciaiResults with the full result data
-      // history.push({
-      //   pathname: "/app/hair-alohecia-results",
-      //   state: {
-      //     final_diagnosis: data.final_diagnosis,
-      //     hair_texture: data.hair_texture,
-      //     solution: data.solution,
-      //     texture_solution: data.texture_solution,
-      //     illness_percentages: data.illness_percentages,
-      //   }
-      // });
+      history.push({
+        pathname: "/app/hair-alohecia-results",
+        state: {
+          final_diagnosis: data.final_diagnosis,
+          hair_texture: data.hair_texture,
+          solution: data.solution,
+          // texture_solution: data.texture_solution,
+          illness_percentages: data.illness_percentages,
+        }
+      });
 
     } catch (error) {
       console.error("Error uploading images:", error);
