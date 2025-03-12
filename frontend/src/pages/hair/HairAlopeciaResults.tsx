@@ -153,7 +153,7 @@ const HairAlopeciaResults: React.FC = () => {
             </IonLabel>
           </IonItem>
 
-          {/* <IonCard style={{ backgroundColor: "#94FFD4" }}>
+          <IonCard style={{ backgroundColor: "#94FFD4" }}>
             <IonCardHeader>
               <IonCardTitle><strong>Recommendations For Texture</strong></IonCardTitle>
             </IonCardHeader>
@@ -170,7 +170,7 @@ const HairAlopeciaResults: React.FC = () => {
                 </ul>
               </IonLabel>
             </IonCardContent>
-          </IonCard> */}
+          </IonCard>
 
 
 
