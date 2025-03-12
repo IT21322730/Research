@@ -9,6 +9,7 @@
     overflow: hidden; /* Prevent overflow */
 }
 
+
 /* Styles for the video element to cover the full screen */
 .video-fullscreen {
     position: absolute;
