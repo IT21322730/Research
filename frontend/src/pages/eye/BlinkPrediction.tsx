@@ -84,7 +84,7 @@ const BlinkPrediction: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/eye-video" />
+            <IonBackButton defaultHref="/app/blink" />
           </IonButtons>
           <IonTitle>YOUR BLINK PREDICTION</IonTitle>
         </IonToolbar>
@@ -112,19 +112,28 @@ const BlinkPrediction: React.FC = () => {
             <div style={{ textAlign: 'center', marginTop: '0px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>Stress and Fatigue Level Analysis</h2>
               <div style={{ maxWidth: '400px', margin: 'auto' }}>
-                <Bar
-                  data={chartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                      x: {
-                        beginAtZero: true,
-                      },
+              <Bar
+                data={chartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    tooltip: {
+                      enabled: false, // Disables tooltips on hover
                     },
-                  }}
-                  height={210}
-                />
+                    datalabels: {
+                      display: false, // Hides the numbers inside the bars
+                    },
+                  },
+                  scales: {
+                    x: {
+                      beginAtZero: true,
+                    },
+                  },
+                }}
+                height={210}
+              />
+
               </div>
               
               <div className="color-coding">
