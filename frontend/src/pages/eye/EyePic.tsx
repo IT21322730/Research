@@ -72,13 +72,11 @@ const EyePic: React.FC = () => {
     const video = videoRef.current;
     if (video) {
       const canvas = document.createElement("canvas");
-
       // Ensure the canvas matches the video dimensions
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
       canvas.width = videoWidth;
       canvas.height = videoHeight;
-
       const context = canvas.getContext("2d");
       if (context) {
         // Flip the image horizontally for front camera correction
@@ -99,6 +97,7 @@ const EyePic: React.FC = () => {
       }
     }
   };
+  
 
 
   const toggleCamera = () => {
