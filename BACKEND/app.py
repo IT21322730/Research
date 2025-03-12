@@ -357,6 +357,34 @@ def novelty_function():
         return jsonify({"error": str(e)}), 500
 
 
+ # Lux Value Detector
+@app.route('/analyze-light', methods=['POST'])
+def analyze_light():
+    try:
+        data = request.get_json()
+        lux = data.get("lux")
+
+        if lux is None:
+            return jsonify({"error": "Missing lux value"}), 400
+
+        # Process Lux Values for Micro-Expression Analysis
+        if lux < 100:
+            message = "❌ Too Dark! Increase lighting."
+        elif 100 <= lux < 300:
+            message = "✅ Good, but slightly dim."
+        elif 300 <= lux <= 600:
+            message = "✅✅ Optimal Lighting! Best for your analysis."
+        elif 600 < lux <= 1000:
+            message = "✅ Acceptable, but may cause glare."
+        else:  # lux > 1000
+            message = "❌ Overexposed! Reduce brightness."
+
+        return jsonify({"lux": lux, "message": message})
+
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
