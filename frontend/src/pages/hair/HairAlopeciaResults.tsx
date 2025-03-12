@@ -127,7 +127,7 @@ const HairAlopeciaResults: React.FC = () => {
             )}
           </IonCard>
 
-          {/* <IonCard style={{ backgroundColor: "#FDFD66" }}>
+          <IonCard style={{ backgroundColor: "#FDFD66" }}>
             <IonCardHeader>
               <IonCardTitle><strong>Recommendations For Alophecia Diagnosis</strong></IonCardTitle>
             </IonCardHeader>
@@ -144,7 +144,7 @@ const HairAlopeciaResults: React.FC = () => {
                 </ul>
               </IonLabel>
             </IonCardContent>
-          </IonCard> */}
+          </IonCard>
 
           <IonItem lines="none">
             <IonLabel>
