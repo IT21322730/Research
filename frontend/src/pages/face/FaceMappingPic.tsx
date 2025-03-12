@@ -12,7 +12,7 @@ import {
   IonButton,
   IonAlert,
 } from "@ionic/react";
-import { camera, save, swapHorizontal } from "ionicons/icons";
+import { camera, save, swapHorizontal,refreshCircle } from "ionicons/icons";
 import { getAuth } from "firebase/auth";
 import { useHistory } from "react-router-dom";
 import "../css/FaceMappingPic.css";
@@ -149,12 +149,15 @@ const FaceMappingPic: React.FC = () => {
         )}
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={toggleCamera}>
-            <IonIcon icon={swapHorizontal} />
-          </div>
-          <div className="tab-button" onClick={takePicture}>
-            <IonIcon icon={camera} />
-          </div>
+                  <div className="tab-button" onClick={() => window.location.reload()}>
+                    <IonIcon icon={refreshCircle} />
+                  </div>
+                  <div className="tab-button" onClick={toggleCamera}>
+                    <IonIcon icon={swapHorizontal} />
+                  </div>
+                  <div className="tab-button" onClick={takePicture}>
+                    <IonIcon icon={camera} />
+                  </div>
           <div className="tab-button" onClick={() => setShowAlert(true)}>
             <IonIcon icon={save} />
           </div>
