@@ -155,7 +155,7 @@ const HairAlopheciaPic: React.FC = () => {
           final_diagnosis: data.final_diagnosis,
           hair_texture: data.hair_texture,
           solution: data.solution,
-          // texture_solution: data.texture_solution,
+          texture_solution: data.texture_solution,
           illness_percentages: data.illness_percentages,
         }
       });
