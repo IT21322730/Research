@@ -94,7 +94,7 @@ const HairPrakruthiResults: React.FC = () => {
                   marginBottom: "15px",
                 }}
               >
-                {/* <b>Successful!!!</b> */}
+                <b>Successful!!!</b>
                 <br />
 
                 {/* Hair prakurthi analysis is done! */}
