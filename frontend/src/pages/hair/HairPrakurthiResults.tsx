@@ -120,7 +120,7 @@ const HairPrakruthiResults: React.FC = () => {
                 <IonText>No prediction data available.</IonText>
               )} */}
 
-              {/* <button
+              <button
                 className="take-picture-button"
                 style={{
                   fontWeight: "600",
@@ -142,7 +142,7 @@ const HairPrakruthiResults: React.FC = () => {
                 onClick={handleRedirect}
               >
                 Take the next step
-              </button> */}
+              </button>
             </div>
           )}
         </div>
