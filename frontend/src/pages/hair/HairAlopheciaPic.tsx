@@ -15,7 +15,7 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning,refreshCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import "../css/Hairalophecia.css";
@@ -33,8 +33,7 @@ const HairAlopheciaPic: React.FC = () => {
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View", "Top of the Head View"]);
   const [capturedPhotos, setCapturedPhotos] = useState<{ [tab: number]: string }>({});
   const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
-
-
+  
   useEffect(() => {
     const startCamera = async () => {
       try {
@@ -98,6 +97,7 @@ const HairAlopheciaPic: React.FC = () => {
         }
     }
 };
+
 
   const resetPhotos = () => {
     setPhoto(null);
@@ -164,6 +164,10 @@ const HairAlopheciaPic: React.FC = () => {
     }
   };
 
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+  
 
 
   return (
@@ -207,9 +211,12 @@ const HairAlopheciaPic: React.FC = () => {
 
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
-            <IonIcon icon={swapHorizontal} />
-          </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+                      <IonIcon icon={refreshCircle} />
+                    </div>
+                    <div className="tab-button" onClick={toggleCamera}>
+                      <IonIcon icon={swapHorizontal} />
+                    </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
