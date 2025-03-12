@@ -83,7 +83,7 @@ const FacePrakurthiPrediction: React.FC = () => {
 
               {/* Overall Result in One Line */}
               <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-                Overall Result: <span style={{ color: "rgb(72, 209, 204)" }}>{prakrutiData.final_prakriti}</span>
+                Overall Result: <span style={{ color: "rgb(1, 5, 5)" }}>{prakrutiData.final_prakriti}</span>
               </p>
 
               {/* Individual Predictions */}
