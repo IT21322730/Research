@@ -1643,7 +1643,6 @@ def novelty_function():
 
 
 ### IT21324024 - Nail Novelty ###
-
 ### Capillary refil time analysis
 # Function to calculate the average color intensity of the nail region
 def get_color_intensity(frame, roi):
@@ -1767,7 +1766,8 @@ def analyze_crt():
                 os.remove(video_path)
     else:
         return jsonify({"error": "No video file found"}), 400
-    
+
+
 
 # Lux Value Detector
 @app.route('/analyze-light', methods=['POST'])
