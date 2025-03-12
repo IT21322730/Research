@@ -74,15 +74,15 @@ const HairAlopeciaResults: React.FC = () => {
         >
           
           <IonList>
-            {/* <IonItem lines="none">
+            <IonItem lines="none">
               <IonLabel style={{ textAlign: 'center', display: 'block' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'turquoise' }}>
+                <h3 style={{ fontSize: '1.5rem' }}>
                   Alopecia and Texture Analysis is Successful!
                 </h3>
               </IonLabel>
 
 
-            </IonItem> */}
+            </IonItem>
             <IonItem lines="none">
               <IonLabel>
                 <h3 style={{ fontSize: '1.0rem' }}>
