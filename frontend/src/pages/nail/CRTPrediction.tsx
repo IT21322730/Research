@@ -44,7 +44,7 @@ const CRTPrediction: React.FC = () => {
       console.error("🚨 No CRT data! Redirecting...");
       setError("No CRT data available.");
       setLoading(false);
-      setTimeout(() => history.replace("/app/step"), 2000);
+      setTimeout(() => history.replace("/app/home"), 2000);
       return;
     }
 
@@ -125,7 +125,7 @@ const CRTPrediction: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/step" />
+            <IonBackButton defaultHref="/app/home" />
           </IonButtons>
           <IonTitle>CRT PREDICTION RESULTS</IonTitle>
         </IonToolbar>

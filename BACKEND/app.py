@@ -1496,7 +1496,19 @@ disease_solutions = {
     },
     "No significant hair loss detected": {
         "message": "No significant hair loss detected. Regular hair care and nutrition may improve overall hair health."
+    },
+
+    # Hair Texture Solutions
+    "Fine Texture": {
+        "message": "Use lightweight, volumizing shampoos and avoid heavy conditioners that can make hair flat. Use light oils like argan or grapeseed oil instead of thick butters. Eating protein, iron, and vitamin B12 can help strengthen fine hair. Avoid too much heat styling and use dry shampoo to control oil."
+    },
+    "Medium Texture": {
+        "message": "Use a moisturizing shampoo that is not too heavy, and apply conditioner only to the middle and ends of your hair. Jojoba or almond oil can add shine without making hair greasy. Deep condition every 1-2 weeks and always use a heat protectant before styling. A diet with biotin, zinc, and omega-3s helps keep hair healthy."
+    },
+    "Coarse Texture": {
+        "message": "Keep hair hydrated with sulfate-free shampoos and deep condition weekly to avoid dryness and frizz. Use heavier oils like coconut oil and shea butter to retain moisture. Reduce heat styling and sleep on a silk pillowcase to prevent friction. Eating foods rich in vitamin E, omega-6, and water (like cucumbers and watermelon) helps hair stay strong and flexible."
     }
+
 }
 def detect_alopecia(image, gender="unknown"):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -1609,6 +1621,7 @@ def novelty_function():
             final_alopecia = "Androgenetic Alopecia (Male)"
 
         solution = disease_solutions.get(final_alopecia, {"message": "Solution not available"})
+        texture_solution = disease_solutions.get(final_texture, {"message": "Solution not available"})
 
         user_ref = db.collection("users").document(user_uid)
         user_doc = user_ref.get()
@@ -1626,6 +1639,7 @@ def novelty_function():
             "hair_texture": final_texture,
             "timestamp": timestamp,
             "solution": solution["message"],
+            "texture_solution": texture_solution["message"],
             "illness_percentages": illness_percentages
         }
         doc_ref.set(result_data)
@@ -1634,7 +1648,8 @@ def novelty_function():
             "final_diagnosis": final_alopecia,
             "hair_texture": final_texture,
             "illness_percentages": illness_percentages,
-            "solution": solution["message"]
+            "solution": solution["message"],
+            "texture_solution": texture_solution["message"],
         })
     except Exception as e:
         traceback.print_exc()
@@ -1643,7 +1658,6 @@ def novelty_function():
 
 
 ### IT21324024 - Nail Novelty ###
-
 ### Capillary refil time analysis
 # Function to calculate the average color intensity of the nail region
 def get_color_intensity(frame, roi):
@@ -1767,7 +1781,8 @@ def analyze_crt():
                 os.remove(video_path)
     else:
         return jsonify({"error": "No video file found"}), 400
-    
+
+
 
 # Lux Value Detector
 @app.route('/analyze-light', methods=['POST'])
