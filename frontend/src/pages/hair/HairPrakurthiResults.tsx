@@ -96,7 +96,7 @@ const HairPrakruthiResults: React.FC = () => {
               >
                 <b>Successful!!!</b>
                 <br />
-                 
+
                 Hair prakurthi analysis is done!
               </h2>
 
@@ -106,12 +106,15 @@ const HairPrakruthiResults: React.FC = () => {
                   <p style={{ fontWeight: 'bold', fontSize: '25px' }}>{prakrutiData.final_prakriti}</p>
 
                   <h3>Individual Image Predictions:</h3>
-                  
-                  {prakrutiData.individual_predictions.map(
-                    (prediction: string, index: number) => (
-                      <p style={{fontSize: '16px' }} key={index}>Image {index + 1}: {prediction}</p>
-                    )
+
+                  {prakrutiData?.individual_predictions?.length ? (
+                    prakrutiData.individual_predictions.map((prediction: string, index: number) => (
+                      <p style={{ fontSize: '16px' }} key={index}>Image {index + 1}: {prediction}</p>
+                    ))
+                  ) : (
+                    <p style={{ fontSize: '16px', color: 'gray' }}>No individual predictions available.</p>
                   )}
+
                 </div>
               ) : (
                 <IonText>No prediction data available.</IonText>
