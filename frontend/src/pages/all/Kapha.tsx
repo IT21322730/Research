@@ -78,7 +78,13 @@ const Kapha: React.FC = () => {
           <p>Tree Pose is made by standing on one leg for a while to balance the kapha dosha.</p>
 
           <h2>Kapha Diet Guidelines</h2>
-          <table className="diet-table">
+          <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+          <table className="diet-table"
+          style={{
+            width: "100%", // Ensures it stretches to fit parent width
+            minWidth: "600px", // Prevents shrinking too much
+            borderCollapse: "collapse", // Merges borders for a clean look
+          }}>
             <thead>
               <tr>
                 <th>Favor</th>
@@ -139,6 +145,7 @@ const Kapha: React.FC = () => {
               </tr>
             </tbody>
           </table>
+          </div>
 
           <h2>Ayurvedic Remedies and Practices for Kapha</h2>
           <ul>
