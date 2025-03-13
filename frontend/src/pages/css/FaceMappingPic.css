@@ -1,7 +1,10 @@
 .captured-photo {
   width: 100%;
-  height: 480px; /* Reduced height */
-  margin-bottom: 10px; /* Reduced margin */
+  object-fit: contain; /* Prevents stretching */
+  max-width: 400px;
+  max-height: 590px;
+  display: block;
+  margin: 0 auto;
 }
 
 .view-buttons {
@@ -23,6 +26,6 @@
 video {
   transform: scaleX(-1); /* Mirror the video horizontally */
   width: 100%; /* Full width to match captured photo */
-  height: 480px; /* Match the height to captured photo */
+  height: 590px; /* Match the height to captured photo */
   object-fit: cover; /* Ensure the video fits the container while maintaining aspect ratio */
 }

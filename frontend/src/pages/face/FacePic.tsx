@@ -15,10 +15,12 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning, refreshCircle } from "ionicons/icons";
 import "../css/FacePic.css";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
+import Reloader from '../all/Reloader'; // Import Reloader component
 
 const FacePic: React.FC = () => {
   const history = useHistory();
@@ -31,6 +33,8 @@ const FacePic: React.FC = () => {
   const [capturedViews, setCapturedViews] = useState<{ [view: string]: string }>({});
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Left View", "Right View"]);
   const [showWarningAlert, setShowWarningAlert] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false); // Loader state
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
   const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   useEffect(() => {
@@ -64,36 +68,38 @@ const FacePic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-        const context = canvas.getContext("2d");
-        if (context) {
-            // Clear the canvas before drawing
-            context.clearRect(0, 0, canvas.width, canvas.height);
+      const context = canvas.getContext("2d");
+      if (context) {
+        // Clear the canvas before drawing
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Flip the canvas horizontally (mirror effect)
-            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+        // Flip the canvas horizontally (mirror effect)
+        context.setTransform(-1, 0, 0, 1, canvas.width, 0);
 
-            // Draw the video frame onto the canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Draw the video frame onto the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Reset transformations to prevent future issues
-            context.setTransform(1, 0, 0, 1, 0, 0);
+        // Reset transformations to prevent future issues
+        context.setTransform(1, 0, 0, 1, 0, 0);
 
-            const dataUrl = canvas.toDataURL("image/png");
-            setPhoto(dataUrl);
+        const dataUrl = canvas.toDataURL("image/png");
+        setPhoto(dataUrl);
 
-            // Save the captured image for the current view
-            setCapturedViews((prev) => {
-                const updatedViews = { ...prev, [currentView]: dataUrl };
-                validateCapturedViews(updatedViews);
-                return updatedViews;
-            });
-        }
+        console.log("Captured Lux Value:", lux);
+
+        // Save the captured image for the current view
+        setCapturedViews((prev) => {
+          const updatedViews = { ...prev, [currentView]: dataUrl };
+          validateCapturedViews(updatedViews);
+          return updatedViews;
+        });
+      }
     }
-};
+  };
 
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Front View", "Left View", "Right View"];
@@ -101,7 +107,14 @@ const FacePic: React.FC = () => {
     setMissingViews(missing);
   };
 
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+
+
   const handleSaveToBackend = async () => {
+    setLoading(true); // Start loading animation
+
     const auth = getAuth(); // Get Firebase Auth instance
     const user = auth.currentUser; // Get the currently logged-in user
 
@@ -145,6 +158,8 @@ const FacePic: React.FC = () => {
 
     } catch (error) {
       console.error("Error uploading images:", error);
+    } finally {
+      setLoading(false); // Stop loading animation
     }
   };
 
@@ -162,14 +177,18 @@ const FacePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>TAKE THE PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <LuxMeter onLuxChange={setLux} />
+        {/* Show loading animation when processing */}
+        {loading && <Reloader />}
+
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
@@ -191,7 +210,10 @@ const FacePic: React.FC = () => {
         </IonSegment>
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
+          <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
           </div>
           <div className="tab-button" onClick={takePicture}>
@@ -203,6 +225,7 @@ const FacePic: React.FC = () => {
             </IonButton>
           </div>
         </div>
+
 
         {missingViews.length > 0 && (
           <p className="missing-warning">

@@ -55,17 +55,11 @@ const Home: React.FC = () => {
     {
       id: '5',
       image: 'https://www.drmalaymehta.com/wp-content/uploads/2023/12/androgenic-alopecia-diagnosed-994x1024.jpg',
-      name: 'Patterned Alopecia Analysis',
+      name: 'Patterned Alopecia Analysis and Hair Texture Based Diagnosis',
       route: '/app/alophecia',
     },
     {
       id: '6',
-      image: 'https://haireveryday.com/wp-content/uploads/2022/10/Hormones.jpg',
-      name: 'Hair Texture Based Diagnosis',
-      route: '/app/texture',
-    },
-    {
-      id: '7',
       image: 'https://bjgp.org/content/bjgp/66/652/587/F1.large.jpg',
       name: 'Capillary Refill Time Analysis',
       route: '/app/cap',
