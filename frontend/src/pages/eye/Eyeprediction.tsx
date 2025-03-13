@@ -105,23 +105,17 @@ const PredictionPage: React.FC = () => {
               <p style={{ fontSize: '20px', marginBottom: '10px' }}>{prediction}</p>
               <button
                 className="take-picture-button"
-                style={{
-                  fontWeight: '600',
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderRadius: '5px',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s',
-                  fontFamily: '"Open Sans", sans-serif',
-                  width: '350px',
-                  height: '45px',
-                  textAlign: 'center',
-                  backgroundColor: 'rgb(72, 209, 204)',
+                style={{ 
+                  backgroundColor: '#48D1CC', 
                   color: 'black',
-                  marginTop: '20px',
-                  marginBottom: '5px',
-                }}
+                  padding: "15px 20px", 
+                  borderRadius: "5px", 
+                  border: "none", 
+                  cursor: "pointer", 
+                  fontWeight: "bold", 
+                  width: "100%", 
+                  fontSize: "18px", /* Added font size */
+                  fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                 onClick={handleRedirect} // Trigger redirect on button click
               >
                 Take the next step
