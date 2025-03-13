@@ -158,7 +158,7 @@ const CRTPrediction: React.FC = () => {
 
               {/* CRT Duration Above the Chart */}
               <IonText style={{ color: "blue", fontWeight: "bold", fontSize: "16px", display: "block", textAlign: "left", marginBottom: "5px" }}>
-                CRT Duration: {crtDuration} minutes
+                CRT Duration: {crtDuration} seconds
               </IonText>
 
               {/* Bar Chart Card */}
