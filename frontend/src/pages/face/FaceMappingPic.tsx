@@ -143,26 +143,36 @@ const FaceMappingPic: React.FC = () => {
       <IonContent>
         <LuxMeter onLuxChange={setLux} />
         {!photo ? (
-          <video ref={videoRef} id="video" autoPlay playsInline></video>
+          <video
+            ref={videoRef}
+            id="video"
+            autoPlay
+            playsInline
+            style={{ width: "590px", height: "590px", objectFit: "cover" }}
+          ></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg
+            src={photo}
+            alt="Captured Photo"
+            style={{ width: "590px", height: "590px", objectFit: "cover" }}
+          />
         )}
-
+  
         <div className="tab-bar">
-                  <div className="tab-button" onClick={() => window.location.reload()}>
-                    <IonIcon icon={refreshCircle} />
-                  </div>
-                  <div className="tab-button" onClick={toggleCamera}>
-                    <IonIcon icon={swapHorizontal} />
-                  </div>
-                  <div className="tab-button" onClick={takePicture}>
-                    <IonIcon icon={camera} />
-                  </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
+          <div className="tab-button" onClick={toggleCamera}>
+            <IonIcon icon={swapHorizontal} />
+          </div>
+          <div className="tab-button" onClick={takePicture}>
+            <IonIcon icon={camera} />
+          </div>
           <div className="tab-button" onClick={() => setShowAlert(true)}>
             <IonIcon icon={save} />
           </div>
         </div>
-
+  
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
@@ -183,6 +193,7 @@ const FaceMappingPic: React.FC = () => {
       </IonContent>
     </IonPage>
   );
+  
 };
 
 export default FaceMappingPic;
