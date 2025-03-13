@@ -70,6 +70,7 @@ const PredictionPage: React.FC = () => {
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             maxWidth: '380px',
             margin: '15px auto',
+
           }}
         >
           {loading ? (
@@ -90,7 +91,7 @@ const PredictionPage: React.FC = () => {
                   margin: '20px auto',
                   display: 'block',
                 }}
-              />
+              /><br/>
               <h2
                 style={{
                   margin: '0',
@@ -102,7 +103,7 @@ const PredictionPage: React.FC = () => {
               >
                 <b>Successful!!!</b><br />Eye prakurthi analysis is done!
               </h2>
-              <p style={{ fontSize: '20px', marginBottom: '10px' }}>{prediction}</p>
+              <p style={{ fontSize: '20px', marginBottom: '10px' }}>{prediction}</p><br/>
               <button
                 className="take-picture-button"
                 style={{ 
