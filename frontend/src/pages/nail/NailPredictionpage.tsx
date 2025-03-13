@@ -11,11 +11,11 @@ import {
   IonText,
 } from "@ionic/react";
 import Reloader from "../all/Reloader";
-import img from "../images/img_05.png";
+import img from "../images/img_05.jpg";
 
 interface PredictionState {
   predictionResult?: {
-    overall_prediction: string;
+    final_prakriti: string;
     individual_predictions: string[];
   };
 }
@@ -32,22 +32,27 @@ const NailPredictionPage: React.FC = () => {
     console.log("🛠 Prediction Result:", location.state?.predictionResult);
 
     if (!location.state || !location.state.predictionResult) {
-      console.error("🚨 No prediction data! Redirecting...");
+      console.error("No prediction data! Redirecting...");
       setError("No prediction data available.");
       setLoading(false);
       setTimeout(() => history.replace("/app/step"), 2000);
       return;
     }
 
-    const { overall_prediction, prediction1, prediction2 } = location.state.predictionResult as any;
+    const { final_prakriti, individual_predictions } = location.state.predictionResult as any;
 
     setPredictionData({
-      overall_prediction,
-      individual_predictions: [prediction1, prediction2],
+      final_prakriti,
+      individual_predictions,
     });
 
     setLoading(false);
   }, [location.state, history]);
+
+  // Function to handle the redirect
+  const handleRedirect = () => {
+    history.push('/app/step');
+  };
 
   return (
     <IonPage>
@@ -56,7 +61,7 @@ const NailPredictionPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Nail Prakruti Prediction</IonTitle>
+          <IonTitle>NAIL PRAKURTHI PREDICTION</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -98,17 +103,17 @@ const NailPredictionPage: React.FC = () => {
               </h2>
               <h3>Overall Result:</h3>
               <p style={{ fontWeight: "bold", fontSize: "25px" }}>
-                {predictionData.overall_prediction}
+                {predictionData.final_prakriti}
               </p>
               <h3>Individual Image Predictions:</h3>
               {Array.isArray(predictionData.individual_predictions) &&
               predictionData.individual_predictions.length > 0 ? (
                 <>
                   <p style={{ fontSize: "16px" }}>
-                    Image1: {predictionData.individual_predictions[0]}
+                    Image 1: {predictionData.individual_predictions[0]}
                   </p>
                   <p style={{ fontSize: "16px" }}>
-                    Image2: {predictionData.individual_predictions[1]}
+                    Image 2: {predictionData.individual_predictions[1]}
                   </p>
                 </>
               ) : (
@@ -118,7 +123,31 @@ const NailPredictionPage: React.FC = () => {
           ) : (
             <p>No prediction data found.</p>
           )}
+          <button
+                className="take-picture-button"
+                style={{
+                  fontWeight: '600',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '5px',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.3s',
+                  fontFamily: '"Open Sans", sans-serif',
+                  width: '350px',
+                  height: '45px',
+                  textAlign: 'center',
+                  backgroundColor: 'rgb(72, 209, 204)',
+                  color: 'black',
+                  marginTop: '20px',
+                  marginBottom: '5px',
+                }}
+                onClick={handleRedirect} // Trigger redirect on button click
+              >
+                Take the next step
+              </button>
         </div>
+        
       </IonContent>
     </IonPage>
   );
