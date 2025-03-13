@@ -52,7 +52,13 @@ const Pitta = () => {
 
           <section className="pitta-diet">
             <h2>Pitta Dosha Diet Guidelines</h2>
-            <table className="diet-table">
+            <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+            <table className="diet-table"
+            style={{
+              width: "100%", // Ensures it stretches to fit parent width
+              minWidth: "600px", // Prevents shrinking too much
+              borderCollapse: "collapse", // Merges borders for a clean look
+            }}>
               <thead>
                 <tr>
                   <th>Category</th>
@@ -103,6 +109,7 @@ const Pitta = () => {
                 </tr>
               </tbody>
             </table>
+            </div>
           </section>
 
           <h2 className="pitta-subheader">Yoga for Pitta Dosha</h2>
