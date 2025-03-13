@@ -1797,9 +1797,9 @@ def analyze_light():
         # Process Lux Values for Micro-Expression Analysis
         if lux < 100:
             message = "❌ Too Dark! Increase lighting."
-        elif 100 <= lux < 300:
+        elif 100 <= lux < 400:
             message = "✅ Good, but slightly dim."
-        elif 300 <= lux <= 600:
+        elif 400 <= lux <= 600:
             message = "✅✅ Optimal Lighting! Best for your analysis."
         elif 600 < lux <= 1000:
             message = "✅ Acceptable, but may cause glare."
