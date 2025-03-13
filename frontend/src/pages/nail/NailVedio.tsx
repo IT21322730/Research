@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/NailVedio.css';
-import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal,refreshCircle } from 'ionicons/icons';
 import { getFirestore } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
 import { IonToast } from '@ionic/react';
@@ -28,6 +28,7 @@ const NailVideo: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPressToast, setShowPressToast] = useState(false);
   const [showReleaseToast, setShowReleaseToast] = useState(false);
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -85,6 +86,10 @@ const NailVideo: React.FC = () => {
       console.error('Error accessing media devices:', error);
       alert('Unable to access camera.');
     }
+  };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
   };
 
 
@@ -182,7 +187,12 @@ const NailVideo: React.FC = () => {
         {errorMessage && <div className="error-message">{errorMessage}</div>}
       </IonContent>
       <div className="tab-bar">
-        <div className="tab-button"><IonIcon icon={swapHorizontal} /></div>
+              <div className="tab-button" onClick={() => window.location.reload()}>
+                          <IonIcon icon={refreshCircle} />
+                        </div>
+                        <div className="tab-button" onClick={toggleCamera}>
+                                    <IonIcon icon={swapHorizontal} />
+                                  </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
