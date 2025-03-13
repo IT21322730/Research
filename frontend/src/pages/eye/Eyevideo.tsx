@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/Eyevideo.css';
-import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal ,refreshCircle} from 'ionicons/icons';
 import axios, { AxiosError } from 'axios'; // Import AxiosError
 import { useHistory } from 'react-router-dom';
 import Reloader from '../all/Reloader'; // Import Reloader component
@@ -26,7 +26,7 @@ const Eyevideo: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // Track login state
   const [loading, setLoading] = useState<boolean>(false);
   const [isPredictionInProgress, setIsPredictionInProgress] = useState<boolean>(false); // Track prediction state
-
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -77,7 +77,7 @@ const Eyevideo: React.FC = () => {
       setTimeout(() => {
         clearInterval(interval);
         handleStopRecording();
-      }, 15000);
+      }, 30000);// 30 seconds
     }
   };
 
@@ -144,6 +144,10 @@ const Eyevideo: React.FC = () => {
     setShowAlert(false); // Dismiss the alert if "No" is clicked
   };
 
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -176,9 +180,12 @@ const Eyevideo: React.FC = () => {
       <div className="tab-bar">
         <div className="tab-button">
         <div className="tab-button" onClick={() => window.location.reload()}>
-          <IonIcon icon={swapHorizontal} />
+                    <IonIcon icon={refreshCircle} />
+                  </div>
         </div>
-        </div>
+        <div className="tab-button" onClick={toggleCamera}>
+                    <IonIcon icon={swapHorizontal} />
+                  </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />

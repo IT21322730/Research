@@ -46,8 +46,17 @@ const FaceMicro: React.FC = () => {
           </ol>
 
           <button
-          className="take-picture-button"
-          style={{ backgroundColor: '#48D1CC', color: 'black' }}
+          style={{ 
+            backgroundColor: '#48D1CC', 
+            color: 'black',
+            padding: "15px 20px", 
+            borderRadius: "5px", 
+            border: "none", 
+            cursor: "pointer", 
+            fontWeight: "bold", 
+            width: "90%", 
+            fontSize: "18px", /* Added font size */
+            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
           onClick={handleTakePicture}
           >
           Take Your Video

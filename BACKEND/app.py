@@ -50,8 +50,6 @@ facePrakrurthi_model = tf.keras.models.load_model('./model/FacePrakurthiFinal_CN
 image_model = tf.keras.models.load_model('./model/Hybrid_CNN_Transformer_Model.h5')
 # Load the DL model for hair images
 hair_model = tf.keras.models.load_model('./model/Dataset4_CNN_Model.h5')
-# Load the DL model for hair images - IT21324024
-import tensorflow as tf
 # Load the DL model for nail images - IT21324024
 nail_model = tf.keras.models.load_model('./model/Nails.h5')
 
@@ -1498,7 +1496,19 @@ disease_solutions = {
     },
     "No significant hair loss detected": {
         "message": "No significant hair loss detected. Regular hair care and nutrition may improve overall hair health."
+    },
+
+    # Hair Texture Solutions
+    "Fine Texture": {
+        "message": "Use lightweight, volumizing shampoos and avoid heavy conditioners that can make hair flat. Use light oils like argan or grapeseed oil instead of thick butters. Eating protein, iron, and vitamin B12 can help strengthen fine hair. Avoid too much heat styling and use dry shampoo to control oil."
+    },
+    "Medium Texture": {
+        "message": "Use a moisturizing shampoo that is not too heavy, and apply conditioner only to the middle and ends of your hair. Jojoba or almond oil can add shine without making hair greasy. Deep condition every 1-2 weeks and always use a heat protectant before styling. A diet with biotin, zinc, and omega-3s helps keep hair healthy."
+    },
+    "Coarse Texture": {
+        "message": "Keep hair hydrated with sulfate-free shampoos and deep condition weekly to avoid dryness and frizz. Use heavier oils like coconut oil and shea butter to retain moisture. Reduce heat styling and sleep on a silk pillowcase to prevent friction. Eating foods rich in vitamin E, omega-6, and water (like cucumbers and watermelon) helps hair stay strong and flexible."
     }
+
 }
 def detect_alopecia(image, gender="unknown"):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -1566,10 +1576,9 @@ def calculate_illness_percentages(alopecia_diagnoses):
         del illness_counts["No significant hair loss detected"]
 
     total_valid_diagnoses = sum(illness_counts.values())
-    illness_percentages = {illness: (count / total_valid_diagnoses) * 100 for illness, count in illness_counts.items()}
+    illness_percentages = {illness: round((count / total_valid_diagnoses) * 100, 2) for illness, count in illness_counts.items()}
     
     return illness_percentages
-
 @app.route('/novelty-function', methods=['POST'])
 def novelty_function():
     try:
@@ -1612,6 +1621,7 @@ def novelty_function():
             final_alopecia = "Androgenetic Alopecia (Male)"
 
         solution = disease_solutions.get(final_alopecia, {"message": "Solution not available"})
+        texture_solution = disease_solutions.get(final_texture, {"message": "Solution not available"})
 
         user_ref = db.collection("users").document(user_uid)
         user_doc = user_ref.get()
@@ -1629,6 +1639,7 @@ def novelty_function():
             "hair_texture": final_texture,
             "timestamp": timestamp,
             "solution": solution["message"],
+            "texture_solution": texture_solution["message"],
             "illness_percentages": illness_percentages
         }
         doc_ref.set(result_data)
@@ -1637,7 +1648,8 @@ def novelty_function():
             "final_diagnosis": final_alopecia,
             "hair_texture": final_texture,
             "illness_percentages": illness_percentages,
-            "solution": solution["message"]
+            "solution": solution["message"],
+            "texture_solution": texture_solution["message"],
         })
     except Exception as e:
         traceback.print_exc()
@@ -1646,8 +1658,158 @@ def novelty_function():
 
 
 ### IT21324024 - Nail Novelty ###
-
 ### Capillary refil time analysis
+# Function to calculate the average color intensity of the nail region
+def get_color_intensity(frame, roi):
+    nail_region = frame[roi[1]:roi[3], roi[0]:roi[2]]
+    hsv = cv2.cvtColor(nail_region, cv2.COLOR_BGR2HSV)
+    intensity = np.mean(hsv[:, :, 2])  # Use V channel for brightness
+    return intensity
+
+# Function to monitor CRT based on color intensity change
+def track_crt(video_path, roi):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return None
+
+    intensities = []
+    frame_timestamps = []
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        timestamp = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0  # Convert to seconds
+        intensity = get_color_intensity(frame, roi)
+        
+        intensities.append(intensity)
+        frame_timestamps.append(timestamp)
+    
+    cap.release()
+
+    if len(intensities) < 2:
+        return None  # Not enough data to analyze
+
+    # Normalize intensity values
+    intensities = np.array(intensities)
+    intensities = (intensities - intensities.min()) / (intensities.max() - intensities.min())
+
+    # Detect recovery time (CRT)
+    initial_drop_index = np.argmax(np.diff(intensities) < -0.05)  # Find initial intensity drop
+    recovery_index = np.argmax(intensities[initial_drop_index:] > 0.85) + initial_drop_index  # Find recovery time
+
+    if recovery_index <= initial_drop_index:
+        return None  # No valid recovery detected
+
+    crt_time = frame_timestamps[recovery_index] - frame_timestamps[initial_drop_index]
+    return round(crt_time, 2)
+
+# Function to determine vascular efficiency and circulatory health in percentages
+def get_health_insights(crt_duration):
+    if crt_duration < 2:
+        vascular_efficiency = "90%"  # 90% efficiency
+        circulatory_health = "95%"  # 95% circulatory health
+        recommendation = [
+        "Maintain a balanced diet rich in iron and vitamin C.",
+        "Stay hydrated to support optimal blood circulation.",
+        "Engage in regular exercise to sustain excellent vascular efficiency."]
+    elif 2 <= crt_duration < 3:
+        vascular_efficiency = "70%"  # 70% efficiency
+        circulatory_health = "75%"  # 75% circulatory health
+        recommendation = [
+            "Increase daily physical activity such as walking or jogging.",
+            "Monitor blood pressure regularly and reduce sodium intake.",
+            "Incorporate heart-healthy foods like nuts, fish, and leafy greens."
+        ]
+    else:
+        vascular_efficiency = "50%"  # 50% efficiency
+        circulatory_health = "55%"  # 55% circulatory health
+        recommendation = [
+             "Consult a healthcare provider for further cardiovascular assessment.",
+            "Avoid smoking and limit alcohol consumption to improve circulation.",
+            "Consider stress management techniques like meditation or yoga."
+        ]
+    
+    return vascular_efficiency, circulatory_health, recommendation
+
+@app.route('/crt-analysis', methods=['POST'])
+def analyze_crt():
+    if 'video' in request.files:
+        video_file = request.files['video']
+        video_path = os.path.join("uploads", video_file.filename)
+        
+        try:
+            video_file.save(video_path)
+        except Exception as e:
+            return jsonify({"error": f"Error saving video: {str(e)}"}), 500
+        
+        roi = (100, 100, 300, 200)  # Adjust based on your video
+        
+        try:
+            crt_time = track_crt(video_path, roi)
+            if crt_time is None:
+                return jsonify({"error": "CRT analysis failed, unable to determine CRT duration."}), 500
+
+            vascular_efficiency, circulatory_health, recommendation = get_health_insights(crt_time)
+            
+            local_tz = pytz.timezone('Asia/Colombo')
+            timestamp = datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')
+            
+            doc_ref = db.collection("crt_results").document()
+            doc_ref.set({
+                "crt_duration": crt_time,
+                "vascular_efficiency": vascular_efficiency,
+                "circulatory_health": circulatory_health,
+                "recommendation": recommendation,
+                "timestamp": timestamp
+            })
+            
+            return jsonify({
+                "message": "CRT Analysis Successfully Completed!!!",
+                "crt_duration": crt_time,
+                "vascular_efficiency": vascular_efficiency,
+                "circulatory_health": circulatory_health,
+                "recommendation": recommendation,
+                "timestamp": timestamp
+            })
+        except Exception as e:
+            return jsonify({"error": f"Error processing video: {str(e)}"}), 500
+        
+        finally:
+            if os.path.exists(video_path):
+                os.remove(video_path)
+    else:
+        return jsonify({"error": "No video file found"}), 400
+
+
+
+# Lux Value Detector
+@app.route('/analyze-light', methods=['POST'])
+def analyze_light():
+    try:
+        data = request.get_json()
+        lux = data.get("lux")
+
+        if lux is None:
+            return jsonify({"error": "Missing lux value"}), 400
+
+        # Process Lux Values for Micro-Expression Analysis
+        if lux < 100:
+            message = "❌ Too Dark! Increase lighting."
+        elif 100 <= lux < 400:
+            message = "✅ Good, but slightly dim."
+        elif 400 <= lux <= 600:
+            message = "✅✅ Optimal Lighting! Best for your analysis."
+        elif 600 < lux <= 1000:
+            message = "✅ Acceptable, but may cause glare."
+        else:  # lux > 1000
+            message = "❌ Overexposed! Reduce brightness."
+
+        return jsonify({"lux": lux, "message": message})
+
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
 
 
 

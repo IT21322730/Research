@@ -15,10 +15,11 @@ import {
   IonLabel,
   IonImg
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
+import { camera, save, swapHorizontal, warning, refreshCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import "../css/NailPic.css";
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
 
 const NailPic: React.FC = () => {
   const history = useHistory();
@@ -27,36 +28,39 @@ const NailPic: React.FC = () => {
   const [photo1, setPhoto1] = useState<string | null>(null);
   const [photo2, setPhoto2] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
-  const [currentView, setCurrentView] = useState<string>("Left Hand");
   const [capturedViews, setCapturedViews] = useState<{ [view: string]: string }>({});
-  const [missingViews, setMissingViews] = useState<string[]>(["Left Hand", "Right Hand"]);
+  const [currentView, setCurrentView] = useState<string>("Palm View");
+  const [missingViews, setMissingViews] = useState<string[]>(["Palm View", "Dorsal View"]);
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
   const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: useFrontCamera ? "user" : "environment" },
-        });
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+      const startCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: useFrontCamera ? "user" : "environment" },
+          });
+  
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play().catch((error) =>
+              console.log("Video play was interrupted:", error)
+            );
+          }
+        } catch (error) {
+          console.error("Error accessing the camera: ", error);
         }
-      } catch (error) {
-        console.error("Error accessing the camera:", error);
-      }
-    };
-
-    startCamera();
-
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [useFrontCamera, currentView]);
+      };
+  
+      startCamera();
+  
+      return () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach((track) => track.stop());
+        }
+      };
+    }, [useFrontCamera, currentView]);
 
   const takePicture = () => {
     const video = videoRef.current;
@@ -67,7 +71,17 @@ const NailPic: React.FC = () => {
 
       const context = canvas.getContext("2d");
       if (context) {
+        if (useFrontCamera) {
+          // Flip the image back to normal if using the front camera
+          context.translate(canvas.width, 0);
+          context.scale(-1, 1);
+        }
+
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Reset transformations (optional, for safety)
+        context.setTransform(1, 0, 0, 1, 0, 0);
+
         const dataUrl = canvas.toDataURL("image/png");
 
         setCapturedViews((prev) => {
@@ -76,20 +90,23 @@ const NailPic: React.FC = () => {
           return updatedViews;
         });
 
-        if (currentView === "Left Hand") {
+        if (currentView === "Palm View") {
           setPhoto1(dataUrl);
         } else {
           setPhoto2(dataUrl);
         }
+
       }
+      console.log("Captured Lux Value:", lux);
     }
   };
 
   const validateCapturedViews = (views: { [view: string]: string }) => {
-    const requiredViews = ["Left Hand", "Right Hand"];
+    const requiredViews = ["Palm View", "Dorsal View"];
     const missing = requiredViews.filter((view) => !views[view]);
     setMissingViews(missing);
   };
+
 
   const toggleCamera = () => {
     setUseFrontCamera((prev) => !prev);
@@ -151,10 +168,11 @@ const NailPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <LuxMeter onLuxChange={setLux} />
         {!capturedViews[currentView] ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={capturedViews[currentView]} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }}  />
+          <IonImg src={capturedViews[currentView]} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
@@ -163,21 +181,22 @@ const NailPic: React.FC = () => {
             setCurrentView(e.detail.value as string);
           }}
         >
-          <IonSegmentButton value="Left Hand">
+          <IonSegmentButton value="Palm View">
             <IonLabel>Palm View</IonLabel>
           </IonSegmentButton>
-          <IonSegmentButton value="Right Hand">
+          <IonSegmentButton value="Dorsal View">
             <IonLabel>Dorsal View</IonLabel>
           </IonSegmentButton>
+
         </IonSegment>
 
         <div className="tab-bar">
-        <div className="tab-button" onClick={() => window.location.reload()}>
-                    <IonIcon icon={refreshCircle} />
-                  </div>
-                  <div className="tab-button" onClick={toggleCamera}>
-                    <IonIcon icon={swapHorizontal} />
-                  </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
+          <div className="tab-button" onClick={toggleCamera}>
+            <IonIcon icon={swapHorizontal} />
+          </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>

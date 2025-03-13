@@ -106,7 +106,7 @@ const Step: React.FC = () => {
             <IonHeader>
             <IonToolbar>
                 <IonButtons slot="start">
-                    <IonBackButton defaultHref="/login" />
+                    <IonBackButton defaultHref="/app/home" />
                 </IonButtons>
                 <IonTitle>PRAKURTHI ANALYSIS</IonTitle>
                 <IonButtons slot="end">
@@ -136,6 +136,9 @@ const Step: React.FC = () => {
                                 <li>Right Side View: Turn your head slightly to the right, ensuring your profile is fully visible. Keep your posture consistent.</li>
                                 <li>Review the images for clarity before uploading.</li>
                             </ul>
+                            <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+                                Remember:To get the optimal result, maintain the optimal lux value
+                            </p>
                             <button
                                 style={{ 
                                     backgroundColor: '#48D1CC', 
@@ -173,7 +176,10 @@ const Step: React.FC = () => {
                                 <li>Focus on each eye separately, avoiding reflections and glare.</li>
                                 <li>Take close-up photos of the right eye and left eye.</li>
                                 <li>Review the images for clarity before uploading.</li>
-                            </ul>
+                            </ul>                            
+                            <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+                                Remember:To get the optimal result, maintain the optimal lux value
+                            </p>
                             <button
                                 style={{ 
                                     backgroundColor: '#48D1CC', 
@@ -212,6 +218,9 @@ const Step: React.FC = () => {
                                 <li>Scalp: Part your hair to expose the scalp and take close-ups.</li>
                                 <li>Review the images for clarity before uploading.</li>
                             </ul>
+                            <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+                                Remember:To get the optimal result, maintain the optimal lux value
+                            </p>
                             <button
                                 
                                 style={{ 
@@ -248,6 +257,9 @@ const Step: React.FC = () => {
                                 <li>Place your hand flat on a neutral background, keep your fingers relaxed, and take a photo from directly above, ensuring your whole hand is visible.</li>
                                 <li>Hold your hand slightly clenched on a plain background with good lighting, and capture the top of your hand clearly showing the nails and fingertips.</li>
                             </ul>
+                            <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+                                Remember:To get the optimal result, maintain the optimal lux value
+                            </p>
                             <button
                                 style={{ 
                                     backgroundColor: '#48D1CC', 

@@ -1,6 +1,7 @@
 /* Main container for the Vata-Pitta page */
 .Pitta-Kapha-container {
     font-family: "Open Sans", sans-serif;
+    justify-content: center;
     color: #48D1CC;
     padding: 20px;
     background-color: #f5f5f5;

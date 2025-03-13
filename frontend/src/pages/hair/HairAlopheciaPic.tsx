@@ -15,10 +15,11 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning,refreshCircle } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import "../css/Hairalophecia.css";
+import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
 
 const HairAlopheciaPic: React.FC = () => {
   const history = useHistory();
@@ -31,8 +32,8 @@ const HairAlopheciaPic: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("Front View");
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View", "Top of the Head View"]);
   const [capturedPhotos, setCapturedPhotos] = useState<{ [tab: number]: string }>({});
-
-
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
+  
   useEffect(() => {
     const startCamera = async () => {
       try {
@@ -64,24 +65,39 @@ const HairAlopheciaPic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/png");
-        setPhoto(dataUrl);
+        const context = canvas.getContext("2d");
+        if (context) {
+            // Clear the canvas before drawing
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-        setCapturedViews((prev) => {
-          const updatedViews = { ...prev, [currentView]: dataUrl };
-          validateCapturedViews(updatedViews);
-          return updatedViews;
-        });
-      }
+            // Flip the canvas horizontally (mirror effect)
+            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Reset transformations to prevent future issues
+            context.setTransform(1, 0, 0, 1, 0, 0);
+
+            const dataUrl = canvas.toDataURL("image/png");
+            setPhoto(dataUrl);
+
+            console.log("Captured Lux Value:", lux);
+
+            // Save the captured image for the current view
+            setCapturedViews((prev) => {
+                const updatedViews = { ...prev, [currentView]: dataUrl };
+                validateCapturedViews(updatedViews);
+                return updatedViews;
+            });
+        }
     }
-  };
+};
+
 
   const resetPhotos = () => {
     setPhoto(null);
@@ -140,6 +156,7 @@ const HairAlopheciaPic: React.FC = () => {
           hair_texture: data.hair_texture,
           solution: data.solution,
           illness_percentages: data.illness_percentages,
+          texture_solution: data.texture_solution,
         }
       });
 
@@ -148,6 +165,10 @@ const HairAlopheciaPic: React.FC = () => {
     }
   };
 
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+  
 
 
   return (
@@ -157,10 +178,11 @@ const HairAlopheciaPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/alophecia" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>TAKE THE PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
+      <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
@@ -190,9 +212,12 @@ const HairAlopheciaPic: React.FC = () => {
 
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
-            <IonIcon icon={swapHorizontal} />
-          </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+                      <IonIcon icon={refreshCircle} />
+                    </div>
+                    <div className="tab-button" onClick={toggleCamera}>
+                      <IonIcon icon={swapHorizontal} />
+                    </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>

@@ -69,7 +69,8 @@ const PredictionPage: React.FC = () => {
             backgroundColor: 'white',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             maxWidth: '380px',
-            margin: '15px auto',
+            margin: '20px auto',
+
           }}
         >
           {loading ? (
@@ -90,7 +91,7 @@ const PredictionPage: React.FC = () => {
                   margin: '20px auto',
                   display: 'block',
                 }}
-              />
+              /><br/>
               <h2
                 style={{
                   margin: '0',
@@ -102,26 +103,20 @@ const PredictionPage: React.FC = () => {
               >
                 <b>Successful!!!</b><br />Eye prakurthi analysis is done!
               </h2>
-              <p style={{ fontSize: '20px', marginBottom: '10px' }}>{prediction}</p>
+              <p style={{ fontSize: '20px', marginBottom: '10px' }}>{prediction}</p><br/>
               <button
                 className="take-picture-button"
-                style={{
-                  fontWeight: '600',
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderRadius: '5px',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s',
-                  fontFamily: '"Open Sans", sans-serif',
-                  width: '350px',
-                  height: '45px',
-                  textAlign: 'center',
-                  backgroundColor: 'rgb(72, 209, 204)',
+                style={{ 
+                  backgroundColor: '#48D1CC', 
                   color: 'black',
-                  marginTop: '20px',
-                  marginBottom: '5px',
-                }}
+                  padding: "15px 20px", 
+                  borderRadius: "5px", 
+                  border: "none", 
+                  cursor: "pointer", 
+                  fontWeight: "bold", 
+                  width: "100%", 
+                  fontSize: "18px", /* Added font size */
+                  fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
                 onClick={handleRedirect} // Trigger redirect on button click
               >
                 Take the next step

@@ -74,9 +74,23 @@ const FaceVideoPrediction: React.FC = () => {
       },
     },
     plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true, backgroundColor: "#333", titleColor: "#fff", bodyColor: "#fff" },
+      legend: {
+        display: false, // ✅ Labels are below the chart
+      },
+      tooltip: {
+        enabled: true, // ✅ Enables tooltips when hovering
+        callbacks: {
+          label: (tooltipItem: any) => {
+            const value = tooltipItem.raw;
+            return `${value}%`; // ✅ Show percentage in tooltip
+          },
+        },
+      },
+      datalabels: {
+        display: false, // ❌ Hide data labels from the chart itself
+      },
     },
+
   };
 
   return (
