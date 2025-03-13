@@ -26,7 +26,7 @@ const HairAlophecia: React.FC = () => {
       <IonContent fullscreen>
         <div className="hair-analysis-container">
           <IonText className="title-text">
-            <h2 className='headline-name'>Patterned Alopecia Analysis</h2>
+            <h2 className='headline-name'>Patterned Alopecia Analysis and Hair Texture Based Diagnosis</h2>
             <p className="justified-text">
               This analysis helps to determine the Ayurvedic dosha types based on hair characteristics. 
               Please follow the instructions for capturing your eye images for accurate analysis.
