@@ -70,6 +70,8 @@ const App: React.FC = () => (
         <Route path="/app/nail-pic" component={NailPic} exact={true} />
         <Route path="/app/nail-video" component={NailVideo} exact={true} />
         <Route path="/app/nailprediction" component={NailPredictionPage} exact={true} />
+        
+
        
 
         
