@@ -30,8 +30,9 @@ const Eyevideo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-
   const history = useHistory();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     // Check if the user is logged in (example: checking localStorage)
@@ -171,8 +172,80 @@ const Eyevideo: React.FC = () => {
         {isRecording && <div className="recording-time">Recording Time: {recordingTime}s</div>}
 
         {recordedVideoURL && (
-          <div className="playback-container">
-            <video src={recordedVideoURL} controls className="video-playback" />
+          <div
+            className="playback-container"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "fixed", // Full-screen effect
+              top: 0,
+              left: 0,
+              width: "100%", // Full width
+              height: "89%", // Full height
+              background: "white", // Black background for better visibility
+              zIndex: 999, // Ensure it's on top
+            }}
+          >
+            <video
+              ref={playbackVideoRef}
+              src={recordedVideoURL}
+              className="video-playback"
+              style={{
+                width: "100%",
+                height: "89%",
+                objectFit: "cover", // Cover entire screen
+                borderRadius: "0", // Remove rounded corners for full-screen
+                transform: "scaleX(-1)",
+                cursor: "pointer",
+                position: "relative",
+                zIndex: "1",
+              }}
+              onClick={() => {
+                if (playbackVideoRef.current?.paused) {
+                  playbackVideoRef.current?.play();
+                  setIsPlaying(true);
+                } else {
+                  playbackVideoRef.current?.pause();
+                  setIsPlaying(false);
+                }
+              }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            />
+
+            {/* Play Button (Always Visible Until Playing) */}
+            {!isPlaying && (
+              <button
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(0, 0, 0, 0.6)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "60px",
+                  height: "60px",
+                  fontSize: "24px",
+                  color: "white",
+                  cursor: "pointer",
+                  zIndex: "1000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent video from playing instantly when clicking the button
+                  if (playbackVideoRef.current) {
+                    playbackVideoRef.current.play();
+                    setIsPlaying(true);
+                  }
+                }}
+              >
+                ▶️
+              </button>
+            )}
           </div>
         )}
       </IonContent>
