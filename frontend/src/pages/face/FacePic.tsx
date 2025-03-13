@@ -177,7 +177,7 @@ const FacePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>TAKE THE PICTUER</IonTitle>
+          <IonTitle>TAKE THE PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
