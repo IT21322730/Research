@@ -13,7 +13,7 @@ import {
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import '../css/FaceVideo.css';
-import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal,refreshCircle } from 'ionicons/icons';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
@@ -27,7 +27,7 @@ const FaceVideo: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [emotionResult, setEmotionResult] = useState<string | null>(null);
   const [emotionCount, setEmotionCount] = useState<number | null>(null);
-
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const history = useHistory(); // Initialize history for navigation
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -111,6 +111,10 @@ const FaceVideo: React.FC = () => {
 
     setRecordingTime(0);
     setIsRecording(false);
+  };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
   };
 
  const handleSaveVideo = async () => {
@@ -210,9 +214,12 @@ const FaceVideo: React.FC = () => {
       </IonContent>
 
       <div className="tab-bar">
-        <div className="tab-button">
-          <IonIcon icon={swapHorizontal} />
-        </div>
+        <div className="tab-button" onClick={() => window.location.reload()}>
+                    <IonIcon icon={refreshCircle} />
+                  </div>
+                  <div className="tab-button" onClick={toggleCamera}>
+                              <IonIcon icon={swapHorizontal} />
+                            </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />

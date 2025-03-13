@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent ,IonButtons,IonBackButton} from '@ionic/react';
 import '../css/Pitta.css'; // Importing the external CSS file
 
 const Pitta = () => {
@@ -7,7 +7,10 @@ const Pitta = () => {
     <>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Pitta Balance Tips</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/app/final" />
+            </IonButtons>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="pitta-container">
@@ -49,7 +52,13 @@ const Pitta = () => {
 
           <section className="pitta-diet">
             <h2>Pitta Dosha Diet Guidelines</h2>
-            <table className="diet-table">
+            <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+            <table className="diet-table"
+            style={{
+              width: "100%", // Ensures it stretches to fit parent width
+              minWidth: "600px", // Prevents shrinking too much
+              borderCollapse: "collapse", // Merges borders for a clean look
+            }}>
               <thead>
                 <tr>
                   <th>Category</th>
@@ -100,6 +109,7 @@ const Pitta = () => {
                 </tr>
               </tbody>
             </table>
+            </div>
           </section>
 
           <h2 className="pitta-subheader">Yoga for Pitta Dosha</h2>

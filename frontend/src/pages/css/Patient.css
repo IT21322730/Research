@@ -1,49 +1,50 @@
 /* Custom styling for the modal box */
 .modal-box {
-    width: 90%; /* Adjust the width */
-    max-width: 400px; /* Maximum width for the box */
-    margin: 0 auto; /* Center the box */
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
     padding: 20px;
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for the box */
-    margin-top: 5px; /* Add top margin to position the modal box */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
     margin-bottom: 30px;
-  }
-  
-  /* Optional: Style for the close button */
-  .modal-box .ion-button {
-    margin-top: 30px; /* Adjust the space above the close button */
-  }
-  
-  /* Style for the input fields and textareas */
-  .patient-input {
-    font-family: "Open Sans", sans-serif; /* Ensure Open Sans is applied to inputs */
-    width: 100%; /* Make inputs take up the full width of the container */
-    margin-bottom: 15px; /* Add space between inputs */
-  }
-  
-  /* Optional: Style for the modal content padding */
-  .modal-box .ion-label {
-    padding-bottom: 20px;
-  }
-  
-  .patient-details-text{
-    font-family: "Open Sans", sans-serif;
-  }
+}
 
-  /* CSS to position the trash icon */
-  .delete-icon {
+/* Optional: Style for the close button */
+.modal-box .ion-button {
+    margin-top: 30px;
+}
+
+/* Style for the input fields and textareas */
+.patient-input {
+    font-family: "Open Sans", sans-serif;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Optional: Style for the modal content padding */
+.modal-box .ion-label {
+    padding-bottom: 20px;
+}
+
+.patient-details-text {
+    font-family: "Open Sans", sans-serif;
+}
+
+/* CSS to position the trash icon */
+.delete-icon {
     position: absolute;
     top: 10px;
     right: 10px;
     color: rgb(149, 105, 105);
     cursor: pointer;
-    font-size: 24px; /* Adjust size if needed */
-  }
+    font-size: 24px;
+}
 
-  .patient-edit {
-    background-color: #48D1CC; /* Blue color */
+/* Styling for edit button */
+.patient-edit {
+    background-color: #48D1CC;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -52,7 +53,4 @@
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
     margin-top: 10px;
-  }
-
-  
-  
+}
