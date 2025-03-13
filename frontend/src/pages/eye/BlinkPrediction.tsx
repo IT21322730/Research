@@ -110,7 +110,7 @@ const BlinkPrediction: React.FC = () => {
             </div>
           ) : (
             <div style={{ textAlign: 'center', marginTop: '0px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>Stress and Fatigue Level Analysis</h2>
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#48D1CC'}}>Stress and Fatigue Level Analysis</h2>
               <div style={{ maxWidth: '400px', margin: 'auto' }}>
                 <Bar
                   data={chartData}
