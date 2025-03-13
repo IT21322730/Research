@@ -1,0 +1,56 @@
+/* Custom styling for the modal box */
+.modal-box {
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    margin-bottom: 30px;
+}
+
+/* Optional: Style for the close button */
+.modal-box .ion-button {
+    margin-top: 30px;
+}
+
+/* Style for the input fields and textareas */
+.patient-input {
+    font-family: "Open Sans", sans-serif;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Optional: Style for the modal content padding */
+.modal-box .ion-label {
+    padding-bottom: 20px;
+}
+
+.patient-details-text {
+    font-family: "Open Sans", sans-serif;
+}
+
+/* CSS to position the trash icon */
+.delete-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: rgb(149, 105, 105);
+    cursor: pointer;
+    font-size: 24px;
+}
+
+/* Styling for edit button */
+.patient-edit {
+    background-color: #48D1CC;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    margin-top: 10px;
+}

@@ -3,7 +3,7 @@ import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonText, IonImg, 
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import '../css/Hairalophecia.css'; // Import your styles here
 
-const HairPrakurthi: React.FC = () => {
+const HairAlophecia: React.FC = () => {
   const history = useHistory();
 
   const handleTakePicture = () => {
@@ -26,7 +26,7 @@ const HairPrakurthi: React.FC = () => {
       <IonContent fullscreen>
         <div className="hair-analysis-container">
           <IonText className="title-text">
-            <h2 className='headline-name'>Patterned Alopecia Analysis</h2>
+            <h2 className='headline-name'>Patterned Alopecia Analysis and Hair Texture Based Diagnosis</h2>
             <p className="justified-text">
               This analysis helps to determine the Ayurvedic dosha types based on hair characteristics. 
               Please follow the instructions for capturing your eye images for accurate analysis.
@@ -42,12 +42,25 @@ const HairPrakurthi: React.FC = () => {
             <li>Front Weave: Face the camera directly, showing your hairline clearly.</li>
             <li>Back Weave: Turn around, ensuring the back of your head is visible.</li>
             <li>Scalp: Part your hair to expose the scalp and take close-ups.</li>
+            <li>Top of Head: Capture a top-down view of your head, ensuring the crown area is clearly visible.</li>
             <li>Review the images for clarity before uploading.</li>
           </ol>
+          <p style={{ color: "red", fontWeight: "bold", marginLeft: "20px", marginRight : "20px"}}>
+            Remember:To get the optimal result, maintain the optimal lux value
+          </p>
 
           <button
-          className="take-picture-button"
-          style={{ backgroundColor: '#48D1CC', color: 'black' }}
+          style={{ 
+            backgroundColor: '#48D1CC', 
+            color: 'black',
+            padding: "15px 20px", 
+            borderRadius: "5px", 
+            border: "none", 
+            cursor: "pointer", 
+            fontWeight: "bold", 
+            width: "90%", 
+            fontSize: "18px", /* Added font size */
+            fontFamily: "'Open Sans', sans-serif" /* Added Font Style */ }}
           onClick={handleTakePicture}
           >
           Take Your Picture
@@ -60,4 +73,4 @@ const HairPrakurthi: React.FC = () => {
   );
 };
 
-export default HairPrakurthi;
+export default HairAlophecia;

@@ -15,11 +15,11 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning } from "ionicons/icons";
+import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
-
+ 
 
 
 const HairPic: React.FC = () => {
@@ -32,6 +32,7 @@ const HairPic: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("Front View");
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View"]);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
   const [showWarningAlert, setShowWarningAlert] = useState(false);
 
   useEffect(() => {
@@ -65,29 +66,49 @@ const HairPic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/png");
-        setPhoto(dataUrl);
+        const context = canvas.getContext("2d");
+        if (context) {
+            // Clear the canvas before drawing
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-        setCapturedViews((prev) => {
-          const updatedViews = { ...prev, [currentView]: dataUrl };
-          validateCapturedViews(updatedViews);
-          return updatedViews;
-        });
-      }
+            // Flip the canvas horizontally (mirror effect)
+            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Reset transformations to prevent future issues
+            context.setTransform(1, 0, 0, 1, 0, 0);
+
+            const dataUrl = canvas.toDataURL("image/png");
+            setPhoto(dataUrl);
+
+            console.log("Captured Lux Value:", lux);
+
+            // Save the captured image for the current view
+            setCapturedViews((prev) => {
+                const updatedViews = { ...prev, [currentView]: dataUrl };
+                validateCapturedViews(updatedViews);
+                return updatedViews;
+            });
+        }
     }
-  };
+};
+  
+  
 
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Front View", "Back View", "Scalp View"];
     const missing = requiredViews.filter((view) => !views[view]);
     setMissingViews(missing);
+  };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
   };
  
   const handleSaveToBackend = async () => {
@@ -108,7 +129,7 @@ const HairPic: React.FC = () => {
 
     const requestData = {
       user_uid: user.uid, // Automatically retrieve the UID of the logged-in doctor
-      patient_uid: "patient456", // Keep or update as needed
+      // patient_uid: "patient456", // Keep or update as needed
       image_data: capturedImages.map(img => img.split(",")[1]) // Remove metadata prefix
     };
 
@@ -152,14 +173,15 @@ const HairPic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>Take the Picture</IonTitle>
+          <IonTitle>TAKE THE PICTUER</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
+      <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" />
+          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
         )}
 
         <IonSegment
@@ -181,9 +203,12 @@ const HairPic: React.FC = () => {
         </IonSegment>
 
         <div className="tab-bar">
-          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
+        <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
-          </div>
+        </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
