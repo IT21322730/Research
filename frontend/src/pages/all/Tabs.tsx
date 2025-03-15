@@ -25,6 +25,7 @@ import NailHome from '../nail/NailHome';
 import NailPrakurthi from '../nail/NailPrakurthi';
 import NailCap from '../nail/NailCap';
 import NailPredictionPage from '../nail/NailPredictionpage';
+import CRTPrediction from '../nail/CRTPrediction';
 
 
 
@@ -66,6 +67,7 @@ const Tabs: React.FC = () => {
             <Route path="/app/nailhome" component={NailHome} />
             <Route path="/app/nailprakurthi" component={NailPrakurthi} />
             <Route path="/app/cap" component={NailCap} />
+            <Route path="/app/crt-prediction" component={CRTPrediction} exact={true} />
             
 
             <Route path="/app/patient-info" component={Patient} />
