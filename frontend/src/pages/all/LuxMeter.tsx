@@ -109,7 +109,11 @@ const LuxMeter: React.FC<LuxMeterProps> = ({ onLuxChange }) => {
     if (!lux) return "medium"; // Default color
 
     if (lux < 100 || lux > 1000) return "danger"; // ❌ Too dark or overexposed
+
+    if (lux >= 100 && lux < 300) return "warning"; // ⚠️ Slightly dim
+
     if (lux >= 100 && lux < 300) return "warning"; // ⚠ Slightly dim
+
     if (lux >= 300 && lux <= 600) return "success"; // ✅ Best lighting
     return "primary"; // Acceptable but slightly bright
   };
@@ -145,4 +149,8 @@ const LuxMeter: React.FC<LuxMeterProps> = ({ onLuxChange }) => {
   );
 };
 
+
+export default LuxMeter;
+
 export default LuxMeter;
+

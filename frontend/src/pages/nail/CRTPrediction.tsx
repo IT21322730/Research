@@ -90,10 +90,9 @@ const CRTPrediction: React.FC = () => {
       datalabels: {
         anchor: 'end',
         align: 'top',
-        formatter: (value: number) => `${value}%`, // Use backticks (`) for string interpolation
+        formatter: (value: number) => ${value}%,
         font: { weight: 'bold', size: 14 },
         color: '#000',
-
       },
     },
     scales: {
@@ -102,8 +101,7 @@ const CRTPrediction: React.FC = () => {
         max: 100, // Keeps scale at 100
         ticks: {
           stepSize: 25, // Shows 0, 25, 50, 75, 100
-          callback: (value: number) => `${value}%`, // Use backticks (`) for string interpolation
-
+          callback: (value: number) => ${value}%,
         },
         grid: { drawBorder: false, color: "rgba(0, 0, 0, 0.1)" }, // Light grid lines
       },

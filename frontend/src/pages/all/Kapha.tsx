@@ -1,13 +1,16 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonButtons,IonBackButton } from '@ionic/react';
 import '../css/Kapha.css';
 
 const Kapha: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar style={{ backgroundColor: '#48D1CC' }}>
-          <IonTitle>Kapha Dosha</IonTitle>
+        <IonToolbar>
+          <IonButtons slot="start">
+                      <IonBackButton defaultHref="/app/final" />
+                      </IonButtons>
+          <IonTitle>RECOMANDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -75,7 +78,13 @@ const Kapha: React.FC = () => {
           <p>Tree Pose is made by standing on one leg for a while to balance the kapha dosha.</p>
 
           <h2>Kapha Diet Guidelines</h2>
-          <table className="diet-table">
+          <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+          <table className="diet-table"
+          style={{
+            width: "100%", // Ensures it stretches to fit parent width
+            minWidth: "600px", // Prevents shrinking too much
+            borderCollapse: "collapse", // Merges borders for a clean look
+          }}>
             <thead>
               <tr>
                 <th>Favor</th>
@@ -136,6 +145,7 @@ const Kapha: React.FC = () => {
               </tr>
             </tbody>
           </table>
+          </div>
 
           <h2>Ayurvedic Remedies and Practices for Kapha</h2>
           <ul>

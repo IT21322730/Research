@@ -1,6 +1,10 @@
 import React from 'react';
 import { IonSpinner } from '@ionic/react';
 
+import '../css/Reloader.css'; // Import the CSS file
+
+
+
 
 const Reloader: React.FC = () => {
   return (
@@ -13,4 +17,7 @@ const Reloader: React.FC = () => {
   );
 };
 
-export default Reloader;
+
+export default Reloader;
+
+

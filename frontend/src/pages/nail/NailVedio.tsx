@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/NailVedio.css';
-import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal,refreshCircle } from 'ionicons/icons';
 import { getFirestore } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
 import { IonToast } from '@ionic/react';
@@ -28,14 +28,15 @@ const NailVideo: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPressToast, setShowPressToast] = useState(false);
   const [showReleaseToast, setShowReleaseToast] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+    const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const db = getFirestore();
 
@@ -89,6 +90,10 @@ const NailVideo: React.FC = () => {
     }
   };
 
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
+  };
+
 
   const handleStopRecording = async () => {
     if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
@@ -115,15 +120,13 @@ const NailVideo: React.FC = () => {
 
       const videoBlob = await response.blob();
       const formData = new FormData();
-      formData.append('video', videoBlob, `nail_video_${Date.now()}.webm`);
-
-
+      formData.append('video', videoBlob, nail_video_${Date.now()}.webm);
 
 
       console.log('Uploading video to backend...');
 
       // Send to backend
-      const backendResponse = await fetch('http://127.0.0.1:5000/crt-analysis', {
+      const backendResponse = await fetch('http://192.168.1.100:5000/crt-analysis', {
         method: 'POST',
         body: formData,
       });
@@ -131,9 +134,9 @@ const NailVideo: React.FC = () => {
 
       if (!backendResponse.ok) {
         const errorText = await backendResponse.text();
-        console.error(`Backend error: ${backendResponse.status} - ${errorText}`);
-setErrorMessage(`Backend error: ${backendResponse.status} - ${errorText}`);
-throw new Error(`Backend error: ${backendResponse.status} - ${errorText}`);
+        console.error(Backend error: ${backendResponse.status} - ${errorText});
+        setErrorMessage(Backend error: ${backendResponse.status} - ${errorText});
+        throw new Error(Backend error: ${backendResponse.status} - ${errorText});
 
       }
 
@@ -257,12 +260,17 @@ throw new Error(`Backend error: ${backendResponse.status} - ${errorText}`);
               </button>
             )}
           </div>
-        )}
+        )}
         {isUploading && <div className="loading-spinner">Uploading...</div>}
         {errorMessage && <div className="error-message">{errorMessage}</div>}
       </IonContent>
       <div className="tab-bar">
-        <div className="tab-button"><IonIcon icon={swapHorizontal} /></div>
+              <div className="tab-button" onClick={() => window.location.reload()}>
+                          <IonIcon icon={refreshCircle} />
+                        </div>
+                        <div className="tab-button" onClick={toggleCamera}>
+                                    <IonIcon icon={swapHorizontal} />
+                                  </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />

@@ -11,7 +11,7 @@ import {
   IonLabel, 
   IonTextarea, 
   IonButton, 
-  IonAlert 
+  IonSpinner
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
 import '../css/EditPatient.css';
@@ -21,41 +21,48 @@ const EditPatient: React.FC = () => {
   const history = useHistory();
   
   const [prakurthiType, setPrakurthiType] = useState('');
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(true);
 
   // Fetch Patient Data
   useEffect(() => {
-    if (!patientId) return;
-  
-    const fetchPatientData = async () => {
-        const apiUrl = `http://127.0.0.1:5000/patients/${patientId}`;
+    if (!patientId) {
+      setErrorMessage("⚠ No patient ID provided!");
+      return;
+    }
 
+    const fetchPatientData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(https://192.168.1.100:5000/patients/${patientId});
+        if (!response.ok) throw new Error("⚠ No patient found!");
+
         const data = await response.json();
-        if (response.ok) {
-          setPrakurthiType(data.prakurthiType || '');
-        } else {
-          console.error("⚠ No patient found!");
-        }
+        setPrakurthiType(data.prakurthiType || '');
+        setErrorMessage('');
       } catch (error) {
+        if (error instanceof Error) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage("An unknown error occurred.");
+        }
         console.error("❌ Error fetching patient data:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchPatientData();
   }, [patientId]);
   
-  // Handle Save Changes (Only updating Prakurthi Type)
+  // Handle Save Changes
   const handleSave = async () => {
     if (!patientId) {
       console.error("❌ No patient ID provided");
       return;
     }
   
-    // Get the latest input value directly
-    const inputElement = document.querySelector('ion-textarea');
-    const updatedPrakurthiType = (inputElement as HTMLIonTextareaElement)?.value?.trim() || '';
+    const updatedPrakurthiType = prakurthiType.trim();
   
     if (!updatedPrakurthiType) {
       console.error("❌ Prakurthi Type cannot be empty!");
@@ -63,11 +70,8 @@ const EditPatient: React.FC = () => {
     }
   
     try {
-        const apiUrl = `http://127.0.0.1:5000/patients/${patientId}`;
-
+      const apiUrl = https://192.168.1.100:5000/patients/${patientId};
       const requestBody = { prakurthiType: updatedPrakurthiType };
-  
-      console.log("🔥 Sending update request to backend:", requestBody);
   
       const response = await fetch(apiUrl, {
         method: 'PUT',
@@ -75,21 +79,29 @@ const EditPatient: React.FC = () => {
         body: JSON.stringify(requestBody),
       });
   
-      const responseData = await response.json();
-  
-      if (response.ok) {
-        console.log("✅ Prakurthi Type updated successfully!", responseData);
-        history.push('/app/patient-info'); // Navigate after update
-      } else {
+      if (!response.ok) {
+        const responseData = await response.json();
         console.error("❌ Failed to update Prakurthi Type:", responseData.error);
+        return;
       }
+  
+      console.log("✅ Prakurthi Type updated successfully!");
+  
+      // ✅ Navigate to the patient info page first
+      history.push(/app/patient-info/${patientId});
+  
+      // ✅ Optional: Refresh after navigating (if needed)
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+  
     } catch (error) {
       console.error("❌ Error updating Prakurthi Type:", error);
     }
   };
   
-  
-  
+
+
   return (
     <IonPage>
       <IonHeader>
@@ -103,25 +115,33 @@ const EditPatient: React.FC = () => {
 
       <IonContent>
         <div className="edit-patient-form">
-          {/* Prakurthi Type */}
-          <IonItem>
-          <IonLabel position="floating" style={{ fontFamily: "Open Sans, sans-serif" }}>
-            Prakurthi Type
-          </IonLabel><br/>
-          <IonTextarea
-            style={{ fontFamily: "Open Sans, sans-serif" }}
-            value={prakurthiType}
-            onIonInput={(e) => setPrakurthiType(e.detail.value!)}
-            placeholder="Enter Prakurthi Type"
-          />
+          {errorMessage && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
 
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <IonSpinner name="crescent" />
+            </div>
+          ) : (
+            <>
+              {/* Prakurthi Type */}
+              <IonItem>
+                <IonLabel position="floating" style={{ fontFamily: "Open Sans, sans-serif" }}>
+                  Prakurthi Type
+                </IonLabel>
+                <IonTextarea
+                  style={{ fontFamily: "Open Sans, sans-serif" }}
+                  value={prakurthiType}
+                  onIonInput={(e) => setPrakurthiType(e.detail.value!)}
+                  placeholder="Enter Prakurthi Type"
+                />
+              </IonItem>
 
-          </IonItem><br/>
-
-          {/* Save Changes Button */}
-          <IonButton className='save-patient' expand="full" color="primary" onClick={handleSave}>
-            Save Changes
-          </IonButton>
+              {/* Save Changes Button */}
+              <IonButton className='save-patient' expand="full" color="primary" onClick={handleSave}>
+                Save Changes
+              </IonButton>
+            </>
+          )}
         </div>
       </IonContent>
     </IonPage>
