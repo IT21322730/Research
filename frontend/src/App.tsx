@@ -77,9 +77,11 @@ const App: React.FC = () => (
         <Route path="/app/hair-pic-alophecia" component={HairAlopheciaPic} exact={true} />
         
 
+
         {/* IT21324024 */}
         <Route path="/app/nail-pic" component={NailPic} exact={true}/>
         <Route path="/app/nail-video" component={NailVideo} />
+
        
         
       </IonRouterOutlet>

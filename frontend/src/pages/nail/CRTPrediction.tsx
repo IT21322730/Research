@@ -90,7 +90,7 @@ const CRTPrediction: React.FC = () => {
       datalabels: {
         anchor: 'end',
         align: 'top',
-        formatter: (value: number) => `${value}%`,
+        formatter: (value: number) => ${value}%,
         font: { weight: 'bold', size: 14 },
         color: '#000',
       },
@@ -101,7 +101,7 @@ const CRTPrediction: React.FC = () => {
         max: 100, // Keeps scale at 100
         ticks: {
           stepSize: 25, // Shows 0, 25, 50, 75, 100
-          callback: (value: number) => `${value}%`,
+          callback: (value: number) => ${value}%,
         },
         grid: { drawBorder: false, color: "rgba(0, 0, 0, 0.1)" }, // Light grid lines
       },
@@ -208,4 +208,4 @@ const CRTPrediction: React.FC = () => {
   );
 };
 
-export default CRTPrediction;
+export default CRTPrediction;

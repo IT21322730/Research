@@ -19,7 +19,11 @@ import {
   IonInput
 } from "@ionic/react";
 import { add, trash, create } from "ionicons/icons";
+
 import DefaultProfilePic from "../images/img_07.png";
+
+import DefaultProfilePic from "../images/img_07.jpg";
+
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useHistory } from "react-router-dom";
@@ -57,7 +61,11 @@ const Patient: React.FC = () => {
         setUserId(user.uid);
         fetchPatients(user.uid);
       } else {
+
         console.warn("⚠️ No user logged in!");
+
+        console.warn("⚠ No user logged in!");
+
         setUserId(null);
         setSavedPatientDetails([]);
       }
@@ -68,14 +76,24 @@ const Patient: React.FC = () => {
 
   const fetchPatients = async (user_id: string) => {
     try {
+
       const response = await fetch(`http://127.0.0.1:5000/patients?user_id=${user_id}`);
       if (!response.ok) throw new Error("Failed to fetch patients");
   
+
+        const response = await fetch(`http://127.0.0.1:5000/patients?user_id=${user_id}`);
+        if (!response.ok) throw new Error("Failed to fetch patients");
+        
+
       const data = await response.json();
       console.log("🔄 Raw Patient Data:", data);
   
       if (!data.patients || !Array.isArray(data.patients)) {
+
         console.warn("⚠️ Unexpected patient data format:", data);
+
+        console.warn("⚠ Unexpected patient data format:", data);
+
         return;
       }
   
@@ -113,7 +131,11 @@ const Patient: React.FC = () => {
   console.log("🛠 Current State - Name:", patientName, "| Age:", numericAge, "| Prakurthi Type:", prakurthiType);
 
     if (!latestPrakurthiType) {
+
       console.warn("⚠️ Prakurthi Type is empty. Using default value 'Not Provided'");
+
+      console.warn("⚠ Prakurthi Type is empty. Using default value 'Not Provided'");
+
     }
 
     console.log("🛠 Current State - Name:", patientName, "| Age:", patientAge, "| Prakurthi Type:", prakurthiType);
@@ -270,12 +292,20 @@ const Patient: React.FC = () => {
                 onClick={() => {
                   if (!patient.id || patient.id.startsWith("temp-")) {
                     console.error("❌ Invalid Patient ID! Cannot view:", patient);
+
                     alert("⚠️ This patient record is missing a valid ID. Please refresh.");
+
+                    alert("⚠ This patient record is missing a valid ID. Please refresh.");
+
                     return;
                   }
 
                   console.log("👀 Navigating to view patient:", patient.id);
                   history.push(`/app/view-patient/${patient.id}`);
+
+
+
+
                 }}
                 style={{ cursor: "pointer" }} // Make it visually clickable
               />
@@ -294,12 +324,20 @@ const Patient: React.FC = () => {
                     onClick={() => {
                       if (!patient.id || patient.id.startsWith("temp-")) {
                         console.error("❌ Invalid Patient ID! Cannot edit:", patient);
+
                         alert("⚠️ This patient record is missing a valid ID. Please refresh.");
+
+                        alert("⚠ This patient record is missing a valid ID. Please refresh.");
+
                         return;
                       }
 
                       console.log("📝 Navigating to edit:", patient.id);
                       history.push(`/app/edit-patient/${patient.id}`);
+
+
+
+
                     }}
                   >
                     Edit Details
@@ -348,4 +386,8 @@ const Patient: React.FC = () => {
   );
 };
 
+
 export default Patient;
+
+
+

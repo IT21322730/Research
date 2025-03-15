@@ -1,8 +1,7 @@
 import React from 'react';
 import { IonHeader, IonPage, IonContent, IonToolbar, IonTitle, IonText, IonImg, IonBackButton, IonButtons } from '@ionic/react';
 import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
-import '../css/NailPrakurthi.css'; // Import your styles here
-
+import '../css/NailPrakrurthi.css';
 const NailPrakurthi: React.FC = () => {
   const history = useHistory();
 
