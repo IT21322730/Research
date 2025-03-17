@@ -129,7 +129,6 @@ const HairPic: React.FC = () => {
 
     const requestData = {
       user_uid: user.uid, // Automatically retrieve the UID of the logged-in doctor
-      // patient_uid: "patient456", // Keep or update as needed
       image_data: capturedImages.map(img => img.split(",")[1]) // Remove metadata prefix
     };
 
