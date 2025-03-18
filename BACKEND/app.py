@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from firebase_admin import credentials, firestore, initialize_app
 import tensorflow as tf
 import numpy as np
@@ -15,7 +15,6 @@ import mediapipe as mp
 from collections import Counter
 from datetime import datetime
 import pytz
-from flask_cors import cross_origin
 import sys
 import time
 import uuid
@@ -24,8 +23,13 @@ from skimage import feature
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:8100"]}})
+
+CORS(app)  # This will allow all domains, you can specify specific domains if needed.
+
+# Define a route for testing
+@app.route('/')
+def home():
+    return {"message": "Hello, Flask is running!"}
 
 #IT21319488
 UPLOAD_FOLDER = 'uploads'
@@ -33,6 +37,11 @@ UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+@app.route('/')  # Define a route for the root URL
+def serve_test_page():
+    return send_from_directory(os.getcwd(), "test.html")
 
 
 # Firebase setup
@@ -454,42 +463,38 @@ def process_nail_images():
 
 
 #Final Prakurthi Identification
+#Final Prakurthi Identification
 def determine_final_prakriti(individual_predictions):
-    # Count occurrences of each full combination
+    # Count occurrences of each full combination (e.g., "Kapha-Pitta", "Vata-Pitta")
     combination_counts = Counter(individual_predictions.values())
 
     # Get the most common combination(s)
     most_common = combination_counts.most_common()
     
-    # If there's a single most frequent combination, return it
-    if len(most_common) == 1 or most_common[0][1] > most_common[1][1]:
-        return most_common[0][0]  # Return the most frequent Prakriti combination
-    
-    # If there is a tie, apply the tie-breaking logic
-    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
-    
-    # Count occurrences of each dosha within tied components
-    for prakriti in combination_counts.keys():
-        for dosha in prakriti.split("-"):  # Split if it's a combination like "Vata-Pitta"
-            scores[dosha] += combination_counts[prakriti]
+    # Check if there is a tie
+    if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
+        # If there’s a tie, apply the mental & behavioral questionnaire tie-breaking
+        return "Tie - Need Questionnaire Analysis"
 
-    # Now use the logic from determine_prakriti to resolve the tie
-    return determine_prakriti(scores)
+    # If no tie, return the most frequent Prakriti combination
+    return most_common[0][0]
 
-# Logic to break the tie properly
+# Properly handle tie-breaking based on dominant dosha
 def determine_prakriti(scores):
-    # If all three scores are equal, return Tri-doshic
-    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
-        return "Tri-doshic (Vata-Pitta-Kapha)"
-    
-    # Sort scores by value in descending order
+    print("Dosha Scores:", scores)  # Debugging Print
+
+    # Sort doshas by their count in descending order
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
-    # If the top two scores are equal, return them as a tie (sorted order)
+    # If the top two doshas have equal occurrences, return them in sorted order
     if sorted_scores[0][1] == sorted_scores[1][1]:
         return "-".join(sorted([sorted_scores[0][0], sorted_scores[1][0]]))
     
-    # Return the single dominant Prakriti
+    # If all three are equal, return Tri-doshic
+    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
+        return "Tri-doshic (Vata-Pitta-Kapha)"
+
+    # Otherwise, return the single dominant dosha
     return sorted_scores[0][0]
 
 
@@ -537,7 +542,7 @@ def get_final_prakriti():
 
         final_prakriti = determine_final_prakriti(predictions)
 
-        if final_prakriti == "Tie":
+        if final_prakriti == "Tie - Need Questionnaire Analysis":
             # Fetch questionnaire result before returning tie response
             questionnaire_doc = db.collection("questionnaire").document(user_uid).get()
             
@@ -701,35 +706,138 @@ def get_final_prakriti_after_questionnaire(user_uid):
         return jsonify({"error": "An error occurred while analyzing final Prakriti.", "details": str(e)}), 500
 
 
-### Patient creation and update
+### Patient CRUD
+# ✅ Create a new patient
+@app.route("/create/patient", methods=["POST"])
+def create_patient():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "Missing request data"}), 400
+
+        user_id = data.get("user_id")  # ✅ Now correctly matches frontend
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Generate a unique patient_id
+        patient_id = str(uuid.uuid4())
+
+        # Convert UTC to IST (Indian Standard Time - UTC+5:30)
+        ist = pytz.timezone("Asia/Kolkata")
+        timestamp = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(ist)
+        formatted_timestamp = timestamp.strftime("%B %d, %Y at %I:%M:%S %p UTC%z")
+
+        patient_data = {
+            "patient_id": patient_id,
+            "prakurthiType": data.get("prakurthiType", "Unknown"),  # ✅ Ensure it's stored
+            "date_time": formatted_timestamp,
+            "name": data.get("name", "Unknown"),
+            "age": data.get("age", 0),
+            "user_id": user_id  
+        }
+
+        # Store in Firestore
+        db.collection("patients").document(patient_id).set(patient_data)
+
+        return jsonify({
+            "message": "Patient created successfully!",
+            "document_id": patient_id,
+            "user_id": user_id,
+            "date_time": formatted_timestamp
+        }), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ✅ Get all patients for a user
+@app.route("/patients", methods=["GET"])
+def get_patients():
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    patients_ref = db.collection("patients").where("user_id", "==", user_id).stream()
+    patients = []
+
+    for doc in patients_ref:
+        patient_data = doc.to_dict()
+        patient_data["id"] = doc.id  # ✅ Ensure Firestore document ID is used
+        patients.append(patient_data)
+
+    return jsonify({"patients": patients}), 200
+
+
 @app.route('/patients/<patient_id>', methods=['GET', 'PUT'])
 def handle_patient(patient_id):
+    patient_ref = db.collection('patients').document(patient_id)
+
     if request.method == 'GET':
-        doc_ref = db.collection('patients').document(patient_id)
-        doc = doc_ref.get()
-        if doc.exists:
-            return jsonify(doc.to_dict()), 200
+        patient_doc = patient_ref.get()
+        if patient_doc.exists:
+            return jsonify(patient_doc.to_dict()), 200
         else:
             return jsonify({'error': 'Patient not found'}), 404
 
     elif request.method == 'PUT':
         data = request.json
-        doc_ref = db.collection('patients').document(patient_id)
-        doc_ref.update(data)
-        return jsonify({'success': True}), 200
-        
+        if not data:
+            return jsonify({'error': 'Invalid request body'}), 400
 
-@app.route('/patients/<patient_id>', methods=['PUT'])
-def update_patient(patient_id):
-    """Update an existing patient."""
-    data = request.json
-    patient_ref = db.collection('patients').document(patient_id)
+        # Get the current patient document to check the existing prakurthiType
+        patient_doc = patient_ref.get()
+        if patient_doc.exists:
+            current_data = patient_doc.to_dict()
+            current_prakurthi_type = current_data.get('prakurthiType')
 
-    if not patient_ref.get().exists:
-        return jsonify({'error': 'Patient not found'}), 404
+            # Add the current prakurthiType to the history if it's changed
+            if current_prakurthi_type != data.get('prakurthiType'):
+                # Prepare the history update
+                history = current_data.get('history', [])
+                history.append({
+                    'prakurthiType': current_prakurthi_type,
+                    'date': datetime.now().strftime('%Y-%m-%d'),
+                    'time': datetime.now().strftime('%H:%M:%S')
+                })
 
-    patient_ref.update(data)
-    return jsonify({'message': 'Patient updated'}), 200    
+                # Update the patient's prakurthiType and history
+                patient_ref.update({
+                    'prakurthiType': data.get('prakurthiType'),
+                    'history': history
+                })
+
+                # Now fetch the updated document and return the patient details
+                updated_patient_doc = patient_ref.get()
+                updated_patient_data = updated_patient_doc.to_dict()
+
+                # Format the response
+                response_data = {
+                    'name': updated_patient_data.get('name', ''),
+                    'age': updated_patient_data.get('age', 0),
+                    'prakurthiType': updated_patient_data.get('prakurthiType', ''),
+                    'history': updated_patient_data.get('history', [])
+                }
+
+                return jsonify(response_data), 200
+            else:
+                return jsonify({'message': 'No changes detected in Prakurthi Type'}), 200
+        else:
+            return jsonify({'error': 'Patient not found'}), 404
+
+# ✅ Delete a patient by ID
+@app.route("/delete/patient/<patient_id>", methods=["DELETE"])
+def delete_patient(patient_id):
+    try:
+        doc_ref = db.collection("patients").document(patient_id)
+
+        # Check if patient exists
+        if not doc_ref.get().exists:
+            return jsonify({"error": "Patient not found"}), 404
+
+        doc_ref.delete()
+        return jsonify({"message": "Patient deleted successfully!"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
@@ -1785,7 +1893,7 @@ def analyze_crt():
 
 
 # Lux Value Detector
-@app.route('/analyze-light', methods=['POST'])
+@app.route('/analyze-light', methods=['GET','POST'])
 def analyze_light():
     try:
         data = request.get_json()
@@ -1815,5 +1923,7 @@ def analyze_light():
 
     
     
-if __name__ == '__main__':
+# Run the Flask app
+if __name__ == "__main__":
     app.run(debug=True)
+    # app.run(ssl_context=('D:/Git/frontend/192.168.1.114.pem', 'D:/Git/frontend/192.168.1.114-key.pem'), host="0.0.0.0", port=5000)
