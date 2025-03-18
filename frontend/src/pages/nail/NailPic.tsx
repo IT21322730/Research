@@ -133,7 +133,7 @@ const NailPic: React.FC = () => {
     };
 
     try {
-      const response = await fetch("https://192.168.1.100:5000/nailpredict", {
+      const response = await fetch("https://127.0.0.1:5000/nailpredict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
@@ -141,7 +141,8 @@ const NailPic: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(HTTP error! Status: ${response.status}, Message: ${errorText});
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+
       }
 
       const data = await response.json();
