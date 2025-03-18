@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from firebase_admin import credentials, firestore, initialize_app
+from firebase_admin import credentials,firestore, initialize_app
 import tensorflow as tf
 import numpy as np
 from PIL import Image
@@ -10,7 +10,7 @@ from flask_cors import CORS
 import traceback
 import os
 import cv2
-from deepface import DeepFace
+#from deepface import DeepFace
 import mediapipe as mp
 from collections import Counter
 from datetime import datetime
@@ -701,137 +701,37 @@ def get_final_prakriti_after_questionnaire(user_uid):
         return jsonify({"error": "An error occurred while analyzing final Prakriti.", "details": str(e)}), 500
 
 
-# ✅ Create a new patient
-@app.route("/create/patient", methods=["POST"])
-def create_patient():
-    try:
-        data = request.json
-        if not data:
-            return jsonify({"error": "Missing request data"}), 400
-
-        user_id = data.get("user_id")  # ✅ Now correctly matches frontend
-        if not user_id:
-            return jsonify({"error": "User ID is required"}), 400
-
-        # Generate a unique patient_id
-        patient_id = str(uuid.uuid4())
-
-        # Convert UTC to IST (Indian Standard Time - UTC+5:30)
-        ist = pytz.timezone("Asia/Kolkata")
-        timestamp = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(ist)
-        formatted_timestamp = timestamp.strftime("%B %d, %Y at %I:%M:%S %p UTC%z")
-
-        patient_data = {
-            "patient_id": patient_id,
-            "prakurthiType": data.get("prakurthiType", "Unknown"),  # ✅ Ensure it's stored
-            "date_time": formatted_timestamp,
-            "name": data.get("name", "Unknown"),
-            "age": data.get("age", 0),
-            "user_id": user_id  
-        }
-
-        # Store in Firestore
-        db.collection("patients").document(patient_id).set(patient_data)
-
-        return jsonify({
-            "message": "Patient created successfully!",
-            "document_id": patient_id,
-            "user_id": user_id,
-            "date_time": formatted_timestamp
-        }), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-# ✅ Get all patients for a user
-@app.route("/patients", methods=["GET"])
-def get_patients():
-    user_id = request.args.get("user_id")
-    if not user_id:
-        return jsonify({"error": "User ID is required"}), 400
-
-    patients_ref = db.collection("patients").where("user_id", "==", user_id).stream()
-    patients = []
-
-    for doc in patients_ref:
-        patient_data = doc.to_dict()
-        patient_data["id"] = doc.id  # ✅ Ensure Firestore document ID is used
-        patients.append(patient_data)
-
-    return jsonify({"patients": patients}), 200
-
-
+### Patient creation and update
 @app.route('/patients/<patient_id>', methods=['GET', 'PUT'])
 def handle_patient(patient_id):
-    patient_ref = db.collection('patients').document(patient_id)
-
     if request.method == 'GET':
-        patient_doc = patient_ref.get()
-        if patient_doc.exists:
-            return jsonify(patient_doc.to_dict()), 200
+        doc_ref = db.collection('patients').document(patient_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            return jsonify(doc.to_dict()), 200
         else:
             return jsonify({'error': 'Patient not found'}), 404
 
     elif request.method == 'PUT':
         data = request.json
-        if not data:
-            return jsonify({'error': 'Invalid request body'}), 400
+        doc_ref = db.collection('patients').document(patient_id)
+        doc_ref.update(data)
+        return jsonify({'success': True}), 200
+        
 
-        # Get the current patient document to check the existing prakurthiType
-        patient_doc = patient_ref.get()
-        if patient_doc.exists:
-            current_data = patient_doc.to_dict()
-            current_prakurthi_type = current_data.get('prakurthiType')
+@app.route('/patients/<patient_id>', methods=['PUT'])
+def update_patient(patient_id):
+    """Update an existing patient."""
+    data = request.json
+    patient_ref = db.collection('patients').document(patient_id)
 
-            # Add the current prakurthiType to the history if it's changed
-            if current_prakurthi_type != data.get('prakurthiType'):
-                # Prepare the history update
-                history = current_data.get('history', [])
-                history.append({
-                    'prakurthiType': current_prakurthi_type,
-                    'date': datetime.now().strftime('%Y-%m-%d'),
-                    'time': datetime.now().strftime('%H:%M:%S')
-                })
+    if not patient_ref.get().exists:
+        return jsonify({'error': 'Patient not found'}), 404
 
-                # Update the patient's prakurthiType and history
-                patient_ref.update({
-                    'prakurthiType': data.get('prakurthiType'),
-                    'history': history
-                })
+    patient_ref.update(data)
+    return jsonify({'message': 'Patient updated'}), 200    
 
-                # Now fetch the updated document and return the patient details
-                updated_patient_doc = patient_ref.get()
-                updated_patient_data = updated_patient_doc.to_dict()
 
-                # Format the response
-                response_data = {
-                    'name': updated_patient_data.get('name', ''),
-                    'age': updated_patient_data.get('age', 0),
-                    'prakurthiType': updated_patient_data.get('prakurthiType', ''),
-                    'history': updated_patient_data.get('history', [])
-                }
-
-                return jsonify(response_data), 200
-            else:
-                return jsonify({'message': 'No changes detected in Prakurthi Type'}), 200
-        else:
-            return jsonify({'error': 'Patient not found'}), 404
-
-# ✅ Delete a patient by ID
-@app.route("/delete/patient/<patient_id>", methods=["DELETE"])
-def delete_patient(patient_id):
-    try:
-        doc_ref = db.collection("patients").document(patient_id)
-
-        # Check if patient exists
-        if not doc_ref.get().exists:
-            return jsonify({"error": "Patient not found"}), 404
-
-        doc_ref.delete()
-        return jsonify({"message": "Patient deleted successfully!"}), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 #### Novelties ####
 
