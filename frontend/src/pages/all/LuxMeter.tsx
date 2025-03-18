@@ -152,5 +152,5 @@ const LuxMeter: React.FC<LuxMeterProps> = ({ onLuxChange }) => {
 
 export default LuxMeter;
 
-export default LuxMeter;
+
 
