@@ -22,7 +22,6 @@ import { add, trash, create } from "ionicons/icons";
 
 import DefaultProfilePic from "../images/img_07.png";
 
-import DefaultProfilePic from "../images/img_07.jpg";
 
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -81,8 +80,7 @@ const Patient: React.FC = () => {
       if (!response.ok) throw new Error("Failed to fetch patients");
   
 
-        const response = await fetch(`http://127.0.0.1:5000/patients?user_id=${user_id}`);
-        if (!response.ok) throw new Error("Failed to fetch patients");
+        
         
 
       const data = await response.json();
