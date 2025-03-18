@@ -90,7 +90,7 @@ const CRTPrediction: React.FC = () => {
       datalabels: {
         anchor: 'end',
         align: 'top',
-        formatter: (value: number) => ${value}%,
+        formatter: (value: number) => `${value}%`, // Fixed string interpolation
         font: { weight: 'bold', size: 14 },
         color: '#000',
       },
@@ -101,12 +101,12 @@ const CRTPrediction: React.FC = () => {
         max: 100, // Keeps scale at 100
         ticks: {
           stepSize: 25, // Shows 0, 25, 50, 75, 100
-          callback: (value: number) => ${value}%,
+          callback: (value: number) => `${value}%`, // Fixed string interpolation
         },
         grid: { drawBorder: false, color: "rgba(0, 0, 0, 0.1)" }, // Light grid lines
       },
       x: {
-        ticks: { font: { size: 14, weight: 'bold' }, },
+        ticks: { font: { size: 14, weight: 'bold' } },
         grid: { display: false },
       },
     },
@@ -114,10 +114,11 @@ const CRTPrediction: React.FC = () => {
       bar: {
         barThickness: 40, // Increase the bar width here (default is 60)
         categoryPercentage: 0.9, // Adjusts the spacing between bars
-        barPercentage: 0.8, // Adjusts how bars fill the category widthh
+        barPercentage: 0.8, // Adjusts how bars fill the category width
       },
     },
   };
+  
 
 
   return (
