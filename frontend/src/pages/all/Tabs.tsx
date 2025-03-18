@@ -43,13 +43,8 @@ import HairAlopeciaResults from '../hair/HairAlopheciaResults';
 
 // IT21324024
 import NailPredictionPage from '../nail/NailPredictionpage';
-
 import NailCap from '../nail/NailCap';
 import CRTprediction from '../nail/CRTPrediction';
-
-import CRTPrediction from '../nail/CRTPrediction';
-
-
 
 
 const Tabs: React.FC = () => {
@@ -76,7 +71,6 @@ const Tabs: React.FC = () => {
     <IonPage>
       <IonTabs>
         <IonRouterOutlet>
-
           <Route path="/app/home" component={Home} />
           <Route path="/app/profile" component={Profile} />
           <Route path="/app/search" component={Search} />
@@ -128,38 +122,6 @@ const Tabs: React.FC = () => {
           <Route exact path="/app">
             <Redirect to="/app/home" />
           </Route>
-
-            <Route path="/app/home" component={Home} />
-            <Route path="/app/profile" component={Profile} />
-            <Route path="/app/search" component={Search} />
-            <Route path="/app/final-prakurthi" component={Prakurthi} />
-            <Route path="/app/step" component={StepHome} />
-
-            <Route path="/app/eyehome" component={EyeHome} />
-            <Route path="/app/blink" component={BlinkEye} />
-            <Route path="/app/blinkfinal" component={BlinkFinal} />
-
-            <Route path="/app/nailhome" component={NailHome} />
-            <Route path="/app/nailprakurthi" component={NailPrakurthi} />
-            <Route path="/app/cap" component={NailCap} />
-            <Route path="/app/crt-prediction" component={CRTPrediction} exact={true} />
-            
-
-            <Route path="/app/patient-info" component={Patient} />
-            <Route path="/app/edit-patient/:patientId" component={EditPatient} />
-
-            
-            <Route path="/app/final" component={FinalPrakurthi} />
-
-            
-            <Route path="/app/pitta-body" component={Pitta} />
-            <Route path="/app/kapha-body" component={Kapha} />
-
-            
-            <Route exact path="/app">
-                <Redirect to="/app/home" />
-            </Route>
-
         </IonRouterOutlet>
 
         <IonTabBar slot='bottom'>
@@ -209,4 +171,4 @@ const Tabs: React.FC = () => {
   );
 };
 
-export default Tabs;
+export default Tabs;
