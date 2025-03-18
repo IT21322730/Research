@@ -3,6 +3,8 @@ import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle } from "@ion
 import "../css/Question.css";
 import img_02 from "../images/img_02.png";
 import { auth } from "../firebase/firebase"; // Ensure auth is imported
+import { useHistory } from "react-router-dom";
+
 
 const questions = [
   { question: "How do you usually respond to stress or pressure?", answers: ["Feel anxious", "Become irritable", "Remain calm"] },
@@ -30,43 +32,51 @@ const Question: React.FC = () => {
     setSelectedAnswers(newAnswers);
   };
 
-  const handleSubmit = async () => {
-    // Ensure all questions are answered
-    if (selectedAnswers.some(answer => answer === null || answer === undefined)) {
+const history = useHistory(); // Initialize history for navigation
+
+const handleSubmit = async () => {
+  if (selectedAnswers.some(answer => answer === null || answer === undefined)) {
       console.log("Please answer all questions.");
       return;
-    }
-  
-    // Get the current user
-    const user = auth.currentUser;
-    if (!user) {
+  }
+
+  const user = auth.currentUser;
+  if (!user) {
       console.error("User not logged in.");
       return;
-    }
-  
-    try {
+  }
+
+  try {
       const response = await fetch("http://127.0.0.1:5000/submit-questionnaire", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_uid: user.uid,  // ✅ Include user UID
-          answers: selectedAnswers, // ✅ Send answers
-        }),
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              user_uid: user.uid,
+              answers: selectedAnswers,
+          }),
       });
-  
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server Error: ${response.status} - ${errorText}`);
+          const errorText = await response.text();
+          throw new Error(`Server Error: ${response.status} - ${errorText}`);
       }
-  
-      const result = await response.json();
-      setResponse(result.prakriti);
-    } catch (error) {
+
+      const data = await response.json();
+      console.log("Response from server:", data); // ✅ Log response
+
+      // ✅ Navigate to FinalPrakurthiAfterQuestionnaire with state
+      history.push({
+          pathname: "/app/final-after-Q&A",
+          state: { prakrutiResult: data }, // Pass the data
+      });
+
+  } catch (error) {
       console.error("Error sending answers:", error);
-    }
-  };
+  }
+};
+
 
   return (
     <>
