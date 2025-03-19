@@ -1,37 +1,42 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonButtons ,IonBackButton} from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/react';
 import '../css/PittaKapha.css';
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const PittaKapha: React.FC = () => {
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
   return (
     <IonPage>
       <IonHeader>
-                    <IonToolbar>
-                      <IonButtons slot="start">
-                        <IonBackButton defaultHref="/app/final" />
-                      </IonButtons>
-                      <IonTitle>RECOMANDATION</IonTitle>
-                    </IonToolbar>
-                  </IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>RECOMMENDATION</IonTitle>
+        </IonToolbar>
+      </IonHeader>
       <IonContent>
         <div className="Pitta-Kapha-container">
           <h2>What Does Pitta-Kapha Mean?</h2>
           <p>
-            The Pitta-Kapha type combines the fiery and competitive Pitta with the calm, grounded nature of Kapha. 
-            Pitta desires to prove itself, while Kapha enjoys stability and relaxation. Depending on which dosha is more pronounced, 
+            The Pitta-Kapha type combines the fiery and competitive Pitta with the calm, grounded nature of Kapha.
+            Pitta desires to prove itself, while Kapha enjoys stability and relaxation. Depending on which dosha is more pronounced,
             the person may lean more toward the Pitta-Kapha or Kapha-Pitta type. Both types share the same general health and lifestyle recommendations.
           </p>
 
           <h2>Key Characteristics of Pitta-Kapha</h2>
           <p>
-            Pitta-Kapha individuals are strong, resilient, and assertive. Their physical strength, combined with perseverance, 
+            Pitta-Kapha individuals are strong, resilient, and assertive. Their physical strength, combined with perseverance,
             makes them well-suited for leadership roles. They are persistent and have enough energy to support long-term projects.
             This constitution is particularly suited for roles like CEO, provided they have the appropriate education.
           </p>
 
           <h2>Physical Characteristics</h2>
           <p>
-            The Pitta-Kapha constitution is generally healthy, with the digestive fire (Agni) well-balanced. However, there is a tendency toward an unhealthy lifestyle, which can lead to weight gain and associated health issues such as obesity, skin problems, and toxin buildup. 
+            The Pitta-Kapha constitution is generally healthy, with the digestive fire (Agni) well-balanced. However, there is a tendency toward an unhealthy lifestyle, which can lead to weight gain and associated health issues such as obesity, skin problems, and toxin buildup.
             Until around the age of 50, Pitta-Kapha individuals can generally tolerate most things, but indulgence and a sedentary lifestyle should be avoided to maintain health.
           </p>
 
@@ -42,7 +47,7 @@ const PittaKapha: React.FC = () => {
 
           <h2>Health Tips for Pitta-Kapha</h2>
           <p>
-            Agni stimulation is essential for this type, which can be achieved with foods and herbs like ginger, long pepper, and black pepper. 
+            Agni stimulation is essential for this type, which can be achieved with foods and herbs like ginger, long pepper, and black pepper.
             Rasayana (rejuvenating) herbs such as Boerhaavia diffusa or Cyavanprash, along with Amla fruit jam, can serve as preventive measures to maintain health.
           </p>
           <p>
@@ -92,12 +97,12 @@ const PittaKapha: React.FC = () => {
 
           <h2>Herbs for Pitta-Kapha Imbalance</h2>
           <p>
-            Pitta represents the fire and water elements, responsible for digestion and metabolism. 
-            When pitta becomes aggravated, you may experience heartburn, skin rashes, hot flushes, 
-            inflammation, or irritability. Soothing, cooling, and calming herbs help pacify this: 
+            Pitta represents the fire and water elements, responsible for digestion and metabolism.
+            When pitta becomes aggravated, you may experience heartburn, skin rashes, hot flushes,
+            inflammation, or irritability. Soothing, cooling, and calming herbs help pacify this:
             <strong>Mint</strong>, which includes varieties like spearmint, peppermint, and field mint, has a sweet taste and helps soothe inner heat. It also improves digestion, enhances respiratory health, and provides antioxidant benefits. <strong>Coriander</strong>, which is pungent, sweet, and slightly bitter, is a wonderful remedy for clearing irritating heat and helping to clear the digestive tract. <strong>Shatavari</strong>, belonging to the wild asparagus family, helps reduce pitta and vata but increases kapha. It is a rejuvenating tonic and supports female reproductive health.
           </p>
-          
+
           <p>
             Pitta types can benefit from teas like Pukka&apos;s Mint Refresh, which contains peppermint leaf, rose, coriander seed, hibiscus flower, fennel seed, and licorice—ingredients that soothe and calm pitta. Additionally, Pukka’s Womankind tea helps calm and cool pitta and can assist with inflammation and irritation.
           </p>
