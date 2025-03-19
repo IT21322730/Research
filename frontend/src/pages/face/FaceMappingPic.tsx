@@ -105,7 +105,7 @@ const FaceMappingPic: React.FC = () => {
       formData.append("image", blob, "face_image.png");
       formData.append("user_uid", user.uid);
 
-      const response = await fetch("https://192.168.1.114:5000/analyze-face-mapping", {
+      const response = await fetch("http://127.0.0.1:5000/analyze-face-mapping", {
         method: "POST",
         body: formData,
       });
