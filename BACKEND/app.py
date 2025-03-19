@@ -463,7 +463,6 @@ def process_nail_images():
 
 
 #Final Prakurthi Identification
-#Final Prakurthi Identification
 def determine_final_prakriti(individual_predictions):
     # Count occurrences of each full combination (e.g., "Kapha-Pitta", "Vata-Pitta")
     combination_counts = Counter(individual_predictions.values())
