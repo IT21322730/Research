@@ -132,7 +132,7 @@ const Patient: React.FC = () => {
     console.log("📤 Sending patient data:", JSON.stringify(patientData, null, 2));
   
     try {
-      const response = await fetch("https://192.168.1.114:5000/create/patient", {
+      const response = await fetch("http://127.0.0.1:5000/create/patient", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patientData),
@@ -155,7 +155,7 @@ const Patient: React.FC = () => {
     }
   
     try {
-      const apiUrl = `https://192.168.1.114:5000/delete/patient/${patientId}`;
+      const apiUrl = `http://127.0.0.1:5000/delete/patient/${patientId}`;
       const response = await fetch(apiUrl, { method: "DELETE" });
       const responseData = await response.json();
   
@@ -299,7 +299,7 @@ const Patient: React.FC = () => {
                       }
 
                       console.log("📝 Navigating to edit:", patient.id);
-                      history.push(`/app/edit-patient/${patient.id}`);
+                      history.push( `/app/edit-patient/${patient.id}`);
                     }}
                   >
                     Edit Details
