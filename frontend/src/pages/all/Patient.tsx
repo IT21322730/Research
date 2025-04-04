@@ -105,8 +105,9 @@ const Patient: React.FC = () => {
     }
   
     // Capture the latest value from the input
-  const latestAge = (document.getElementById("patient-age") as HTMLInputElement)?.value || "";
-  const numericAge = latestAge.trim() !== "" ? parseInt(latestAge, 10) : "N/A";
+    const latestAgeInput = document.getElementById("patient-age") as HTMLInputElement;
+    const latestAge = latestAgeInput?.value ?? "";
+    const numericAge = latestAge ? parseInt(latestAge, 10) : "N/A";    
 
   const latestPrakurthiType = prakurthiTypeRef.current.trim(); // Use ref instead of state
 
