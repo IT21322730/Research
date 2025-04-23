@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   IonPage,
   IonContent,
@@ -12,135 +12,141 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/Eyevideo.css';
-import { videocam, videocamOff, save, swapHorizontal } from 'ionicons/icons';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { videocam, videocamOff, save, swapHorizontal ,refreshCircle} from 'ionicons/icons';
+import axios, { AxiosError } from 'axios'; // Import AxiosError
+import { useHistory } from 'react-router-dom';
+import Reloader from '../all/Reloader'; // Import Reloader component
 
 const Eyevideo: React.FC = () => {
+  const [showAlert, setShowAlert] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // Track login state
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isPredictionInProgress, setIsPredictionInProgress] = useState<boolean>(false); // Track prediction state
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const history = useHistory();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
 
-  const db = getFirestore();
+  useEffect(() => {
+    // Check if the user is logged in (example: checking localStorage)
+    const userLoggedIn = localStorage.getItem('isLoggedIn'); // Adjust based on your app's logic
 
+    // If user is not logged in and page has not been reloaded yet, force a reload
+    if (!userLoggedIn && !localStorage.getItem('pageReloaded')) {
+      localStorage.setItem('pageReloaded', 'true'); // Set the flag to prevent infinite reloads
+      window.location.reload(); // Force page reload
+    } else {
+      setIsLoggedIn(true); // Set user as logged in
+    }
+  }, []);
+
+  // Start recording
   const handleStartRecording = async () => {
-    try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      mediaStreamRef.current = stream;
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch((error) => {
-            console.error('Error playing video:', error);
-          });
-        };
       }
 
-      chunksRef.current = [];
-      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
+      mediaRecorderRef.current = new MediaRecorder(stream);
       mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
+        chunksRef.current.push(event.data);
       };
 
       mediaRecorderRef.current.onstop = () => {
-        if (chunksRef.current.length > 0) {
-          const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-          const videoURL = URL.createObjectURL(videoBlob);
-          setRecordedVideoURL(videoURL);
-        }
+        const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+        const videoURL = URL.createObjectURL(blob);
+        setRecordedVideoURL(videoURL);
+        setIsRecording(false);
       };
 
       mediaRecorderRef.current.start();
-      let seconds = 0;
-      timerRef.current = setInterval(() => {
-        seconds += 1;
-        setRecordingTime(seconds);
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      const interval = setInterval(() => {
+        setRecordingTime((prevTime) => prevTime + 1);
       }, 1000);
 
-      setIsRecording(true);
-      setRecordedVideoURL(null);
-    } catch (error) {
-      console.error('Error accessing media devices or starting recording.', error);
-      alert('Unable to access your camera or start recording.');
+      setTimeout(() => {
+        clearInterval(interval);
+        handleStopRecording();
+      }, 30000);// 30 seconds
     }
   };
 
-  const handleStopRecording = async () => {
+  // Stop recording
+  const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
     }
-
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      mediaStreamRef.current = null;
-    }
-
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    setRecordingTime(0);
     setIsRecording(false);
-
-    if (chunksRef.current.length > 0) {
-      const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-      const videoFile = new File([videoBlob], 'video.webm', { type: 'video/webm' });
-
-      try {
-        setIsUploading(true);
-        const storage = getStorage();
-        const storageRef = ref(storage, `eyevideos/${Date.now()}_video.webm`);
-        await uploadBytes(storageRef, videoFile);
-
-        const videoURL = await getDownloadURL(storageRef);
-        setRecordedVideoURL(videoURL);
-        setIsUploading(false);
-      } catch (error) {
-        console.error('Error uploading video:', error);
-        setIsUploading(false);
-      }
-    } else {
-      console.warn('No recorded chunks available!');
-    }
   };
 
-  const handleSaveVideo = async () => {
-    if (recordedVideoURL) {
-      setShowAlert(true);
-    } else {
-      // No need to show any alert or message here
-    }
+  // Show confirmation alert
+  const handleSaveVideo = () => {
+    setShowAlert(true);
   };
 
+  // Upload video to backend and navigate
   const confirmSave = async () => {
+    setShowAlert(false); // Dismiss the alert immediately after clicking "Yes"
+
+    if (!recordedVideoURL) return;
+
+    setIsProcessing(true); // Show loading
+    setIsPredictionInProgress(true); // Show reloader during prediction
+    setLoading(true); // Set loading to true to show Reloader
+
     try {
-      await addDoc(collection(db, 'eyevideo'), {
-        videoUrl: recordedVideoURL,
-        timestamp: serverTimestamp(),
+      const formData = new FormData();
+      const videoBlob = await fetch(recordedVideoURL).then((res) => res.blob());
+      formData.append('video', videoBlob, 'video.webm');
+
+      const response = await axios.post('http://127.0.0.1:5000/analyze', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // No alert, just logging success
-      console.log('Video saved successfully!');
-    } catch (error) {
-      console.error('Error saving video:', error);
-      // Optionally log error or handle failure silently
+
+      // Handle successful response
+      if (response.data && response.data.document_id) {
+        const documentId = response.data.document_id;
+        console.log('Backend response received. documentId:', documentId);
+        history.push(`/app/blink-prediction/${documentId}`); // Navigate with document ID
+        
+      } else {
+        console.error('No document_id returned from the backend.');
+      }
+    } catch (error: unknown) {
+      // Type guard to check if it's an AxiosError
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Error uploading video:', error.response.data);
+        } else {
+          console.error('Error uploading video:', error.message);
+        }
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    } finally {
+      setLoading(false); // Hide reloader when loading is complete
+      setIsProcessing(false); // Hide loading spinner
+      setIsPredictionInProgress(false); // Hide reloader once prediction is done
     }
+  };
+
+  const cancelSave = () => {
+    setShowAlert(false); // Dismiss the alert if "No" is clicked
+  };
+
+  const toggleCamera = () => {
+    setUseFrontCamera((prev) => !prev);
   };
 
   return (
@@ -163,25 +169,96 @@ const Eyevideo: React.FC = () => {
           style={{ display: isRecording ? 'block' : 'none' }}
         />
 
-        {isRecording && (
-          <div className={`recording-time ${!isRecording && recordingTime > 0 ? 'stopped' : ''}`}>
-            Recording Time: {recordingTime}s
-          </div>
-        )}
+        {isRecording && <div className="recording-time">Recording Time: {recordingTime}s</div>}
 
         {recordedVideoURL && (
-          <div className="playback-container">
-            <video src={recordedVideoURL} controls className="video-playback" />
+          <div
+            className="playback-container"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "fixed", // Full-screen effect
+              top: 0,
+              left: 0,
+              width: "100%", // Full width
+              height: "89%", // Full height
+              background: "white", // Black background for better visibility
+              zIndex: 999, // Ensure it's on top
+            }}
+          >
+            <video
+              ref={playbackVideoRef}
+              src={recordedVideoURL}
+              className="video-playback"
+              style={{
+                width: "100%",
+                height: "89%",
+                objectFit: "cover", // Cover entire screen
+                borderRadius: "0", // Remove rounded corners for full-screen
+                transform: "scaleX(-1)",
+                cursor: "pointer",
+                position: "relative",
+                zIndex: "1",
+              }}
+              onClick={() => {
+                if (playbackVideoRef.current?.paused) {
+                  playbackVideoRef.current?.play();
+                  setIsPlaying(true);
+                } else {
+                  playbackVideoRef.current?.pause();
+                  setIsPlaying(false);
+                }
+              }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            />
+
+            {/* Play Button (Always Visible Until Playing) */}
+            {!isPlaying && (
+              <button
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(0, 0, 0, 0.6)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "60px",
+                  height: "60px",
+                  fontSize: "24px",
+                  color: "white",
+                  cursor: "pointer",
+                  zIndex: "1000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent video from playing instantly when clicking the button
+                  if (playbackVideoRef.current) {
+                    playbackVideoRef.current.play();
+                    setIsPlaying(true);
+                  }
+                }}
+              >
+                ▶️
+              </button>
+            )}
           </div>
         )}
-
-        {isUploading && <div className="loading-spinner">Uploading...</div>}
       </IonContent>
 
       <div className="tab-bar">
         <div className="tab-button">
-          <IonIcon icon={swapHorizontal} />
+        <div className="tab-button" onClick={() => window.location.reload()}>
+                    <IonIcon icon={refreshCircle} />
+                  </div>
         </div>
+        <div className="tab-button" onClick={toggleCamera}>
+                    <IonIcon icon={swapHorizontal} />
+                  </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
@@ -194,20 +271,22 @@ const Eyevideo: React.FC = () => {
         </div>
       </div>
 
+      {loading && <Reloader />} {/* Display Reloader when loading */}
+
       <IonAlert
         isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
+        onDidDismiss={() => setShowAlert(false)} // Ensures the alert closes when dismissed
         header="Save Video"
         message="Do you want to save this video?"
         buttons={[
           {
             text: 'No',
             role: 'cancel',
-            handler: () => console.log('Video not saved'),
+            handler: cancelSave, // Close alert if "No"
           },
           {
             text: 'Yes',
-            handler: confirmSave,
+            handler: confirmSave, // Start the save process when "Yes"
           },
         ]}
       />
@@ -215,4 +294,4 @@ const Eyevideo: React.FC = () => {
   );
 };
 
-export default Eyevideo;
+export default Eyevideo; // Ensure this is the last line in the file

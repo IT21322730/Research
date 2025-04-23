@@ -1,15 +1,18 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonBackButton, IonButtons} from '@ionic/react';
 import '../css/VataPitta.css';
 
 const VataPitta: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar style={{ backgroundColor: '#48D1CC' }}>
-          <IonTitle>Vata - Pitta Dosha</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonBackButton defaultHref="/app/final" />
+                </IonButtons>
+                <IonTitle>RECOMANDATION</IonTitle>
+              </IonToolbar>
+            </IonHeader>
       <IonContent>
         <div className="Vata-Pitta-container">
           <h1>What Does Vata-Pitta Mean?</h1>
