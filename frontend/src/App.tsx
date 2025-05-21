@@ -48,6 +48,7 @@ import HairAlopeciaResults from './pages/hair/HairAlopheciaResults';
 //IT21324024
 import NailVideo from './pages/nail/NailVedio'
 import NailPic from './pages/nail/NailPic';
+import Camera from './pages/eye/camera';
 
 
 setupIonicReact();
@@ -58,6 +59,7 @@ const App: React.FC = () => (
       <IonRouterOutlet>
         <Route exact path="/" component={FirstLook} />
         <Route path="/app" component={Tabs} />
+ 
         <Route path="/login" component={LoginHome} />
         <Route path="/register" component={Signup} />
         <Route path="/forgot-password" component={ForgotPassword} exact={true} />
@@ -71,6 +73,7 @@ const App: React.FC = () => (
         {/* IT21319488 */}
         <Route path="/app/eye-pic" component={EyePic} exact={true} />
         <Route path="/app/eye-video" component={Eyevideo} exact={true} />
+        <Route path="/app/camera" component={Camera} exact={true} />
 
         {/* IT21319938 */}
         <Route path="/app/hair-pic" component={HairPic} exact={true} />
