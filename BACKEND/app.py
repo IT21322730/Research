@@ -24,8 +24,14 @@ from skimage import feature
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:8100"]}})
+
+CORS(app)  # This will allow all domains, you can specify specific domains if needed.
+
+# Define a route for testing
+@app.route('/')
+def home():
+    return {"message": "Hello, Flask is running!"}
+
 
 #IT21319488
 UPLOAD_FOLDER = 'uploads'
@@ -217,7 +223,16 @@ def process_firebase_image():
 
         #Create a reference to the 'eye' collection and create a new document
         doc_ref = db.collection('eye').document()  # Automatically creates a new document
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Define your local timezone (e.g., 'Asia/Colombo' for Sri Lanka)
+        local_tz = pytz.timezone('Asia/Colombo')
+
+        # Get the current UTC time and convert it to local time
+        utc_now = datetime.utcnow()
+        local_time = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+
+        # Format the timestamp
+        timestamp = local_time.strftime('%Y-%m-%d %H:%M:%S')
 
         doc_ref.set({
             "uuid": user_uid,  # User's Firebase Authentication UID
@@ -455,41 +470,36 @@ def process_nail_images():
 
 #Final Prakurthi Identification
 def determine_final_prakriti(individual_predictions):
-    # Count occurrences of each full combination
+    # Count occurrences of each full combination (e.g., "Kapha-Pitta", "Vata-Pitta")
     combination_counts = Counter(individual_predictions.values())
 
     # Get the most common combination(s)
     most_common = combination_counts.most_common()
     
-    # If there's a single most frequent combination, return it
-    if len(most_common) == 1 or most_common[0][1] > most_common[1][1]:
-        return most_common[0][0]  # Return the most frequent Prakriti combination
-    
-    # If there is a tie, apply the tie-breaking logic
-    scores = {"Vata": 0, "Pitta": 0, "Kapha": 0}
-    
-    # Count occurrences of each dosha within tied components
-    for prakriti in combination_counts.keys():
-        for dosha in prakriti.split("-"):  # Split if it's a combination like "Vata-Pitta"
-            scores[dosha] += combination_counts[prakriti]
+    # Check if there is a tie
+    if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
+        # If there’s a tie, apply the mental & behavioral questionnaire tie-breaking
+        return "Tie - Need Questionnaire Analysis"
 
-    # Now use the logic from determine_prakriti to resolve the tie
-    return determine_prakriti(scores)
+    # If no tie, return the most frequent Prakriti combination
+    return most_common[0][0]
 
-# Logic to break the tie properly
+# Properly handle tie-breaking based on dominant dosha
 def determine_prakriti(scores):
-    # If all three scores are equal, return Tri-doshic
-    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
-        return "Tri-doshic (Vata-Pitta-Kapha)"
-    
-    # Sort scores by value in descending order
+    print("Dosha Scores:", scores)  # Debugging Print
+
+    # Sort doshas by their count in descending order
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
-    # If the top two scores are equal, return them as a tie (sorted order)
+    # If the top two doshas have equal occurrences, return them in sorted order
     if sorted_scores[0][1] == sorted_scores[1][1]:
         return "-".join(sorted([sorted_scores[0][0], sorted_scores[1][0]]))
     
-    # Return the single dominant Prakriti
+    # If all three are equal, return Tri-doshic
+    if scores["Vata"] == scores["Pitta"] == scores["Kapha"]:
+        return "Tri-doshic (Vata-Pitta-Kapha)"
+
+    # Otherwise, return the single dominant dosha
     return sorted_scores[0][0]
 
 
@@ -537,7 +547,7 @@ def get_final_prakriti():
 
         final_prakriti = determine_final_prakriti(predictions)
 
-        if final_prakriti == "Tie":
+        if final_prakriti == "Tie - Need Questionnaire Analysis":
             # Fetch questionnaire result before returning tie response
             questionnaire_doc = db.collection("questionnaire").document(user_uid).get()
             
@@ -1915,5 +1925,6 @@ def analyze_light():
 
     
     
-if __name__ == '__main__':
-    app.run(debug=True)
+# Run the Flask app
+if __name__ == "__main__":
+    app.run(ssl_context=('D:/Git_New/Research/frontend/192.168.1.100.pem', 'D:/Git_New/Research/frontend/192.168.1.100-key.pem'), host="0.0.0.0", port=5000)
