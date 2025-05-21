@@ -1,9 +1,15 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'com.example.app',
   appName: 'frontend',
-  webDir: 'dist'
+  webDir: 'dist',
+  bundledWebRuntime: false,
+  plugins: {
+    Keyboard: {
+      // No resize configuration, as it's not implemented on Android
+    },
+  },
 };
 
 export default config;
