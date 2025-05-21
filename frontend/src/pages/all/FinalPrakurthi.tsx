@@ -41,7 +41,7 @@ const FinalPrakurthi: React.FC = () => {
 
     const fetchFinalPrakurthi = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`);
+        const response = await fetch(`https://192.168.1.100:5000/get-final-prakriti?user_uid=${userUid}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch Final Prakurthi");
@@ -76,19 +76,19 @@ const FinalPrakurthi: React.FC = () => {
         path = "/app/vata-pitta-body";
         break;
       case "Pitta-Vata":
-        path = "/app/vata-pitta-body";
+        path = "/app/pitta-vata-body";
         break;
       case "Pitta-Kapha":
           path = "/app/pitta-kapha-body";
           break;
       case "Kapha-Pitta":
-          path = "/app/pitta-kapha-body";
+          path = "/app/kapha-pitta-body";
           break;
       case "Vata-Kapha":
           path = "/app/vata-kapha-body";
           break;
       case "Kapha-Vata":
-          path = "/app/vata-kapha-body";
+          path = "/app/kapha-vata-body";
           break;
       case "Vata-Pitta-Kapha":
           path = "/app/vata-pitta-kapha-body";

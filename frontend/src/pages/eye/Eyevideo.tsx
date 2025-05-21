@@ -110,7 +110,7 @@ const Eyevideo: React.FC = () => {
       const videoBlob = await fetch(recordedVideoURL).then((res) => res.blob());
       formData.append('video', videoBlob, 'video.webm');
 
-      const response = await axios.post('http://127.0.0.1:5000/analyze', formData, {
+      const response = await axios.post('https://192.168.1.100:5000/analyze', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

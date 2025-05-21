@@ -20,7 +20,7 @@ const VataPitta: React.FC = () => {
       </IonHeader>
       <IonContent>
         <div className="Vata-Pitta-container">
-          <h1>What Does Vata-Pitta Mean?</h1>
+          <h1>What Does Pitta-Vata Mean?</h1>
           <p>
             Vata, Pitta, and Kapha regulate our physical, mental, and emotional constitution.
             The Vata-Pitta type combines the ambitious fire of Pitta with the light and restless qualities of Vata.

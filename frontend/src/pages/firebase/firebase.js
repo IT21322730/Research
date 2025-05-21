@@ -5,7 +5,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, addDoc, onSnapshot,deleteDoc,doc,  getDoc, query,updateDoc, getDocs,where } from "firebase/firestore";
 import {Timestamp, FieldValue } from "firebase/firestore"; // <-- Added FieldValue
-import { getStorage,ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage,ref, uploadBytes, getDownloadURL ,uploadString} from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcRlNcadKaM2o45tj5Tc0bGFXSDU_BoPc",
@@ -25,7 +25,7 @@ export const db = getFirestore(app);// Firestore Database
 export const storage = getStorage(app);// Firebase Storage
 
 // Export Firestore utilities
-export { ref, uploadBytes, getDownloadURL,collection, addDoc,onSnapshot, deleteDoc,doc,getDoc, query,updateDoc,getDocs,where};
+export { ref, uploadBytes, getDownloadURL,collection, addDoc,onSnapshot, deleteDoc,doc,getDoc, query,updateDoc,getDocs,where,uploadString};
 
 // Export FieldValue for usage in Firestore operations - eye video
 export { FieldValue, Timestamp };

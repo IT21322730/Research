@@ -12,9 +12,12 @@ import Vata from './Vata';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
 import VataPitta from './VataPitta';
+import PittaVata from './PittaVata'
 import PittaKapha from './PittaKapha';
 import VataKapaha from './VataKapaha';
 import VataPittaKapha from './VataPittaKapha'
+import KaphaPitta from './KaphaPitta'
+import KapahaVata from './KaphaVata'
 import EditPatient from '../all/EditPatient';
 import Patient from '../all/Patient'
 import Question from '../all/Question';
@@ -46,6 +49,7 @@ import NailPredictionPage from '../nail/NailPredictionpage';
 import NailCap from '../nail/NailCap';
 import CRTprediction from '../nail/CRTPrediction';
 
+import ErrorBoundary  from '../all/ErrorBoundary';
 
 const Tabs: React.FC = () => {
 
@@ -67,6 +71,12 @@ const Tabs: React.FC = () => {
     window.location.reload();
   };
 
+  const ErrorFallback = ({ error }: { error: Error }) => (
+    <div role="alert">
+      <p>Something went wrong: {error.message}</p>
+    </div>
+  );
+
   return (
     <IonPage>
       <IonTabs>
@@ -83,9 +93,16 @@ const Tabs: React.FC = () => {
           <Route path="/app/vata-body" component={Vata} />
           <Route path="/app/pitta-body" component={Pitta} />
           <Route path="/app/kapha-body" component={Kapha} />
+
           <Route path="/app/vata-pitta-body" component={VataPitta} />
-          <Route path="/app/pitta-kapha-body" component={PittaKapha} />
+          <Route path="/app/pitta-vata-body" component={PittaVata} />
+
+          <Route path="/app/kapha-pitta-body" component={KaphaPitta} />
+          <Route path="/app/kapha-kapha-body" component={PittaKapha} />
+
           <Route path="/app/vata-kapha-body" component={VataKapaha} />
+          <Route path="/app/kapha-vata-body" component={KapahaVata} />
+
           <Route path="/app/vata-pitta-kapha-body" component={VataPittaKapha} />
 
           {/* IT21322730 */}
@@ -115,13 +132,12 @@ const Tabs: React.FC = () => {
           <Route path="/app/cap" component={NailCap} exact={true} />
           <Route path="/app/crt-prediction" component={CRTprediction} exact={true} />
 
-
-
-
-
-          <Route exact path="/app">
-            <Redirect to="/app/home" />
-          </Route>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Route exact path="/app">
+          <Redirect to="/app/home" />
+  
+        </Route>
+        </ErrorBoundary>
         </IonRouterOutlet>
 
         <IonTabBar slot='bottom'>

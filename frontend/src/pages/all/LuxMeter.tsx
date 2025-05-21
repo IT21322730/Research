@@ -93,7 +93,7 @@ const LuxMeter: React.FC<LuxMeterProps> = ({ onLuxChange }) => {
   };
 
   const sendLuxToBackend = (luxValue: number) => {
-    fetch("http://127.0.0.1:5000/analyze-light", {
+    fetch("https://192.168.1.100:5000/analyze-light", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ lux: luxValue }),

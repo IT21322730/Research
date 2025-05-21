@@ -19,8 +19,8 @@ const VataKapaha: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <div className="Vata-Kapaha-container">
-          <h2>Character of the Vata-Kapha Type</h2>
+        <div className="Kapaha-Vata-container">
+          <h2>Character of the Kapaha-Vata Type</h2>
           <p>
             The Vata-Kapha Ayurveda type is an interesting combination of the Vata and Kapha doshas. It can be compared to a racecar driver pressing both the gas and the brake pedals at the same time. The creative Vata Dosha is always in the fast lane of life, while the Kapha type is grounded and averse to change. This creates internal conflict, which often leads to frustration for the Vata-Kapha person.
           </p>

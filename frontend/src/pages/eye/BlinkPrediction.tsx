@@ -37,7 +37,7 @@ const BlinkPrediction: React.FC = () => {
     const fetchPrediction = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://127.0.0.1:5000/analyze/${docId}`);
+        const response = await fetch(`https://192.168.1.100:5000/analyze/${docId}`);
         const data = await response.json();
 
         if (response.ok) {

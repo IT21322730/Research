@@ -1,16 +1,21 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons,IonBackButton} from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/react';
 import '../css/Vata.css';
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const Vata: React.FC = () => {
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/final" />
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon icon={arrowBack} />
+            </IonButton>
           </IonButtons>
-          <IonTitle>RECOMANDATION</IonTitle>
+          <IonTitle>RECOMMENDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

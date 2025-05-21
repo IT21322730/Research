@@ -72,7 +72,7 @@ const Step: React.FC = () => {
     
         try {
             // Fetch Final Prakriti
-            const response = await fetch(`http://127.0.0.1:5000/get-final-prakriti?user_uid=${userUid}`);
+            const response = await fetch(`https://192.168.1.100:5000/get-final-prakriti?user_uid=${userUid}`);
     
             if (!response.ok) {
                 throw new Error("Failed to fetch final Prakriti.");

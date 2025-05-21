@@ -45,7 +45,7 @@ const Question: React.FC = () => {
     }
   
     try {
-      const response = await fetch("http://localhost:5000/submit-questionnaire", {
+      const response = await fetch("https://192.168.1.100:5000/submit-questionnaire", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

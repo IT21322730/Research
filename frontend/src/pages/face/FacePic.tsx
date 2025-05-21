@@ -41,7 +41,8 @@ const FacePic: React.FC = () => {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: useFrontCamera ? "user" : "environment" },
+          video: { facingMode: { exact: useFrontCamera ? "user" : "environment" } }
+
         });
 
         if (videoRef.current) {
@@ -136,7 +137,7 @@ const FacePic: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/process-face-images", {
+      const response = await fetch("https://192.168.1.100:5000/process-face-images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),

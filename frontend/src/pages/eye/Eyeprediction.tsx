@@ -26,7 +26,7 @@ const PredictionPage: React.FC = () => {
     const fetchPrediction = async () => {
       try {
         setLoading(true); // Start loading before making the API request
-        const response = await fetch(`http://127.0.0.1:5000/process-firebase-image/${docId}`);
+        const response = await fetch(`https://192.168.1.100:5000/process-firebase-image/${docId}`);
         const data = await response.json();
 
         if (response.ok) {

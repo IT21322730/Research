@@ -20,7 +20,7 @@ const PittaKapha: React.FC = () => {
       </IonHeader>
       <IonContent>
         <div className="Pitta-Kapha-container">
-          <h2>What Does Pitta-Kapha Mean?</h2>
+          <h2>What Does Kapha-Pitta Mean?</h2>
           <p>
             The Pitta-Kapha type combines the fiery and competitive Pitta with the calm, grounded nature of Kapha. 
             Pitta desires to prove itself, while Kapha enjoys stability and relaxation. Depending on which dosha is more pronounced, 
