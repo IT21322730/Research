@@ -160,11 +160,11 @@ const FaceMappingPic: React.FC = () => {
           type="file"
           accept="image/*"
           ref={fileInputRef}
-          // style={{ width: "590px", height: "590px", objectFit: "contain", objectPosition: "center"}}
+          style={{ display: "none" }}
           onChange={handleGalleryImage}
         />
 
-  
+
 
         <div className="tab-bar">
           <div className="tab-button" onClick={() => window.location.reload()}>

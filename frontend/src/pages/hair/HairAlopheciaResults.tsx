@@ -1,193 +1,286 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  IonPage,
+  IonContent,
   IonHeader,
+  IonPage,
+  IonTitle,
   IonToolbar,
+  IonIcon,
+  IonImg,
   IonButtons,
   IonBackButton,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
+  IonButton,
+  IonAlert,
+  IonSegment,
+  IonSegmentButton,
   IonLabel,
-  IonItem,
-  IonList,
 } from "@ionic/react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { camera, save, swapHorizontal, warning, images } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import "../css/Hairalophecia.css";
+import LuxMeter from "../all/LuxMeter";
 
-interface LocationState {
-  final_diagnosis?: string;
-  hair_texture?: string;
-  solution?: string;
-  texture_solution?: string;
-  illness_percentages?: { [key: string]: number };
-}
+const HairAlopheciaPic: React.FC = () => {
+  const history = useHistory();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-const COLORS = ["#a569bd", "#4CAF50", "#1E90FF", "#FFD700", "#34495e", "#FF4500"];
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [capturedViews, setCapturedViews] = useState<{ [view: string]: string }>({});
+  const [currentView, setCurrentView] = useState<string>("Front View");
+  const [missingViews, setMissingViews] = useState<string[]>([
+    "Front View",
+    "Back View",
+    "Scalp View",
+    "Top of the Head View",
+  ]);
+  const [lux, setLux] = useState<number | null>(null);
 
-const HairAlopeciaResults: React.FC = () => {
-  const location = useLocation<LocationState>();
+  useEffect(() => {
+    const startCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: useFrontCamera ? "user" : "environment" },
+        });
 
-  const finalDiagnosis = location.state?.final_diagnosis ?? "No diagnosis found.";
-  const hairTexture = location.state?.hair_texture ?? "No texture found.";
-  const solution = location.state?.solution ?? "Solution not available.";
-  const texture_solution = location.state?.texture_solution ?? "Texture Solution not available.";
-  const illnessPercentages = location.state?.illness_percentages ?? {};
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
+      } catch (error) {
+        console.error("Error accessing the camera: ", error);
+      }
+    };
 
-  const chartData = Object.entries(illnessPercentages).map(([name, value]) => ({
-    name: name.trim(),
-    value: Number(value) || 0,
-  }));
+    startCamera();
+
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [useFrontCamera, currentView]);
+
+  const takePicture = () => {
+    const video = videoRef.current;
+    if (video) {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const context = canvas.getContext("2d");
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(-1, 0, 0, 1, canvas.width, 0); // mirror
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+
+        const dataUrl = canvas.toDataURL("image/png");
+        setPhoto(dataUrl);
+
+        console.log("Captured Lux Value:", lux);
+
+        setCapturedViews((prev) => {
+          const updated = { ...prev, [currentView]: dataUrl };
+          validateCapturedViews(updated);
+          return updated;
+        });
+      }
+    }
+  };
+
+  const validateCapturedViews = (views: { [view: string]: string }) => {
+    const required = ["Front View", "Back View", "Scalp View", "Top of the Head View"];
+    const missing = required.filter((view) => !views[view]);
+    setMissingViews(missing);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length !== 4) {
+      alert("Please select exactly 4 images.");
+      return;
+    }
+
+    const views = ["Front View", "Back View", "Scalp View", "Top of the Head View"];
+    const fileReaders: Promise<string>[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      fileReaders.push(
+        new Promise((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        })
+      );
+    }
+
+    Promise.all(fileReaders).then((images) => {
+      const newCaptured: { [key: string]: string } = {};
+      for (let i = 0; i < images.length; i++) {
+        newCaptured[views[i]] = images[i];
+      }
+      setCapturedViews(newCaptured);
+      setPhoto(newCaptured[currentView] || images[0]);
+      validateCapturedViews(newCaptured);
+    });
+  };
+
+  const handleSaveToBackend = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("No authenticated user found.");
+      return;
+    }
+
+    const capturedImages = Object.values(capturedViews);
+    if (capturedImages.length !== 4) {
+      console.error("Exactly 4 images must be provided.");
+      return;
+    }
+
+    const requestData = {
+      user_uid: user.uid,
+      patient_uid: "patient456", // adjust as needed
+      image_data: capturedImages.map((img) => img.split(",")[1]),
+    };
+
+    try {
+      const res = await fetch("http://127.0.0.1:5000//novelty-function", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Error ${res.status}: ${errText}`);
+      }
+
+      const data = await res.json();
+      console.log("Server response:", data);
+
+      history.push({
+        pathname: "/app/hair-alohecia-results",
+        state: {
+          final_diagnosis: data.final_diagnosis,
+          hair_texture: data.hair_texture,
+          solution: data.solution,
+          texture_solution: data.texture_solution,
+          illness_percentages: data.illness_percentages,
+        },
+      });
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (capturedViews[currentView]) {
+      setPhoto(capturedViews[currentView]);
+    } else {
+      setPhoto(null);
+    }
+  }, [currentView, capturedViews]);
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar style={{ backgroundColor: "#48D1CC" }}>
+        <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/step" />
+            <IonBackButton defaultHref="/app/alophecia" />
           </IonButtons>
-          <IonTitle>HAIR DIAGNOSIS RESULTS</IonTitle>
+          <IonTitle>Take the Picture</IonTitle>
         </IonToolbar>
       </IonHeader>
+      <IonContent>
+        <LuxMeter onLuxChange={setLux} />
 
-      <IonContent fullscreen>
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "20px",
-            backgroundColor: "white",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            maxWidth: "500px",
-            margin: "20px auto",
-            textAlign: "center",
+        {!photo ? (
+          <video ref={videoRef} id="video" autoPlay playsInline />
+        ) : (
+          <IonImg
+            src={photo}
+            alt="Captured"
+            className="captured-photo"
+            style={{ width: "100%", height: "480px", marginBottom: "10px" }}
+          />
+        )}
+
+        <IonSegment
+          value={currentView}
+          onIonChange={(e) => {
+            const value = e.detail.value;
+            if (typeof value === 'string') {
+              setCurrentView(value);
+            }
           }}
         >
-          <IonList>
-            <IonItem lines="none">
-              <IonLabel style={{ textAlign: "center", display: "block", marginTop: "0px" }}>
-                <h3 style={{ fontSize: "1.5rem", fontWeight: "bold", color: "turquoise", margin: "0" }}>
-                  Alopecia and Texture Analysis is Successful!!!
-                </h3>
-              </IonLabel>
-            </IonItem>
-            <IonItem lines="none">
-              <IonLabel>
-                <ul style={{ paddingLeft: "15px", margin: "5px 0" }}>
-                  <li style={{ textAlign: "left" }}>
-                    <strong>Final Diagnosis:</strong> {finalDiagnosis}
-                  </li>
-                </ul>
-              </IonLabel>
-            </IonItem>
-          </IonList>
+          <IonSegmentButton value="Front View"><IonLabel>Front</IonLabel></IonSegmentButton>
+          <IonSegmentButton value="Back View"><IonLabel>Back</IonLabel></IonSegmentButton>
+          <IonSegmentButton value="Scalp View"><IonLabel>Scalp</IonLabel></IonSegmentButton>
+          <IonSegmentButton value="Top of the Head View"><IonLabel>Top</IonLabel></IonSegmentButton>
+        </IonSegment>
 
-          <IonCard style={{ backgroundColor: "white", border: "1px solid blue" }}>
-            {chartData.length > 0 ? (
-              <div style={{ width: "100%", height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={chartData} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" dataKey="value">
-                      {chartData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-
-                    <Tooltip
-                      content={(props: { active?: boolean; payload?: any[] }) => {
-                        const { active, payload } = props;
-                        if (active && payload && payload.length) {
-                          return (
-                            <div
-                              style={{
-                                backgroundColor: "#fff",
-                                border: "1px solid #ddd",
-                                borderRadius: "5px",
-                                padding: "5px",
-                                boxShadow: "0px 2px 5px rgba(0,0,0,0.2)",
-                              }}
-                            >
-                              <p style={{ margin: 0, fontWeight: "bold" }}>
-                                {payload[0].name}: {payload[0].value}%
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-
-                    <Legend align="center" />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <p style={{ textAlign: "center", marginTop: "20px", fontSize: "16px", color: "#555" }}>
-                No data available for illness percentages.
-              </p>
-            )}
-          </IonCard>
-
-          <IonCard style={{ backgroundColor: "#FDFD66" }}>
-            <IonCardHeader>
-              <IonCardTitle>
-                <strong>Recommendations For Alopecia Diagnosis</strong>
-              </IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonLabel>
-                <ul style={{ paddingLeft: "20px", textAlign: "left" }}>
-                  {solution.split(".").map(
-                    (item, index) =>
-                      item.trim() && (
-                        <li key={index} style={{ textAlign: "justify" }}>
-                          {item.trim()}.
-                        </li>
-                      )
-                  )}
-                </ul>
-              </IonLabel>
-            </IonCardContent>
-          </IonCard>
-
-          <IonItem lines="none">
-            <IonLabel>
-              <ul style={{ paddingLeft: "15px", margin: "5px 0" }}>
-                <li style={{ textAlign: "left" }}>
-                  <strong>Hair Texture:</strong> {hairTexture}
-                </li>
-              </ul>
-            </IonLabel>
-          </IonItem>
-
-          <IonCard style={{ backgroundColor: "#94FFD4" }}>
-            <IonCardHeader>
-              <IonCardTitle>
-                <strong>Recommendations For Texture</strong>
-              </IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonLabel>
-                <ul style={{ paddingLeft: "20px", textAlign: "left" }}>
-                  {texture_solution.split(".").map(
-                    (item, index) =>
-                      item.trim() && (
-                        <li key={index} style={{ textAlign: "justify" }}>
-                          {item.trim()}.
-                        </li>
-                      )
-                  )}
-                </ul>
-              </IonLabel>
-            </IonCardContent>
-          </IonCard>
+        <div className="tab-bar">
+          <div className="tab-button" onClick={() => setUseFrontCamera(!useFrontCamera)}>
+            <IonIcon icon={swapHorizontal} />
+          </div>
+          <div className="tab-button" onClick={takePicture}>
+            <IonIcon icon={camera} />
+          </div>
+          <div className="tab-button">
+            <IonButton
+              onClick={() => fileInputRef.current?.click()}
+              style={{ background: "none", border: "none", padding: 0 }}
+            >
+              <IonIcon icon={images} />
+            </IonButton>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              multiple
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+          </div>
+          <div className="tab-button">
+            <IonButton
+              onClick={() => setShowSaveAlert(true)}
+              disabled={missingViews.length > 0}
+            >
+              <IonIcon icon={save} />
+            </IonButton>
+          </div>
         </div>
+
+        {missingViews.length > 0 && (
+          <p className="missing-warning">
+            <IonIcon icon={warning} /> Please capture: {missingViews.join(", ")}
+          </p>
+        )}
+
+        <IonAlert
+          isOpen={showSaveAlert}
+          onDidDismiss={() => setShowSaveAlert(false)}
+          header={"Save Images"}
+          message={"Are you sure you want to save the captured images?"}
+          buttons={[
+            { text: "No", role: "cancel" },
+            { text: "Yes", handler: handleSaveToBackend },
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
 };
 
-export default HairAlopeciaResults;
+export default HairAlopheciaPic;
