@@ -1,21 +1,26 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonBackButton ,IonButtons} from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/react';
 import '../css/VataPittaKapha.css';
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const VataPittaKapha: React.FC = () => {
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
   return (
     <IonPage>
       <IonHeader>
-              <IonToolbar>
-                <IonButtons slot="start">
-                  <IonBackButton defaultHref="/app/final" />
-                </IonButtons>
-                <IonTitle>RECOMANDATION</IonTitle>
-              </IonToolbar>
-            </IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>RECOMMENDATION</IonTitle>
+        </IonToolbar>
+      </IonHeader>
       <IonContent>
         <div className="Vata-Pitta-Kapaha-container">
-        <h2>What Does Vata-Pitta-Kapha Mean?</h2>
+          <h2>What Does Vata-Pitta-Kapha Mean?</h2>
           <p>
             The individual constitution of a person is derived from the relationship of the three Doshas: Vata, Pitta, and Kapha. Because this innate constitutional type predetermines how we are doing physically, mentally, and emotionally, it is of the utmost importance in Ayurveda medicine.
           </p>
@@ -112,125 +117,125 @@ const VataPittaKapha: React.FC = () => {
 
           <div className="yoga-poses-grid">
 
-          <div>
-            <h3>Uttanasana</h3>
-            <img
-              src="https://cdn.yogajournal.com/wp-content/uploads/2021/11/Uttanasana-Pose_Andrew-Clark_2400x1350.jpeg"
-              alt="Uttanasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
+            <div>
+              <h3>Uttanasana</h3>
+              <img
+                src="https://cdn.yogajournal.com/wp-content/uploads/2021/11/Uttanasana-Pose_Andrew-Clark_2400x1350.jpeg"
+                alt="Uttanasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Balasana</h3>
+              <img
+                src="https://www.theyogacollective.com/wp-content/uploads/2019/10/4143473057707883372_IMG_8546-2-1200x800.jpg"
+                alt="Balasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Paschimottanasana</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7YG2QvgeH7DgghmuyK2k0McIH76hlneEaZg&s"
+                alt="Paschimottanasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Supta Virasana</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHx6ZIOPxn3d95bShwsg3CAGVGlNYg7bPeKXNgEdjaggOJr1dIzmxvTKZ8X__vj9Y1UUo&usqp=CAU"
+                alt="Supta Virasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Dhanurasana</h3>
+              <img
+                src="https://www.theyogacollective.com/wp-content/uploads/2019/10/AdobeStock_193776647-1-1200x800.jpeg"
+                alt="Dhanurasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Suryanamaskar</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0fC-X8CC5UWVzUtlPZbgN1aQrStKvMbK00Q&s"
+                alt="Suryanamaskar"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Trikonasana</h3>
+              <img
+                src="https://cdn.yogajournal.com/wp-content/uploads/2021/10/Revolved-Triangle-Pose_Andrew-Clark.jpg"
+                alt="Trikonasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Bhujangasana</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC7IBwWojlhzr5FXxvY9hcYNDZrRa6o226lw&s"
+                alt="Bhujangasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Chandra Namaskar</h3>
+              <img
+                src="https://assets.zeezest.com/images/PROD_anjali_yoga_chandranamaskar_step_by_step_1624019713428.jpg"
+                alt="Chandra Namaskar"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Sheetali Pranayama</h3>
+              <img
+                src="https://static.vikaspedia.in/mediastorage/image/Sheetali_Pranayama.png"
+                alt="Sheetali Pranayama"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Bandhasana</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRezl_lsMggYrdrz-Vq-fi5mSnBLFiSIrKR6A&s"
+                alt="Bandhasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Adho Mukha Svanasana</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4dfp2r7_AlClYG83KewMFwLtXDOxW_g2ZIg&s"
+                alt="Adho Mukha Svanasana"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
+            <div>
+              <h3>Pranayama</h3>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRJ6od-u98Yi1rvnFa-7LMACElE7ZEVLGKvQ&s"
+                alt="Pranayama"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+
           </div>
 
-          <div>
-            <h3>Balasana</h3>
-            <img
-              src="https://www.theyogacollective.com/wp-content/uploads/2019/10/4143473057707883372_IMG_8546-2-1200x800.jpg"
-              alt="Balasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Paschimottanasana</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7YG2QvgeH7DgghmuyK2k0McIH76hlneEaZg&s"
-              alt="Paschimottanasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Supta Virasana</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHx6ZIOPxn3d95bShwsg3CAGVGlNYg7bPeKXNgEdjaggOJr1dIzmxvTKZ8X__vj9Y1UUo&usqp=CAU"
-              alt="Supta Virasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Dhanurasana</h3>
-            <img
-              src="https://www.theyogacollective.com/wp-content/uploads/2019/10/AdobeStock_193776647-1-1200x800.jpeg"
-              alt="Dhanurasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Suryanamaskar</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0fC-X8CC5UWVzUtlPZbgN1aQrStKvMbK00Q&s"
-              alt="Suryanamaskar"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Trikonasana</h3>
-            <img
-              src="https://cdn.yogajournal.com/wp-content/uploads/2021/10/Revolved-Triangle-Pose_Andrew-Clark.jpg"
-              alt="Trikonasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Bhujangasana</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC7IBwWojlhzr5FXxvY9hcYNDZrRa6o226lw&s"
-              alt="Bhujangasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Chandra Namaskar</h3>
-            <img
-              src="https://assets.zeezest.com/images/PROD_anjali_yoga_chandranamaskar_step_by_step_1624019713428.jpg"
-              alt="Chandra Namaskar"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Sheetali Pranayama</h3>
-            <img
-              src="https://static.vikaspedia.in/mediastorage/image/Sheetali_Pranayama.png"
-              alt="Sheetali Pranayama"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Bandhasana</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRezl_lsMggYrdrz-Vq-fi5mSnBLFiSIrKR6A&s"
-              alt="Bandhasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Adho Mukha Svanasana</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4dfp2r7_AlClYG83KewMFwLtXDOxW_g2ZIg&s"
-              alt="Adho Mukha Svanasana"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          <div>
-            <h3>Pranayama</h3>
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRJ6od-u98Yi1rvnFa-7LMACElE7ZEVLGKvQ&s"
-              alt="Pranayama"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-
-          </div>
-          
 
         </div>
 

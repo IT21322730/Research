@@ -1,18 +1,23 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonBackButton, IonButtons} from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/react';
 import '../css/VataPitta.css';
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const VataPitta: React.FC = () => {
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
   return (
     <IonPage>
       <IonHeader>
-              <IonToolbar>
-                <IonButtons slot="start">
-                  <IonBackButton defaultHref="/app/final" />
-                </IonButtons>
-                <IonTitle>RECOMANDATION</IonTitle>
-              </IonToolbar>
-            </IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>RECOMMENDATION</IonTitle>
+        </IonToolbar>
+      </IonHeader>
       <IonContent>
         <div className="Vata-Pitta-container">
           <h1>What Does Vata-Pitta Mean?</h1>
@@ -23,7 +28,7 @@ const VataPitta: React.FC = () => {
 
           <h2>The Best Diet for Vata-Pitta Types</h2>
           <p>
-            Vata-Pitta types should balance both Doshas by prioritizing the more pronounced one. 
+            Vata-Pitta types should balance both Doshas by prioritizing the more pronounced one.
             Seasonal adjustments are also key: pacify Pitta from June to September and Vata from October to January.
           </p>
 
@@ -200,7 +205,7 @@ const VataPitta: React.FC = () => {
                 alt="Yogi Mudra"
               />
             </div>
-        </div>
+          </div>
         </div>
 
       </IonContent>

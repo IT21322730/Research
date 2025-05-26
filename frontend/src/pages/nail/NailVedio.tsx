@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/NailVedio.css';
-import { videocam, videocamOff, save, swapHorizontal,refreshCircle } from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal, refreshCircle } from 'ionicons/icons';
 import { getFirestore } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
 import { IonToast } from '@ionic/react';
@@ -29,6 +29,8 @@ const NailVideo: React.FC = () => {
   const [showPressToast, setShowPressToast] = useState(false);
   const [showReleaseToast, setShowReleaseToast] = useState(false);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -256,7 +258,7 @@ const NailVideo: React.FC = () => {
                   }
                 }}
               >
-                ▶
+                ▶️
               </button>
             )}
           </div>
@@ -265,12 +267,12 @@ const NailVideo: React.FC = () => {
         {errorMessage && <div className="error-message">{errorMessage}</div>}
       </IonContent>
       <div className="tab-bar">
-              <div className="tab-button" onClick={() => window.location.reload()}>
-                          <IonIcon icon={refreshCircle} />
-                        </div>
-                        <div className="tab-button" onClick={toggleCamera}>
-                                    <IonIcon icon={swapHorizontal} />
-                                  </div>
+        <div className="tab-button" onClick={() => window.location.reload()}>
+          <IonIcon icon={refreshCircle} />
+        </div>
+        <div className="tab-button" onClick={toggleCamera}>
+          <IonIcon icon={swapHorizontal} />
+        </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />

@@ -12,18 +12,20 @@ import {
   IonButton,
   IonAlert,
 } from "@ionic/react";
-import { camera, save, swapHorizontal,refreshCircle } from "ionicons/icons";
+import { camera, save, swapHorizontal, refreshCircle, image as imageIcon, images } from "ionicons/icons";
 import { getAuth } from "firebase/auth";
 import { useHistory } from "react-router-dom";
 import "../css/FaceMappingPic.css";
-import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
+import LuxMeter from "../all/LuxMeter";
 
 const FaceMappingPic: React.FC = () => {
   const [photo, setPhoto] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
-  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
+  const [lux, setLux] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [fromGallery, setFromGallery] = useState(false);
   const history = useHistory();
   const auth = getAuth();
   const user = auth.currentUser;
@@ -60,8 +62,6 @@ const FaceMappingPic: React.FC = () => {
     const video = videoRef.current;
     if (video) {
       const canvas = document.createElement("canvas");
-
-      // Ensure the canvas matches the video dimensions
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
       canvas.width = videoWidth;
@@ -69,25 +69,16 @@ const FaceMappingPic: React.FC = () => {
 
       const context = canvas.getContext("2d");
       if (context) {
-        // Flip the image horizontally for front camera correction
         context.translate(videoWidth, 0);
         context.scale(-1, 1); // Mirror horizontally
-
-        // Draw the flipped image
         context.drawImage(video, 0, 0, videoWidth, videoHeight);
-
-        // Reset transformations (optional, but good practice)
         context.setTransform(1, 0, 0, 1, 0, 0);
-
-        // Convert to image and store
         const dataUrl = canvas.toDataURL("image/png");
         setPhoto(dataUrl);
-
         console.log("Captured Lux Value:", lux);
       }
     }
   };
-
 
   const toggleCamera = () => {
     setUseFrontCamera(!useFrontCamera);
@@ -116,19 +107,25 @@ const FaceMappingPic: React.FC = () => {
 
       const result = await response.json();
       console.log("Backend response:", result);
-
       sessionStorage.setItem("faceMappingResult", JSON.stringify(result));
-
-      // ✅ Pass the result as state when navigating
       history.push("/app/face-mapping-prediction", result);
-
-      
-      
     } catch (error) {
       console.error("Error sending image to backend:", error);
     }
   };
 
+  const handleGalleryImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result && typeof e.target.result === "string") {
+        setPhoto(e.target.result); // Set photo preview
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <IonPage>
@@ -157,7 +154,18 @@ const FaceMappingPic: React.FC = () => {
             style={{ width: "590px", height: "590px", objectFit: "cover" }}
           />
         )}
-  
+
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleGalleryImage}
+        />
+
+
+
         <div className="tab-bar">
           <div className="tab-button" onClick={() => window.location.reload()}>
             <IonIcon icon={refreshCircle} />
@@ -168,11 +176,14 @@ const FaceMappingPic: React.FC = () => {
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
+          <div className="tab-button" onClick={() => fileInputRef.current?.click()}>
+            <IonIcon icon={imageIcon} />
+          </div>
           <div className="tab-button" onClick={() => setShowAlert(true)}>
             <IonIcon icon={save} />
           </div>
         </div>
-  
+
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
@@ -193,7 +204,6 @@ const FaceMappingPic: React.FC = () => {
       </IonContent>
     </IonPage>
   );
-  
 };
 
 export default FaceMappingPic;

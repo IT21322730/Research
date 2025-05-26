@@ -1,16 +1,21 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage,IonButtons,IonBackButton } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/react';
 import '../css/VataKapaha.css';
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const VataKapaha: React.FC = () => {
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-                      <IonBackButton defaultHref="/app/final" />
-                    </IonButtons>
-          <IonTitle>RECOMANDATION</IonTitle>
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>RECOMMENDATION</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -32,13 +37,13 @@ const VataKapaha: React.FC = () => {
 
           <h2>Health Tips for Vata-Kapha Types</h2>
           <p>
-            To manage the fluctuating conditions of a Vata-Kapha type, it is important to focus on maintaining warmth, ease, and mental clarity. Regular Hatha yoga can be helpful, as can eating warm, nourishing meals. Creating and following a structured daily routine is essential for maintaining balance. 
+            To manage the fluctuating conditions of a Vata-Kapha type, it is important to focus on maintaining warmth, ease, and mental clarity. Regular Hatha yoga can be helpful, as can eating warm, nourishing meals. Creating and following a structured daily routine is essential for maintaining balance.
           </p>
           <p>
             The Vata-Kapha Ayurveda type is an interesting combination of the Vata and Kapha doshas. It can be compared to a racecar driver pressing both the gas and the brake pedals at the same time. The creative Vata Dosha is always in the fast lane of life, while the Kapha type is grounded and averse to change. This creates internal conflict, which often leads to frustration for the Vata-Kapha person.
-        </p>
+          </p>
 
-        <h2>Vata-Kapha Balancing Dietary Guide</h2>
+          <h2>Vata-Kapha Balancing Dietary Guide</h2>
           <h3>Key Dietary Principles:</h3>
           <ul>
             <li><strong>Fruits:</strong> Select fresh fruits like apples, pears, persimmon, and sweet grapes. Soaked dried fruits like raisins, prunes, and figs are also beneficial.</li>
