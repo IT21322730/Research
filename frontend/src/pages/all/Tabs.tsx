@@ -8,6 +8,7 @@ import Search from '../all/Search';
 import Prakurthi from '../all/Prakurthi';
 import { home, person, search, logOut } from 'ionicons/icons';  // Import icons correctly
 import FinalPrakurthi from '../all/FinalPrakurthi';
+import FinalPrakurthiAfterQuestionnaire from './FinalPrakurthiAfterQuestionnare';
 import Vata from './Vata';
 import Pitta from './Pitta';
 import Kapha from './Kapha'
@@ -46,6 +47,7 @@ import NailPredictionPage from '../nail/NailPredictionpage';
 
 import NailCap from '../nail/NailCap';
 import CRTprediction from '../nail/CRTPrediction';
+import { Component } from 'ionicons/dist/types/stencil-public-runtime';
 
 import CRTPrediction from '../nail/CRTPrediction';
 
@@ -83,6 +85,7 @@ const Tabs: React.FC = () => {
           <Route path="/app/final-prakurthi" component={Prakurthi} />
           <Route path="/app/final" component={FinalPrakurthi} />
           <Route path="/app/question" component={Question} />
+          <Route path="/app/final-after-Q&A" component={FinalPrakurthiAfterQuestionnaire} />
           <Route path="/app/step" component={Step} />
           <Route path="/app/patient-info" component={Patient} />
           <Route path="/app/edit-patient/:patientId" component={EditPatient} />

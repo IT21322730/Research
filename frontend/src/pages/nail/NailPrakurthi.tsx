@@ -37,8 +37,8 @@ const NailPrakurthi: React.FC = () => {
           <h3 className="instructions-heading">Instructions:</h3>
           <ol className="instructions-list">
             <li>Ensure good lighting and clean the camera lens.</li>
-            <li>Place your hand flat on a neutral background, keep your fingers relaxed, and take a photo from directly above, ensuring your whole hand is visible.</li>
-            <li>Hold your hand slightly clenched on a plain background with good lighting, and capture the top of your hand clearly showing the nails and fingertips.</li>
+            <li>Place your hand flat on a white background, keep your fingers relaxed, and take a photo from directly above, ensuring your whole hand is visible.</li>
+            <li>Hold your hand slightly clenched on a white background with good lighting, and capture the top of your hand clearly showing the nails and fingertips.</li>
           </ol>
 
           <button
