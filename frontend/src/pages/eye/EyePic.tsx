@@ -3,31 +3,31 @@ import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonImg,
   IonButtons, IonBackButton, IonAlert, IonLoading
 } from '@ionic/react';
-import { camera, swapHorizontal, save, refreshCircle } from 'ionicons/icons';
-import { useHistory } from "react-router-dom";
-import { auth } from "../firebase/firebase";  // Use auth instead of getAuth
-import { db, doc, getDoc } from "../firebase/firebase"; // Use db instead of getFirestore, getDocs instead of getDoc
-import Reloader from '../all/Reloader'; // Import Reloader component
+import { camera, swapHorizontal, save, refreshCircle ,images } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import { auth } from '../firebase/firebase';  // Firebase Authentication
+import { db, doc, getDoc } from '../firebase/firebase'; // Firestore for user data
+import Reloader from '../all/Reloader';  // Reloader component for loading state
+import LuxMeter from '../all/LuxMeter';  // LuxMeter component for measuring light
 import '../css/EyePic.css';
-import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 const EyePic: React.FC = () => {
   const history = useHistory();
   const [photo, setPhoto] = useState<string | null>(null);
   const [useFrontCamera, setUseFrontCamera] = useState<boolean>(true);
   const [showAlert, setShowAlert] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false); // Loader state
-  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
+  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [lux, setLux] = useState<number | null>(null);  // Store Lux value
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const user = auth.currentUser; // Get current user from Firebase Auth
   const user_uid = user ? user.uid : ''; // Firebase Authentication UID
 
   // Function to get user document ID from Firestore
-  // Function to get user document ID from Firestore
   const getUserDocId = async (uid: string) => {
     try {
-      const userRef = doc(db, "users", uid); // Reference to user document
+      const userRef = doc(db, 'users', uid); // Reference to user document
       const userDoc = await getDoc(userRef);  // Use getDoc to fetch a single document
 
       if (userDoc.exists()) {
@@ -45,39 +45,49 @@ const EyePic: React.FC = () => {
   useEffect(() => {
     const startCamera = async () => {
       try {
+        console.log('Starting camera with facingMode:', useFrontCamera ? 'user' : 'environment');
+  
+        // Stop any existing camera stream
+        if (videoRef.current && videoRef.current.srcObject) {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach(track => track.stop());
+        }
+  
+        // Start a new camera stream
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: useFrontCamera ? 'user' : 'environment' }
         });
-
+  
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.play().catch(error => console.log('Video play was interrupted:', error));
         }
       } catch (error) {
-        console.error("Error accessing the camera: ", error);
+        console.error('Error accessing the camera:', error);
       }
     };
-
+  
     startCamera();
-
+    
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [useFrontCamera]);
+  }, [useFrontCamera]);  // Re-run the camera setup whenever the camera toggle changes
 
+  // Function to take a picture
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       // Ensure the canvas matches the video dimensions
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
       canvas.width = videoWidth;
       canvas.height = videoHeight;
-      const context = canvas.getContext("2d");
+      const context = canvas.getContext('2d');
       if (context) {
         // Flip the image horizontally for front camera correction
         context.translate(videoWidth, 0);
@@ -86,25 +96,71 @@ const EyePic: React.FC = () => {
         // Draw the flipped image
         context.drawImage(video, 0, 0, videoWidth, videoHeight);
 
-        // Reset transformations (optional, but good practice)
+        // Reset transformations (optional)
         context.setTransform(1, 0, 0, 1, 0, 0);
 
         // Convert to image and store
-        const dataUrl = canvas.toDataURL("image/png");
+        const dataUrl = canvas.toDataURL('image/png');
         setPhoto(dataUrl);
 
-        console.log("Captured Lux Value:", lux);
+        console.log('Captured Lux Value:', lux);
       }
     }
   };
-  
 
+  // Function to resize the image before sending it to the backend
+  const resizeImage = (imageData: string, maxWidth: number = 1024, maxHeight: number = 1024) => {
+    return new Promise<string>((resolve, reject) => {
+      const img = new Image();
+      img.src = imageData;
 
-  const toggleCamera = () => {
-    setUseFrontCamera((prev) => !prev);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = img.width;
+        let height = img.height;
+
+        // Resize image while maintaining aspect ratio
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Convert the canvas to a Base64 string
+        const resizedImage = canvas.toDataURL('image/jpeg');
+        resolve(resizedImage);
+      };
+
+      img.onerror = (error) => {
+        reject(error);
+      };
+    });
   };
 
-
+  // Function to toggle between front and back camera
+  const toggleCamera = () => {
+    console.log("Toggling camera..."); // Log the camera toggle action
+    setUseFrontCamera(prev => {
+      const newUseFrontCamera = !prev;
+      // Log the camera facing mode
+      console.log("Switching to:", newUseFrontCamera ? 'front camera' : 'back camera');
+      return newUseFrontCamera;
+    });  // Toggle between front and back camera
+  };
+  
+  // Function to save the image to backend
   const handleSaveToBackend = async () => {
     try {
       if (!photo) {
@@ -113,6 +169,9 @@ const EyePic: React.FC = () => {
       }
 
       setLoading(true); // Show loader before saving
+
+      // Resize the image before sending it to the backend
+      const resizedPhoto = await resizeImage(photo);
 
       // Get user document ID from Firestore
       const user_doc_id = await getUserDocId(user_uid);
@@ -128,7 +187,7 @@ const EyePic: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image_data: photo,
+          image_data: resizedPhoto,  // Send resized photo
           user_uid: user_uid,
           user_doc_id: user_doc_id // Send both UID and document ID
         }),
@@ -160,6 +219,22 @@ const EyePic: React.FC = () => {
     }
   };
 
+  const selectImageFromGallery = async () => {
+    try {
+      const image = await Camera.getPhoto({
+        source: CameraSource.Photos, 
+        resultType: CameraResultType.DataUrl,
+      });
+
+      if (image.dataUrl) {
+        setPhoto(image.dataUrl); 
+      }
+    } catch (error) {
+      console.error('Error selecting image:', error);
+    }
+  };
+
+  // Confirm before saving or deleting the image
   const confirmSaveOrDelete = () => {
     setShowAlert(true);
   };
@@ -169,7 +244,7 @@ const EyePic: React.FC = () => {
     if (confirmSave) {
       handleSaveToBackend(); // Call the backend processing on save
     }
-    setPhoto(null);
+    setPhoto(null); // Reset the photo state
   };
 
   return (
@@ -179,22 +254,22 @@ const EyePic: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/app/step" />
           </IonButtons>
-          <IonTitle>TAKE THE PICTUER</IonTitle>
+          <IonTitle>TAKE THE EYE PICTURE</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <div style={{ position: 'relative', top: '5px' }}>
-        <LuxMeter onLuxChange={setLux} />
+          <LuxMeter onLuxChange={setLux} />
         </div>
 
+        {/* Display camera feed or captured photo */}
         {!photo ? (
-
-          <video ref={videoRef} id="video" autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }}></video>
-
+          <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '79vh', objectFit: 'cover' }} />
         ) : (
           <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '79vh' }} />
         )}
 
+        {/* Camera controls */}
         <div className="tab-bar">
           <div className="tab-button" onClick={() => window.location.reload()}>
             <IonIcon icon={refreshCircle} />
@@ -205,13 +280,18 @@ const EyePic: React.FC = () => {
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
           </div>
+          <div className="tab-button" onClick={selectImageFromGallery}>
+            <IonIcon icon={images} />
+          </div>
           <div className="tab-button" onClick={confirmSaveOrDelete}>
             <IonIcon icon={save} />
           </div>
         </div>
 
-        {loading && <Reloader />} {/* Display Reloader when loading */}
+        {/* Loading spinner */}
+        {loading && <Reloader />}
 
+        {/* Alert for saving or discarding the image */}
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}

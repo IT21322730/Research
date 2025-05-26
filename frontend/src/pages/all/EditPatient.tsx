@@ -27,15 +27,15 @@ const EditPatient: React.FC = () => {
   // Fetch Patient Data
   useEffect(() => {
     if (!patientId) {
-      setErrorMessage("⚠ No patient ID provided!");
+      setErrorMessage("⚠️ No patient ID provided!");
       return;
     }
 
     const fetchPatientData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(https://192.168.1.100:5000/patients/${patientId});
-        if (!response.ok) throw new Error("⚠ No patient found!");
+        const response = await fetch(`http://127.0.0.1:5000/patients/${patientId}`);
+        if (!response.ok) throw new Error("⚠️ No patient found!");
 
         const data = await response.json();
         setPrakurthiType(data.prakurthiType || '');
@@ -88,7 +88,7 @@ const EditPatient: React.FC = () => {
       console.log("✅ Prakurthi Type updated successfully!");
   
       // ✅ Navigate to the patient info page first
-      history.push(/app/patient-info/${patientId});
+      history.push(`/app/patient-info/${patientId}`);
   
       // ✅ Optional: Refresh after navigating (if needed)
       setTimeout(() => {
@@ -148,4 +148,4 @@ const EditPatient: React.FC = () => {
   );
 };
 
-export default EditPatient;
+export default EditPatient;

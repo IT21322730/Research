@@ -79,26 +79,29 @@ const Step: React.FC = () => {
             }
     
             const data = await response.json();
-            console.log("API Response:", data);
+            console.log("API Response:", data); // ✅ Check the API response
     
-            // Handle Tie Case (Redirect to /app/question)
-            if (data.next_step === "Fill the questionnaire") {
+            // ✅ Ensure the correct condition for handling a tie
+            if (data.final_prakriti === "Tie - Need Questionnaire Analysis") {
                 alert("A tie was detected. Redirecting to the questionnaire...");
-                history.push("/app/question");
+                history.replace("/app/question"); // 🔹 Ensures immediate navigation
+                window.location.reload(); // 🔹 Force refresh
                 return;
             }
     
-            // If no tie, show final Prakriti result
+            // ✅ If no tie, navigate to /app/final
             if (data.final_prakriti) {
                 alert(`Final Prakriti: ${data.final_prakriti}`);
                 history.push("/app/final");
+                
+
             }
     
         } catch (error) {
             console.error("Error:", error);
             alert(`Error: ${error.message}`);
         }
-    };    
+    };       
     
 
     return (

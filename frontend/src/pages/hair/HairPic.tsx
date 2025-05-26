@@ -15,12 +15,17 @@ import {
   IonSegmentButton,
   IonLabel,
 } from "@ionic/react";
-import { camera, save, swapHorizontal, warning ,refreshCircle} from "ionicons/icons";
+import {
+  camera,
+  save,
+  swapHorizontal,
+  warning,
+  refreshCircle,
+  images
+} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
-import LuxMeter from "../all/LuxMeter";  // Import the LuxMeter component
- 
-
+import { getAuth } from "firebase/auth";
+import LuxMeter from "../all/LuxMeter";
 
 const HairPic: React.FC = () => {
   const history = useHistory();
@@ -32,10 +37,12 @@ const HairPic: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("Front View");
   const [missingViews, setMissingViews] = useState<string[]>(["Front View", "Back View", "Scalp View"]);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
-  const [lux, setLux] = useState<number | null>(null);  // Store Lux Value
-  const [showWarningAlert, setShowWarningAlert] = useState(false);
+  const [lux, setLux] = useState<number | null>(null);
+  const [fileInputRef] = useState(React.createRef<HTMLInputElement>());
 
   useEffect(() => {
+
+
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -52,6 +59,7 @@ const HairPic: React.FC = () => {
         console.error("Error accessing the camera: ", error);
       }
     };
+    
 
     startCamera();
 
@@ -66,40 +74,30 @@ const HairPic: React.FC = () => {
   const takePicture = () => {
     const video = videoRef.current;
     if (video) {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-        const context = canvas.getContext("2d");
-        if (context) {
-            // Clear the canvas before drawing
-            context.clearRect(0, 0, canvas.width, canvas.height);
+      const context = canvas.getContext("2d");
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.setTransform(1, 0, 0, 1, 0, 0);
 
-            // Flip the canvas horizontally (mirror effect)
-            context.setTransform(-1, 0, 0, 1, canvas.width, 0);
+        const dataUrl = canvas.toDataURL("image/png");
+        setPhoto(dataUrl);
 
-            // Draw the video frame onto the canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        console.log("Captured Lux Value:", lux);
 
-            // Reset transformations to prevent future issues
-            context.setTransform(1, 0, 0, 1, 0, 0);
-
-            const dataUrl = canvas.toDataURL("image/png");
-            setPhoto(dataUrl);
-
-            console.log("Captured Lux Value:", lux);
-
-            // Save the captured image for the current view
-            setCapturedViews((prev) => {
-                const updatedViews = { ...prev, [currentView]: dataUrl };
-                validateCapturedViews(updatedViews);
-                return updatedViews;
-            });
-        }
+        setCapturedViews((prev) => {
+          const updatedViews = { ...prev, [currentView]: dataUrl };
+          validateCapturedViews(updatedViews);
+          return updatedViews;
+        });
+      }
     }
-};
-  
-  
+  };
 
   const validateCapturedViews = (views: { [view: string]: string }) => {
     const requiredViews = ["Front View", "Back View", "Scalp View"];
@@ -110,10 +108,10 @@ const HairPic: React.FC = () => {
   const toggleCamera = () => {
     setUseFrontCamera((prev) => !prev);
   };
- 
+
   const handleSaveToBackend = async () => {
-    const auth = getAuth(); // Get Firebase Auth instance
-    const user = auth.currentUser; // Get the currently logged-in user
+    const auth = getAuth();
+    const user = auth.currentUser;
 
     if (!user) {
       console.error("No authenticated user found. Please log in.");
@@ -128,9 +126,9 @@ const HairPic: React.FC = () => {
     }
 
     const requestData = {
-      user_uid: user.uid, // Automatically retrieve the UID of the logged-in doctor
-      // patient_uid: "patient456", // Keep or update as needed
-      image_data: capturedImages.map(img => img.split(",")[1]) // Remove metadata prefix
+      user_uid: user.uid,
+      patient_uid: "patient456",
+      image_data: capturedImages.map((img) => img.split(",")[1]),
     };
 
     try {
@@ -148,23 +146,61 @@ const HairPic: React.FC = () => {
       const data = await response.json();
       console.log("Response from server:", data);
 
-      // Navigate to PredictionPage with the prakruti result
       history.push({
         pathname: "/app/hair-results",
-        state: { prakrutiResult: data }
+        state: { prakrutiResult: data },
       });
-
     } catch (error) {
       console.error("Error uploading images:", error);
     }
-};
-
+  };
 
   const resetPhotos = () => {
     setPhoto(null);
     setCapturedViews({});
     setMissingViews(["Front View", "Back View", "Scalp View"]);
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length !== 3) {
+      alert("Please select exactly 3 images.");
+      return;
+    }
+
+    const views = ["Front View", "Back View", "Scalp View"];
+    const fileReaders: Promise<string>[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      fileReaders.push(
+        new Promise((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        })
+      );
+    }
+
+    Promise.all(fileReaders).then((images) => {
+      const newCapturedViews: { [key: string]: string } = {};
+      for (let i = 0; i < images.length; i++) {
+        newCapturedViews[views[i]] = images[i];
+      }
+      setCapturedViews(newCapturedViews);
+      setPhoto(images[views.indexOf(currentView)] || images[0]);
+ // Display first image
+      validateCapturedViews(newCapturedViews);
+    });
+  };
+  useEffect(() => {
+    if (capturedViews[currentView]) {
+      setPhoto(capturedViews[currentView]);
+    } else {
+      setPhoto(null);
+    }
+  }, [currentView, capturedViews]);
+  
 
   return (
     <IonPage>
@@ -177,11 +213,16 @@ const HairPic: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-      <LuxMeter onLuxChange={setLux} />
+        <LuxMeter onLuxChange={setLux} />
         {!photo ? (
           <video ref={videoRef} id="video" autoPlay playsInline></video>
         ) : (
-          <IonImg src={photo} alt="Captured Photo" className="captured-photo" style={{ width: '100%', height: '480px', marginBottom: '10px' }} />
+          <IonImg
+            src={photo}
+            alt="Captured Photo"
+            className="captured-photo"
+            style={{ width: "100%", height: "480px", marginBottom: "10px" }}
+          />
         )}
 
         <IonSegment
@@ -203,14 +244,30 @@ const HairPic: React.FC = () => {
         </IonSegment>
 
         <div className="tab-bar">
-        <div className="tab-button" onClick={() => window.location.reload()}>
+          <div className="tab-button" onClick={() => window.location.reload()}>
             <IonIcon icon={refreshCircle} />
-        </div>
-        <div className="tab-button" onClick={toggleCamera}>
+          </div>
+          <div className="tab-button" onClick={toggleCamera}>
             <IonIcon icon={swapHorizontal} />
-        </div>
+          </div>
           <div className="tab-button" onClick={takePicture}>
             <IonIcon icon={camera} />
+          </div>
+          <div className="tab-button">
+            <IonButton
+              onClick={() => fileInputRef.current?.click()}
+              style={{ background: "none", border: "none", padding: "0" }}
+            >
+              <IonIcon icon={images} />
+            </IonButton>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              multiple
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
           </div>
           <div className="tab-button">
             <IonButton onClick={() => setShowSaveAlert(true)} disabled={missingViews.length > 0}>
@@ -242,28 +299,9 @@ const HairPic: React.FC = () => {
             },
           ]}
         />
-
-        <IonAlert
-          isOpen={showSaveAlert}
-          onDidDismiss={() => setShowSaveAlert(false)}
-          header={"Save Images"}
-          message={"Are you sure you want to save the captured images?"}
-          buttons={[
-            {
-              text: "No",
-              role: "cancel",
-              handler: () => setShowSaveAlert(false),
-            },
-            {
-              text: "Yes",
-              handler: handleSaveToBackend, // Navigate to PredictionPage
-            },
-          ]}
-        />
       </IonContent>
     </IonPage>
   );
 };
 
 export default HairPic;
-

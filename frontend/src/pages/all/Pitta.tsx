@@ -1,17 +1,22 @@
 import React from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent ,IonButtons,IonBackButton} from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton, IonPage, IonIcon } from '@ionic/react';
 import '../css/Pitta.css'; // Importing the external CSS file
+import { arrowBack } from "ionicons/icons";
+import { useHistory } from "react-router-dom";
 
 const Pitta = () => {
-  return (
-    <>
-      <IonHeader>
+  const history = useHistory(); // Use useHistory() instead of useNavigate()
+    return (
+      <IonPage>
+        <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/app/final" />
-            </IonButtons>
-          <IonTitle>RECOMANDATION</IonTitle>
-        </IonToolbar>
+        <IonButtons slot="start">
+          <IonButton onClick={() => history.goBack()}>
+            <IonIcon icon={arrowBack} />
+          </IonButton>
+        </IonButtons>
+        <IonTitle>RECOMMENDATION</IonTitle>
+      </IonToolbar>
       </IonHeader>
       <IonContent className="pitta-container">
         <div className="pitta-frame">
@@ -232,7 +237,8 @@ const Pitta = () => {
 
         </div>
       </IonContent>
-    </>
+      </IonPage>
+
   );
 };
 

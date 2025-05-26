@@ -12,7 +12,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import '../css/Eyevideo.css';
-import { videocam, videocamOff, save, swapHorizontal ,refreshCircle} from 'ionicons/icons';
+import { videocam, videocamOff, save, swapHorizontal, refreshCircle } from 'ionicons/icons';
 import axios, { AxiosError } from 'axios'; // Import AxiosError
 import { useHistory } from 'react-router-dom';
 import Reloader from '../all/Reloader'; // Import Reloader component
@@ -30,6 +30,9 @@ const Eyevideo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
+
   const history = useHistory();
   const [isPlaying, setIsPlaying] = useState(false);
   const playbackVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -119,7 +122,7 @@ const Eyevideo: React.FC = () => {
         const documentId = response.data.document_id;
         console.log('Backend response received. documentId:', documentId);
         history.push(`/app/blink-prediction/${documentId}`); // Navigate with document ID
-        
+
       } else {
         console.error('No document_id returned from the backend.');
       }
@@ -248,17 +251,18 @@ const Eyevideo: React.FC = () => {
             )}
           </div>
         )}
+
       </IonContent>
 
       <div className="tab-bar">
         <div className="tab-button">
-        <div className="tab-button" onClick={() => window.location.reload()}>
-                    <IonIcon icon={refreshCircle} />
-                  </div>
+          <div className="tab-button" onClick={() => window.location.reload()}>
+            <IonIcon icon={refreshCircle} />
+          </div>
         </div>
         <div className="tab-button" onClick={toggleCamera}>
-                    <IonIcon icon={swapHorizontal} />
-                  </div>
+          <IonIcon icon={swapHorizontal} />
+        </div>
         <div className="tab-button">
           <IonButton onClick={isRecording ? handleStopRecording : handleStartRecording} fill="clear">
             <IonIcon icon={isRecording ? videocamOff : videocam} />
