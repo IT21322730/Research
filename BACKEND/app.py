@@ -1183,6 +1183,7 @@ def analyze_face_endpoint():
     return jsonify(result)
 
 
+
 ### Micro expression analysis
 
 # **Function to analyze the video and return psychological insights**
